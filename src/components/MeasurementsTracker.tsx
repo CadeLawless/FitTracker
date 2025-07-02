@@ -99,8 +99,8 @@ export default function MeasurementsTracker() {
 
   const loadData = async () => {
     try {
-      const user = await supabase.auth.getUser();
-      if (!user.data.user) return;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
       setUserAuth(user);
 
