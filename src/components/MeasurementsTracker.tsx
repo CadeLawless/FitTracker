@@ -1158,16 +1158,18 @@ export default function MeasurementsTracker() {
                               
                               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-4">
                                 {entry.values.length > 0 && (
-                                  {entry.values.map((value) => (                             
-                                    <div key={value.id} className="text-center p-3 bg-gray-50 rounded-lg">
-                                      <p className="text-xs text-gray-500 uppercase tracking-wide truncate">
-                                        {value.field?.field_name}
-                                      </p>
-                                      <p className="text-sm lg:text-base font-semibold text-gray-900">
-                                        {value.value} {value.field?.unit}
-                                      </p>
-                                    </div>
-                                  ))}
+                                  <>
+                                    {entry.values.map((value) => (                             
+                                      <div key={value.id} className="text-center p-3 bg-gray-50 rounded-lg">
+                                        <p className="text-xs text-gray-500 uppercase tracking-wide truncate">
+                                          {value.field?.field_name}
+                                        </p>
+                                        <p className="text-sm lg:text-base font-semibold text-gray-900">
+                                          {value.value} {value.field?.unit}
+                                        </p>
+                                      </div>
+                                    ))}
+                                  </>
                                 )}
                               </div>
                               
