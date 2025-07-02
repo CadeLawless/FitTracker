@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Ruler, TrendingUp, TrendingDown, X, Edit2, Trash2, Calendar, AlertTriangle, Save, Settings, Check, Eye, EyeOff, Calculator, CheckCircle } from 'lucide-react';
+import { Plus, Ruler, TrendingUp, TrendingDown, X, Edit2, Trash2, Calendar, AlertTriangle, Save, Settings, Check, Eye, EyeOff, Calculator, CheckCircle, AlertCircle } from 'lucide-react';
 import { supabase, bodyFatCalculations } from '../lib/supabase';
 import { formatDate } from '../lib/date';
 import type { BodyMeasurement, BodyMeasurementEntry, BodyMeasurementValue, MeasurementField, UserProfile } from '../types';
