@@ -541,7 +541,7 @@ export default function MeasurementsTracker() {
     <>
       {/* Notifications */}
       {notifications.length > 0 && (
-        <div className="fixed top-4 right-4 z-50 space-y-2 w-[min(100%,500px)]">
+        <div className="fixed top-4 right-4 z-50 space-y-2 w-[min(100%,400px)]">
           {notifications.map((notification) => (
             <div
               key={notification.id}
