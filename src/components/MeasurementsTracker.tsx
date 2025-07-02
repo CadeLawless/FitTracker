@@ -113,7 +113,7 @@ export default function MeasurementsTracker() {
 
       if (profileError && profileError.code !== 'PGRST116') throw profileError;
 
-      const gender = user.data.user.user_metadata?.gender as 'male' | 'female';
+      const gender = user.user_metadata?.gender as 'male' | 'female';
 
       // Load measurement fields
       const { data: fieldsData, error: fieldsError } = await supabase
