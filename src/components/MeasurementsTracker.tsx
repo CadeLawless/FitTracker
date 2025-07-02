@@ -41,6 +41,7 @@ export default function MeasurementsTracker() {
   const [showForm, setShowForm] = useState(false);
   const [showCustomizeFields, setShowCustomizeFields] = useState(false);
   const [editingEntry, setEditingEntry] = useState<BodyMeasurement | null>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [deleteConfirmation, setDeleteConfirmation] = useState<DeleteConfirmation>({
     isOpen: false,
     entryId: null,
