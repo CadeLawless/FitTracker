@@ -15,11 +15,28 @@ interface CustomFieldForm {
   unit: string;
 }
 
+interface BodyFatCalculatorData {
+  gender: string;
+  age: string;
+  chest: string;
+  abdominal: string;
+  thigh: string;
+  tricep: string;
+  suprailiac: string;
+}
+
+interface Notification {
+  id: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+  title: string;
+  message: string;
+}
+
 export default function MeasurementsTracker() {
   const [entries, setEntries] = useState<BodyMeasurement[]>([]);
   const [measurementFields, setMeasurementFields] = useState<MeasurementField[]>([]);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [userGender, setUserGender] = useState<'male' | 'female' | null>(null);
+  const [userAuth, setUserAuth] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [showCustomizeFields, setShowCustomizeFields] = useState(false);
@@ -32,6 +49,15 @@ export default function MeasurementsTracker() {
   const [customFieldForm, setCustomFieldForm] = useState<CustomFieldForm>({
     field_name: '',
     unit: '',
+  });
+   const [bodyFatData, setBodyFatData] = useState<BodyFatCalculatorData>({
+    gender: '',
+    age: '',
+    chest: '',
+    abdominal: '',
+    thigh: '',
+    tricep: '',
+    suprailiac: '',
   });
   const [formData, setFormData] = useState<Record<string, string>>({
     date: new Date().toISOString().split('T')[0],
@@ -54,10 +80,28 @@ export default function MeasurementsTracker() {
     }
   }, [showForm]);
 
+  // Notification system
+  const showNotification = (type: Notification['type'], title: string, message: string) => {
+    const id = Date.now().toString();
+    const notification: Notification = { id, type, title, message };
+    setNotifications(prev => [...prev, notification]);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    }, 5000);
+  };
+
+  const removeNotification = (id: string) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  };
+
   const loadData = async () => {
     try {
       const user = await supabase.auth.getUser();
       if (!user.data.user) return;
+
+      setUserAuth(user);
 
       // Load user profile and gender for body fat calculation
       const { data: profileData, error: profileError } = await supabase
@@ -113,7 +157,13 @@ export default function MeasurementsTracker() {
       });
 
       setUserProfile(profileData);
-      setUserGender(gender);
+      // Set default values for body fat calculator from profile and auth data
+      const age = calculateAge(user.user_metadata?.birth_date || data?.birth_date);
+      setBodyFatData(prev => ({
+        ...prev,
+        gender: user.user_metadata?.gender || data?.gender || '',
+        age: age > 0 ? age.toString() : '',
+      }));
       setMeasurementFields(fieldsData || []);
       setEntries(transformedEntries);
     } catch (error) {
@@ -123,26 +173,91 @@ export default function MeasurementsTracker() {
     }
   };
 
-  const calculateBodyFat = () => {
-    const waist = parseFloat(formData.waist || '0');
-    const neck = parseFloat(formData.neck || '0');
-    const hips = parseFloat(formData.hips || '0');
-
-    if (!userProfile || !waist || !neck || !userProfile.height_inches || !userGender) return;
-
-    try {
-      const bodyFat = bodyFatCalculations.calculateBodyFat(
-        userGender,
-        waist,
-        neck,
-        userProfile.height_inches,
-        userGender === 'female' ? hips : undefined
-      );
-
-      setFormData({ ...formData, body_fat_percentage: bodyFat.toFixed(1) });
-    } catch (error) {
-      console.error('Error calculating body fat:', error);
+  const calculateAge = (birthDate: string): number => {
+    if (!birthDate) return 0;
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
     }
+    return age;
+  };
+
+  const calculateBodyFat = () => {
+    const { gender, age, chest, abdominal, thigh, tricep, suprailiac } = bodyFatData;
+    
+    if (!gender || !age) {
+      showNotification('error', 'Missing Information', 'Please enter gender and age to calculate body fat percentage.');
+      return;
+    }
+
+    const ageNum = parseInt(age);
+    if (ageNum <= 0) {
+      showNotification('error', 'Invalid Age', 'Please enter a valid age.');
+      return;
+    }
+
+    let bodyFat = 0;
+
+    if (gender === 'male') {
+      // Jackson-Pollock 3-site formula for men (chest, abdominal, thigh)
+      const chestNum = parseFloat(chest);
+      const abdominalNum = parseFloat(abdominal);
+      const thighNum = parseFloat(thigh);
+      
+      if (!chestNum || !abdominalNum || !thighNum) {
+        showNotification('error', 'Missing Measurements', 'For males, please enter chest, abdominal, and thigh skinfold measurements.');
+        return;
+      }
+      
+      const sum = chestNum + abdominalNum + thighNum;
+      const density = 1.10938 - (0.0008267 * sum) + (0.0000016 * sum * sum) - (0.0002574 * ageNum);
+      bodyFat = (495 / density) - 450;
+    } else if (gender === 'female') {
+      // Jackson-Pollock 3-site formula for women (tricep, suprailiac, thigh)
+      const tricepNum = parseFloat(tricep);
+      const supraNum = parseFloat(suprailiac);
+      const thighNum = parseFloat(thigh);
+      
+      if (!tricepNum || !supraNum || !thighNum) {
+        showNotification('error', 'Missing Measurements', 'For females, please enter tricep, suprailiac, and thigh skinfold measurements.');
+        return;
+      }
+      
+      const sum = tricepNum + supraNum + thighNum;
+      const density = 1.0994921 - (0.0009929 * sum) + (0.0000023 * sum * sum) - (0.0001392 * ageNum);
+      bodyFat = (495 / density) - 450;
+    } else {
+      showNotification('error', 'Invalid Gender', 'Please select a valid gender (male or female) for body fat calculation.');
+      return;
+    }
+
+    if (bodyFat > 0 && bodyFat < 50) {
+      const roundedBodyFat = Math.round(bodyFat * 10) / 10;
+      setFormData(prev => ({ ...prev, body_fat_percentage: roundedBodyFat.toString() }));
+      showNotification('success', 'Calculation Complete', `Body fat percentage calculated: ${roundedBodyFat}%`);
+    } else {
+      showNotification('error', 'Invalid Result', 'Invalid calculation result. Please check your measurements.');
+    }
+  };
+
+  const resetBodyFatCalculator = () => {
+    // Reset to profile defaults
+    const age = userAuth?.user_metadata?.birth_date || userProfile?.birth_date 
+      ? calculateAge(userAuth?.user_metadata?.birth_date || userProfile?.birth_date) 
+      : 0;
+    
+    setBodyFatData({
+      gender: userAuth?.user_metadata?.gender || userProfile?.gender || '',
+      age: age > 0 ? age.toString() : '',
+      chest: '',
+      abdominal: '',
+      thigh: '',
+      tricep: '',
+      suprailiac: '',
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -286,6 +401,7 @@ export default function MeasurementsTracker() {
       date: new Date().toISOString().split('T')[0],
       notes: '',
     });
+    resetBodyFatCalculator();
   };
 
   const getFieldKey = (fieldName: string): string => {
@@ -383,10 +499,8 @@ export default function MeasurementsTracker() {
 
   const activeFields = measurementFields.filter(field => field.is_active);
   const inactiveFields = measurementFields.filter(field => !field.is_active);
-
-  // Check if we have the required fields for body fat calculation
-  const hasBodyFatFields = activeFields.some(f => getFieldKey(f.field_name) === 'waist') && 
-                          activeFields.some(f => getFieldKey(f.field_name) === 'neck');
+  const activeFieldsWithoutBodyFat = activeFields.filter(field => field.field_name !== 'Body Fat %');
+  const bodyFatField = activeFields.find(field => field.field_name === 'Body Fat %');
 
   if (loading) {
     return (
@@ -396,8 +510,64 @@ export default function MeasurementsTracker() {
     );
   }
 
+  const getNotificationIcon = (type: Notification['type']) => {
+    switch (type) {
+      case 'success':
+        return <CheckCircle className="h-5 w-5 text-green-600" />;
+      case 'error':
+        return <AlertCircle className="h-5 w-5 text-red-600" />;
+      case 'warning':
+        return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
+      default:
+        return <AlertCircle className="h-5 w-5 text-blue-600" />;
+    }
+  };
+
+  const getNotificationColors = (type: Notification['type']) => {
+    switch (type) {
+      case 'success':
+        return 'bg-green-50 border-green-200 text-green-800';
+      case 'error':
+        return 'bg-red-50 border-red-200 text-red-800';
+      case 'warning':
+        return 'bg-yellow-50 border-yellow-200 text-yellow-800';
+      default:
+        return 'bg-blue-50 border-blue-200 text-blue-800';
+    }
+  };
+
   return (
-    <div className="space-y-6 lg:space-y-8">
+    <>
+      {/* Notifications */}
+      {notifications.length > 0 && (
+        <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
+          {notifications.map((notification) => (
+            <div
+              key={notification.id}
+              className={`w-full border rounded-lg shadow-lg p-4 ${getNotificationColors(notification.type)}`}
+            >
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  {getNotificationIcon(notification.type)}
+                </div>
+                <div className="ml-3 w-0 flex-1">
+                  <p className="text-sm font-medium">{notification.title}</p>
+                  <p className="text-sm mt-1">{notification.message}</p>
+                </div>
+                <div className="ml-4 flex-shrink-0 flex">
+                  <button
+                    onClick={() => removeNotification(notification.id)}
+                    className="inline-flex text-gray-400 hover:text-gray-600 focus:outline-none"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Delete Confirmation Modal */}
       {deleteConfirmation.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -539,338 +709,486 @@ export default function MeasurementsTracker() {
           </div>
         </div>
       )}
-
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Body Measurements</h1>
-          <p className="mt-2 text-sm lg:text-base text-gray-600">Track your body measurements and progress over time.</p>
-        </div>
-        <div className="flex gap-3">
-          <button
-            onClick={() => setShowCustomizeFields(true)}
-            className="flex items-center justify-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm lg:text-base"
-          >
-            <Settings className="h-4 w-4 mr-2" />
-            Customize Fields
-          </button>
-          <button
-            onClick={handleAddNew}
-            className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm lg:text-base"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Entry
-          </button>
-        </div>
-      </div>
-
-      {/* Stats */}
-      {entries.length > 0 && activeFields.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-          {activeFields.slice(0, 4).map((field) => {
-            const latest = getLatestMeasurement(field.field_name);
-            const change = getMeasurementChange(field.field_name);
-            
-            return (
-              <div key={field.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <Ruler className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600" />
-                  {change !== null && (
-                    change > 0 ? (
-                      <TrendingUp className="h-5 w-5 text-red-500" />
-                    ) : change < 0 ? (
-                      <TrendingDown className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <div className="h-5 w-5" />
-                    )
-                  )}
-                </div>
-                <div>
-                  <p className="text-xs lg:text-sm font-medium text-gray-600">{field.field_name}</p>
-                  <p className="text-lg lg:text-2xl font-bold text-gray-900">
-                    {latest !== null ? `${latest} ${field.unit}` : 'No data'}
-                  </p>
-                  {change !== null && (
-                    <p className="text-xs text-gray-500">
-                      {change > 0 ? '+' : ''}{change.toFixed(1)} {field.unit}
-                    </p>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Add Entry Form */}
-      {showForm && (
-        <div ref={formRef} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
-          <div className="flex items-center justify-between mb-4 lg:mb-6">
-            <h2 className="text-base lg:text-lg font-semibold text-gray-900">Add Measurement Entry</h2>
+      
+      <div className="space-y-6 lg:space-y-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Body Measurements</h1>
+            <p className="mt-2 text-sm lg:text-base text-gray-600">Track your body measurements and progress over time.</p>
+          </div>
+          <div className="flex gap-3">
             <button
-              onClick={resetForm}
-              className="text-gray-400 hover:text-gray-600 p-1"
+              onClick={() => setShowCustomizeFields(true)}
+              className="flex items-center justify-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm lg:text-base"
             >
-              <X className="h-5 w-5" />
+              <Settings className="h-4 w-4 mr-2" />
+              Customize Fields
+            </button>
+            <button
+              onClick={handleAddNew}
+              className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm lg:text-base"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Entry
             </button>
           </div>
-          
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="date" className="block text-sm font-medium text-gray-700">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  id="date"
-                  required
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
-                />
-              </div>
-            </div>
-
-            {/* Measurement Fields */}
-            {activeFields.length > 0 && (
-              <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Measurements</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {activeFields.map((field) => (
-                    <div key={field.id}>
-                      <label className="block text-sm font-medium text-gray-700">
-                        {field.field_name} ({field.unit})
-                      </label>
-                      <input
-                        type="number"
-                        step="0.1"
-                        value={formData[getFieldKey(field.field_name)] || ''}
-                        onChange={(e) => setFormData({ 
-                          ...formData, 
-                          [getFieldKey(field.field_name)]: e.target.value 
-                        })}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
-                        placeholder={`Enter ${field.field_name.toLowerCase()}`}
-                      />
-                    </div>
-                  ))}
+        </div>
+  
+        {/* Stats */}
+        {entries.length > 0 && activeFields.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+            {activeFields.slice(0, 4).map((field) => {
+              const latest = getLatestMeasurement(field.field_name);
+              const change = getMeasurementChange(field.field_name);
+              
+              return (
+                <div key={field.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <Ruler className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600" />
+                    {change !== null && (
+                      change > 0 ? (
+                        <TrendingUp className="h-5 w-5 text-red-500" />
+                      ) : change < 0 ? (
+                        <TrendingDown className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <div className="h-5 w-5" />
+                      )
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-xs lg:text-sm font-medium text-gray-600">{field.field_name}</p>
+                    <p className="text-lg lg:text-2xl font-bold text-gray-900">
+                      {latest !== null ? `${latest} ${field.unit}` : 'No data'}
+                    </p>
+                    {change !== null && (
+                      <p className="text-xs text-gray-500">
+                        {change > 0 ? '+' : ''}{change.toFixed(1)} {field.unit}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
-
-            {/* Body Fat Calculator */}
-            {hasBodyFatFields && userProfile && userGender && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-medium text-blue-900">Body Fat Calculator</h3>
-                  <Calculator className="h-5 w-5 text-blue-600" />
-                </div>
-                <p className="text-xs text-blue-700 mb-3">
-                  Fill in waist, neck{userGender === 'female' && ', and hips'} measurements to calculate body fat percentage.
-                </p>
-                <button
-                  type="button"
-                  onClick={calculateBodyFat}
-                  disabled={!formData.waist || !formData.neck || (userGender === 'female' && !formData.hips)}
-                  className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
-                >
-                  <Calculator className="h-4 w-4 mr-2" />
-                  Calculate Body Fat %
-                </button>
-              </div>
-            )}
-
-            <div>
-              <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
-                Notes (optional)
-              </label>
-              <textarea
-                id="notes"
-                rows={3}
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
-                placeholder="Any notes about this measurement..."
-              />
+              );
+            })}
+          </div>
+        )}
+  
+        {/* Add Entry Form */}
+        {showForm && (
+          <div ref={formRef} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+            <div className="flex items-center justify-between mb-4 lg:mb-6">
+              <h2 className="text-base lg:text-lg font-semibold text-gray-900">Add Measurement Entry</h2>
+              <button
+                onClick={resetForm}
+                className="text-gray-400 hover:text-gray-600 p-1"
+              >
+                <X className="h-5 w-5" />
+              </button>
             </div>
             
-            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200">
-              <button
-                type="button"
-                onClick={resetForm}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm lg:text-base"
-              >
-                Save Entry
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+                    Date
+                  </label>
+                  <input
+                    type="date"
+                    id="date"
+                    required
+                    value={formData.date}
+                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                  />
+                </div>
+              </div>
+  
+              {/* Measurement Fields */}
+              {activeFields.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-medium text-gray-700 mb-3">Measurements</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {activeFieldsWithoutBodyFat.map((field) => (
+                      <div key={field.id}>
+                        <label className="block text-sm font-medium text-gray-700">
+                          {field.field_name} ({field.unit})
+                        </label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          value={formData[getFieldKey(field.field_name)] || ''}
+                          onChange={(e) => setFormData({ 
+                            ...formData, 
+                            [getFieldKey(field.field_name)]: e.target.value 
+                          })}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                          placeholder={`Enter ${field.field_name.toLowerCase()}`}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-      {/* Measurement History */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-4 lg:p-6 border-b border-gray-200">
-          <h2 className="text-base lg:text-lg font-semibold text-gray-900">Measurement History</h2>
-        </div>
-        <div className="p-4 lg:p-6">
-          {entries.length > 0 ? (
-            <div className="space-y-4">
-              {entries.map((entry) => {
-                return (
-                  <div key={entry.id}>
-                    {editingEntry?.id === entry.id ? (
-                      /* Inline Edit Form */
-                      <div className="border border-blue-200 rounded-lg p-4 bg-blue-50">
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                          <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-medium text-gray-900">Edit Measurement Entry</h3>
-                            <button
-                              type="button"
-                              onClick={() => setEditingEntry(null)}
-                              className="text-gray-400 hover:text-gray-600 p-1"
-                            >
-                              <X className="h-4 w-4" />
-                            </button>
+              {/* Body Fat Calculator Section - Mobile Responsive */}
+              {bodyFatField && (
+                <div className="border-t border-gray-200 pt-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                    <h3 className="text-sm lg:text-base font-medium text-gray-900 flex items-center">
+                      <Calculator className="h-4 w-4 lg:h-5 lg:w-5 mr-2 text-green-600 flex-shrink-0" />
+                      Body Fat Calculator
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={resetBodyFatCalculator}
+                      className="text-sm text-gray-500 hover:text-gray-700 self-start sm:self-auto"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                  
+                  <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+                    <p className="text-sm text-gray-600">
+                      Use skinfold calipers to measure at the specified sites. Measurements should be in millimeters.
+                    </p>
+                    
+                    {/* User Info - Mobile Responsive */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Gender</label>
+                        <select
+                          value={bodyFatData.gender}
+                          onChange={(e) => setBodyFatData(prev => ({ ...prev, gender: e.target.value }))}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                        >
+                          <option value="">Select gender</option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Age</label>
+                        <input
+                          type="number"
+                          value={bodyFatData.age}
+                          onChange={(e) => setBodyFatData(prev => ({ ...prev, age: e.target.value }))}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                          placeholder="Enter your age"
+                        />
+                      </div>
+                    </div>
+    
+                    {/* Skinfold Measurements - Mobile Responsive */}
+                    {bodyFatData.gender === 'male' ? (
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-gray-900">Male Protocol (3-Site)</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">Chest (mm)</label>
+                            <input
+                              type="number"
+                              step="0.1"
+                              value={bodyFatData.chest}
+                              onChange={(e) => setBodyFatData(prev => ({ ...prev, chest: e.target.value }))}
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                              placeholder="Chest skinfold"
+                            />
                           </div>
-                          
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">Abdominal (mm)</label>
+                            <input
+                              type="number"
+                              step="0.1"
+                              value={bodyFatData.abdominal}
+                              onChange={(e) => setBodyFatData(prev => ({ ...prev, abdominal: e.target.value }))}
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                              placeholder="Abdominal skinfold"
+                            />
+                          </div>
+                          <div className="sm:col-span-2 lg:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700">Thigh (mm)</label>
+                            <input
+                              type="number"
+                              step="0.1"
+                              value={bodyFatData.thigh}
+                              onChange={(e) => setBodyFatData(prev => ({ ...prev, thigh: e.target.value }))}
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                              placeholder="Thigh skinfold"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ) : bodyFatData.gender === 'female' ? (
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-gray-900">Female Protocol (3-Site)</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">Tricep (mm)</label>
+                            <input
+                              type="number"
+                              step="0.1"
+                              value={bodyFatData.tricep}
+                              onChange={(e) => setBodyFatData(prev => ({ ...prev, tricep: e.target.value }))}
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                              placeholder="Tricep skinfold"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">Suprailiac (mm)</label>
+                            <input
+                              type="number"
+                              step="0.1"
+                              value={bodyFatData.suprailiac}
+                              onChange={(e) => setBodyFatData(prev => ({ ...prev, suprailiac: e.target.value }))}
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                              placeholder="Suprailiac skinfold"
+                            />
+                          </div>
+                          <div className="sm:col-span-2 lg:col-span-1">
+                            <label className="block text-sm font-medium text-gray-700">Thigh (mm)</label>
+                            <input
+                              type="number"
+                              step="0.1"
+                              value={bodyFatData.thigh}
+                              onChange={(e) => setBodyFatData(prev => ({ ...prev, thigh: e.target.value }))}
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                              placeholder="Thigh skinfold"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-4">
+                        <p className="text-gray-500 text-sm lg:text-base">Please select your gender to see the appropriate measurement fields.</p>
+                      </div>
+                    )}
+    
+                    <div className="flex justify-center">
+                      <button
+                        type="button"
+                        onClick={calculateBodyFat}
+                        className="px-4 lg:px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm lg:text-base"
+                      >
+                        Calculate Body Fat %
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Body Fat Result - Mobile Responsive */}
+              <div>
+                <label htmlFor="body_fat_percentage" className="block text-sm font-medium text-gray-700">
+                  Body Fat Percentage (%)
+                </label>
+                <input
+                  type="number"
+                  id="body_fat_percentage"
+                  step="0.1"
+                  value={formData.body_fat_percentage || ''}
+                  onChange={(e) => setFormData(prev => ({ 
+                    ...prev, 
+                    body_fat_percentage: e.target.value 
+                  }))}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                  placeholder="Enter or calculate body fat %"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  You can enter this manually or use the calculator above
+                </p>
+              </div>
+  
+              <div>
+                <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
+                  Notes (optional)
+                </label>
+                <textarea
+                  id="notes"
+                  rows={3}
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                  placeholder="Any notes about this measurement..."
+                />
+              </div>
+              
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200">
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm lg:text-base"
+                >
+                  Save Entry
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+  
+        {/* Measurement History */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="p-4 lg:p-6 border-b border-gray-200">
+            <h2 className="text-base lg:text-lg font-semibold text-gray-900">Measurement History</h2>
+          </div>
+          <div className="p-4 lg:p-6">
+            {entries.length > 0 ? (
+              <div className="space-y-4">
+                {entries.map((entry) => {
+                  return (
+                    <div key={entry.id}>
+                      {editingEntry?.id === entry.id ? (
+                        /* Inline Edit Form */
+                        <div className="border border-blue-200 rounded-lg p-4 bg-blue-50">
+                          <form onSubmit={handleSubmit} className="space-y-4">
+                            <div className="flex items-center justify-between mb-4">
+                              <h3 className="text-sm font-medium text-gray-900">Edit Measurement Entry</h3>
+                              <button
+                                type="button"
+                                onClick={() => setEditingEntry(null)}
+                                className="text-gray-400 hover:text-gray-600 p-1"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700">Date</label>
+                                <input
+                                  type="date"
+                                  required
+                                  value={formData.date}
+                                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                />
+                              </div>
+                            </div>
+  
+                            {/* Show all fields that have data or are currently active */}
                             <div>
-                              <label className="block text-sm font-medium text-gray-700">Date</label>
-                              <input
-                                type="date"
-                                required
-                                value={formData.date}
-                                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                              <h4 className="text-sm font-medium text-gray-700 mb-3">Measurements</h4>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {measurementFields
+                                  .filter(field => {
+                                    return field.is_active || entry.values.some(v => v.field_id === field.id);
+                                  })
+                                  .map((field) => (
+                                    <div key={field.id}>
+                                      <label className="block text-sm font-medium text-gray-700">
+                                        {field.field_name} ({field.unit})
+                                        {!field.is_active && (
+                                          <span className="text-xs text-gray-500 ml-1">(hidden field)</span>
+                                        )}
+                                      </label>
+                                      <input
+                                        type="number"
+                                        step="0.1"
+                                        value={formData[getFieldKey(field.field_name)] || ''}
+                                        onChange={(e) => setFormData({ 
+                                          ...formData, 
+                                          [getFieldKey(field.field_name)]: e.target.value 
+                                        })}
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                      />
+                                    </div>
+                                  ))}
+                              </div>
+                            </div>
+                            
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700">Notes (optional)</label>
+                              <textarea
+                                rows={2}
+                                value={formData.notes}
+                                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                               />
                             </div>
-                          </div>
-
-                          {/* Show all fields that have data or are currently active */}
-                          <div>
-                            <h4 className="text-sm font-medium text-gray-700 mb-3">Measurements</h4>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                              {measurementFields
-                                .filter(field => {
-                                  return field.is_active || entry.values.some(v => v.field_id === field.id);
-                                })
-                                .map((field) => (
-                                  <div key={field.id}>
-                                    <label className="block text-sm font-medium text-gray-700">
-                                      {field.field_name} ({field.unit})
-                                      {!field.is_active && (
-                                        <span className="text-xs text-gray-500 ml-1">(hidden field)</span>
-                                      )}
-                                    </label>
-                                    <input
-                                      type="number"
-                                      step="0.1"
-                                      value={formData[getFieldKey(field.field_name)] || ''}
-                                      onChange={(e) => setFormData({ 
-                                        ...formData, 
-                                        [getFieldKey(field.field_name)]: e.target.value 
-                                      })}
-                                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                    />
+                            
+                            <div className="flex flex-col sm:flex-row justify-end gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setEditingEntry(null)}
+                                className="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm"
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                type="submit"
+                                className="flex items-center justify-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                              >
+                                <Save className="h-4 w-4 mr-1" />
+                                Save Changes
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                      ) : (
+                        /* Regular Entry Display - Restored Original Styling */
+                        <div className="flex items-center justify-between p-3 lg:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="flex items-center text-sm lg:text-base font-medium text-gray-900">
+                                <Calendar className="h-4 w-4 mr-1" />
+                                {formatDate(entry.date).toLocaleDateString()}
+                              </div>
+                            </div>
+                            
+                            {entry.values.length > 0 && (
+                              <div className="text-xs lg:text-sm text-gray-600 space-y-1">
+                                {entry.values.map((value) => (
+                                  <div key={value.id}>
+                                    <span className="font-medium">{value.field?.field_name}:</span> {value.value} {value.field?.unit}
                                   </div>
                                 ))}
-                            </div>
+                              </div>
+                            )}
+                            
+                            {entry.notes && (
+                              <p className="text-xs lg:text-sm text-gray-600 truncate mt-1">{entry.notes}</p>
+                            )}
                           </div>
-                          
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">Notes (optional)</label>
-                            <textarea
-                              rows={2}
-                              value={formData.notes}
-                              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                            />
-                          </div>
-                          
-                          <div className="flex flex-col sm:flex-row justify-end gap-2">
+                          <div className="flex items-center gap-2 ml-3">
                             <button
-                              type="button"
-                              onClick={() => setEditingEntry(null)}
-                              className="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm"
+                              onClick={() => handleEdit(entry)}
+                              className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
                             >
-                              Cancel
+                              <Edit2 className="h-4 w-4" />
                             </button>
                             <button
-                              type="submit"
-                              className="flex items-center justify-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                              onClick={() => handleDeleteClick(entry)}
+                              className="p-2 text-gray-400 hover:text-red-600 transition-colors"
                             >
-                              <Save className="h-4 w-4 mr-1" />
-                              Save Changes
+                              <Trash2 className="h-4 w-4" />
                             </button>
                           </div>
-                        </form>
-                      </div>
-                    ) : (
-                      /* Regular Entry Display - Restored Original Styling */
-                      <div className="flex items-center justify-between p-3 lg:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <div className="flex items-center text-sm lg:text-base font-medium text-gray-900">
-                              <Calendar className="h-4 w-4 mr-1" />
-                              {formatDate(entry.date).toLocaleDateString()}
-                            </div>
-                          </div>
-                          
-                          {entry.values.length > 0 && (
-                            <div className="text-xs lg:text-sm text-gray-600 space-y-1">
-                              {entry.values.map((value) => (
-                                <div key={value.id}>
-                                  <span className="font-medium">{value.field?.field_name}:</span> {value.value} {value.field?.unit}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                          
-                          {entry.notes && (
-                            <p className="text-xs lg:text-sm text-gray-600 truncate mt-1">{entry.notes}</p>
-                          )}
                         </div>
-                        <div className="flex items-center gap-2 ml-3">
-                          <button
-                            onClick={() => handleEdit(entry)}
-                            className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteClick(entry)}
-                            className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="text-center py-8 lg:py-12">
-              <Ruler className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 mb-2 text-sm lg:text-base">No measurements recorded yet</p>
-              <button
-                onClick={handleAddNew}
-                className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
-              >
-                Add your first measurement
-              </button>
-            </div>
-          )}
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-8 lg:py-12">
+                <Ruler className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500 mb-2 text-sm lg:text-base">No measurements recorded yet</p>
+                <button
+                  onClick={handleAddNew}
+                  className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
+                >
+                  Add your first measurement
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
