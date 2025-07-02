@@ -34,13 +34,28 @@ export default function Dashboard() {
         .order('date', { ascending: false })
         .limit(1);
 
-      // Load latest measurements
+      // Load latest measurements using new structure
       const { data: measurementData } = await supabase
-        .from('body_measurements')
-        .select('*')
+        .from('body_measurement_entries')
+        .select(`
+          *,
+          values:body_measurement_values(
+            *,
+            field:measurement_fields(*)
+          )
+        `)
         .eq('user_id', user.data.user.id)
         .order('date', { ascending: false })
         .limit(1);
+
+      // Transform measurement to include the values array
+      let transformedMeasurement = null;
+      if (measurementData && measurementData.length > 0) {
+        transformedMeasurement = {
+          ...measurementData[0],
+          values: measurementData[0].values || [],
+        };
+      }
 
       // Load recent workouts
       const { data: workoutData } = await supabase
@@ -58,7 +73,7 @@ export default function Dashboard() {
 
       setStats({
         latestWeight: weightData?.[0] || null,
-        latestMeasurement: measurementData?.[0] || null,
+        latestMeasurement: transformedMeasurement,
         recentWorkouts: workoutData || [],
         totalWorkouts: count || 0,
       });
@@ -69,6 +84,17 @@ export default function Dashboard() {
     }
   };
 
+  // Helper function to get body fat percentage from measurement values
+  const getBodyFatPercentage = () => {
+    if (!stats.latestMeasurement?.values) return null;
+    
+    const bodyFatValue = stats.latestMeasurement.values.find(
+      value => value.field?.field_name === 'Body Fat %'
+    );
+    
+    return bodyFatValue?.value || null;
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -76,6 +102,8 @@ export default function Dashboard() {
       </div>
     );
   }
+
+  const bodyFatPercentage = getBodyFatPercentage();
 
   return (
     <div className="space-y-6 lg:space-y-8">
@@ -112,9 +140,7 @@ export default function Dashboard() {
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
               <p className="text-xs lg:text-sm font-medium text-gray-600">Body Fat</p>
               <p className="text-lg lg:text-2xl font-bold text-gray-900 truncate">
-                {stats.latestMeasurement?.body_fat_percentage 
-                  ? `${stats.latestMeasurement.body_fat_percentage}%` 
-                  : 'No data'}
+                {bodyFatPercentage ? `${bodyFatPercentage}%` : 'No data'}
               </p>
               {stats.latestMeasurement && (
                 <p className="text-xs text-gray-500 truncate">
