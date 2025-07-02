@@ -1132,52 +1132,50 @@ export default function MeasurementsTracker() {
                         </div>
                       ) : (
                         /* Regular Entry Display - Restored Original Styling */
-                            <div className="border border-gray-200 rounded-lg p-4 lg:p-6 hover:bg-gray-50 transition-colors">
-                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-                                <div className="flex items-center">
-                                  <Calendar className="h-4 w-4 lg:h-5 lg:w-5 text-gray-400 mr-2 flex-shrink-0" />
-                                  <span className="font-medium text-gray-900 text-sm lg:text-base">
-                                    {formatDate(entry.date).toLocaleDateString()}
-                                  </span>
-                                </div>
-                                <div className="flex space-x-2">
-                                  <button
-                                    onClick={() => handleEdit(entry)}
-                                    className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
-                                  >
-                                    <Edit2 className="h-4 w-4" />
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeleteClick(entry)}
-                                    className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </button>
-                                </div>
-                              </div>
-                              
-                              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-4">
-                                {entry.values.length > 0 && (
-                                  <>
-                                    {entry.values.map((value) => (                             
-                                      <div key={value.id} className="text-center p-3 bg-gray-50 rounded-lg">
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide truncate">
-                                          {value.field?.field_name}
-                                        </p>
-                                        <p className="text-sm lg:text-base font-semibold text-gray-900">
-                                          {value.value} {value.field?.unit}
-                                        </p>
-                                      </div>
-                                    ))}
-                                  </>
-                                )}
-                              </div>
-                              
-                              {entry.notes && (
-                                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                                  <p className="text-sm text-blue-800">{entry.notes}</p>
-                                </div>
-                              )}
+                        <div className="border border-gray-200 rounded-lg p-4 lg:p-6 hover:bg-gray-50 transition-colors">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                            <div className="flex items-center">
+                              <Calendar className="h-4 w-4 lg:h-5 lg:w-5 text-gray-400 mr-2 flex-shrink-0" />
+                              <span className="font-medium text-gray-900 text-sm lg:text-base">
+                                {formatDate(entry.date).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleEdit(entry)}
+                                className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                              >
+                                <Edit2 className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteClick(entry)}
+                                className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-4">
+                            {entry.values.length > 0 && (
+                              <>
+                                {entry.values.map((value) => (                             
+                                  <div key={value.id} className="text-center p-3 bg-gray-50 rounded-lg">
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide truncate">
+                                      {value.field?.field_name}
+                                    </p>
+                                    <p className="text-sm lg:text-base font-semibold text-gray-900">
+                                      {value.value} {value.field?.unit}
+                                    </p>
+                                  </div>
+                                ))}
+                              </>
+                            )}
+                          </div>
+                          
+                          {entry.notes && (
+                            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                              <p className="text-sm text-blue-800">{entry.notes}</p>
                             </div>
                           )}
                         </div>
