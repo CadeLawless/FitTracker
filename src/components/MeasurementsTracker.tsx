@@ -119,7 +119,7 @@ export default function MeasurementsTracker() {
       const { data: fieldsData, error: fieldsError } = await supabase
         .from('measurement_fields')
         .select('*')
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .order('field_name');
 
       if (fieldsError) throw fieldsError;
@@ -134,7 +134,7 @@ export default function MeasurementsTracker() {
             field:measurement_fields(*)
           )
         `)
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .order('date', { ascending: false });
 
       if (entriesError) throw entriesError;
