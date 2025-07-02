@@ -541,11 +541,11 @@ export default function MeasurementsTracker() {
     <>
       {/* Notifications */}
       {notifications.length > 0 && (
-        <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
+        <div className="fixed top-4 right-4 z-50 space-y-2 w-[min(100%,500px)]">
           {notifications.map((notification) => (
             <div
               key={notification.id}
-              className={`w-full max-w-[400px] border rounded-lg shadow-lg p-4 ${getNotificationColors(notification.type)}`}
+              className={`w-full border rounded-lg shadow-lg p-4 ${getNotificationColors(notification.type)}`}
             >
               <div className="flex items-start">
                 <div className="flex-shrink-0">
