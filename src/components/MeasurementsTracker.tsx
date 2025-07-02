@@ -108,7 +108,7 @@ export default function MeasurementsTracker() {
       const { data: profileData, error: profileError } = await supabase
         .from('user_profiles')
         .select('*')
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .maybeSingle();
 
       if (profileError && profileError.code !== 'PGRST116') throw profileError;
