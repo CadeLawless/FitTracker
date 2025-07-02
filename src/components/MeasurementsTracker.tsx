@@ -986,10 +986,10 @@ export default function MeasurementsTracker() {
                   type="number"
                   id="body_fat_percentage"
                   step="0.1"
-                  value={formData.body_fat_percentage || ''}
+                  value={formData[getFieldKey('Body Fat %')] || ''}
                   onChange={(e) => setFormData(prev => ({ 
                     ...prev, 
-                    body_fat_percentage: e.target.value 
+                    [getFieldKey('Body Fat %')]: e.target.value 
                   }))}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                   placeholder="Enter or calculate body fat %"
