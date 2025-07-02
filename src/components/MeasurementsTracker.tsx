@@ -1181,37 +1181,6 @@ export default function MeasurementsTracker() {
                             </div>
                           )}
                         </div>
-                        <div className="p-4 lg:p-6">
-                          {entry.values.length > 0 && (
-                            <div className="space-y-4 lg:space-y-6">
-                              <div className="text-xs lg:text-sm text-gray-600 space-y-1">
-                                {entry.values.map((value) => (
-                                  <div key={value.id}>
-                                    <span className="font-medium">{value.field?.field_name}:</span> {value.value} {value.field?.unit}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                            
-                            {entry.notes && (
-                              <p className="text-xs lg:text-sm text-gray-600 truncate mt-1">{entry.notes}</p>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 ml-3">
-                            <button
-                              onClick={() => handleEdit(entry)}
-                              className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
-                            >
-                              <Edit2 className="h-4 w-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteClick(entry)}
-                              className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </div>
                       )}
                     </div>
                   );
