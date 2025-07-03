@@ -136,11 +136,31 @@ export default function ProgressPage() {
     const earliest = timeframeEntries[timeframeEntries.length - 1];
     const change = latest.weight - earliest.weight;
 
+    // Get active goal to determine if this is good progress
+    const activeGoal = stats.goals.find(g => g.is_active);
+    let isGoodProgress = false;
+    
+    if (activeGoal) {
+      switch (activeGoal.goal_type) {
+        case 'cutting':
+          isGoodProgress = change < 0;
+          break;
+        case 'bulking':
+          isGoodProgress = change > 0;
+          break;
+        case 'maintaining':
+          isGoodProgress = Math.abs(change) <= 2;
+          break;
+      }
+    }
+
     return {
       current: latest.weight,
       change,
       percentage: ((change / earliest.weight) * 100),
       trend: change > 0 ? 'up' : change < 0 ? 'down' : 'stable',
+      isGoodProgress,
+      goalType: activeGoal?.goal_type,
     };
   };
 
@@ -153,10 +173,14 @@ export default function ProgressPage() {
     const earliest = timeframeMeasurements[timeframeMeasurements.length - 1];
     const change = (latest.body_fat_percentage || 0) - (earliest.body_fat_percentage || 0);
 
+    // Body fat decrease is generally good for all goal types
+    const isGoodProgress = change <= 0;
+
     return {
       current: latest.body_fat_percentage,
       change,
       trend: change > 0 ? 'up' : change < 0 ? 'down' : 'stable',
+      isGoodProgress,
     };
   };
 
@@ -181,7 +205,7 @@ export default function ProgressPage() {
 
     const totalChange = activeGoal.target_weight - activeGoal.starting_weight;
     const currentChange = currentWeight - activeGoal.starting_weight;
-    const progressPercentage = (currentChange / totalChange) * 100;
+    const progressPercentage = Math.abs(totalChange) > 0 ? (currentChange / totalChange) * 100 : 0;
 
     return {
       goal: activeGoal,
@@ -284,20 +308,26 @@ export default function ProgressPage() {
             <div className="flex items-center justify-between mb-3">
               <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600" />
               {weightProgress.trend === 'up' ? (
-                <TrendingUp className="h-5 w-5 text-red-500" />
+                <TrendingUp className={`h-5 w-5 ${
+                  weightProgress.isGoodProgress ? 'text-green-500' : 'text-red-500'
+                }`} />
               ) : weightProgress.trend === 'down' ? (
-                <TrendingDown className="h-5 w-5 text-green-500" />
+                <TrendingDown className={`h-5 w-5 ${
+                  weightProgress.isGoodProgress ? 'text-green-500' : 'text-red-500'
+                }`} />
               ) : (
                 <div className="h-5 w-5" />
               )}
             </div>
             <div>
               <p className="text-xs lg:text-sm font-medium text-gray-600">Weight Change</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900">
+              <p className={`text-lg lg:text-2xl font-bold ${
+                weightProgress.isGoodProgress ? 'text-green-600' : 'text-red-600'
+              }`}>
                 {weightProgress.change > 0 ? '+' : ''}{weightProgress.change.toFixed(1)} lbs
               </p>
               <p className="text-xs text-gray-500">
-                {weightProgress.percentage > 0 ? '+' : ''}{weightProgress.percentage.toFixed(1)}%
+                {weightProgress.goalType && `${weightProgress.goalType} goal`}
               </p>
             </div>
           </div>
@@ -318,7 +348,9 @@ export default function ProgressPage() {
             </div>
             <div>
               <p className="text-xs lg:text-sm font-medium text-gray-600">Body Fat Change</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900">
+              <p className={`text-lg lg:text-2xl font-bold ${
+                bodyFatProgress.isGoodProgress ? 'text-green-600' : 'text-red-600'
+              }`}>
                 {bodyFatProgress.change > 0 ? '+' : ''}{bodyFatProgress.change.toFixed(1)}%
               </p>
               <p className="text-xs text-gray-500">

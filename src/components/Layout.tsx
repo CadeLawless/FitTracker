@@ -12,7 +12,8 @@ import {
   LogOut,
   User,
   Menu,
-  X
+  X,
+  Target
 } from 'lucide-react';
 import { auth } from '../lib/supabase';
 
@@ -36,6 +37,7 @@ export default function Layout({ children }: LayoutProps) {
     { path: '/weight', icon: Scale, label: 'Weight' },
     { path: '/measurements', icon: Ruler, label: 'Measurements' },
     { path: '/workouts', icon: Dumbbell, label: 'Workouts' },
+    { path: '/goals', icon: Target, label: 'Goals' },
     { path: '/progress', icon: TrendingUp, label: 'Progress' },
     { path: '/profile', icon: User, label: 'Profile' },
   ];

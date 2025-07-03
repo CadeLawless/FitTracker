@@ -14,6 +14,7 @@ import WorkoutsPage from './components/WorkoutsPage';
 import RoutineBuilder from './components/RoutineBuilder';
 import WorkoutSession from './components/WorkoutSession';
 import WorkoutSessionDetails from './components/WorkoutSessionDetails';
+import GoalsPage from './components/GoalsPage';
 import ProgressPage from './components/ProgressPage';
 import Profile from './components/Profile';
 import ResetSessionButton from './components/ResetSessionButton';
@@ -116,6 +117,7 @@ function App() {
           <Route path="/workouts/routines/:id/edit" element={<RoutineBuilder />} />
           <Route path="/workouts/start" element={<WorkoutSession />} />
           <Route path="/workouts/session/:id" element={<WorkoutSessionDetails />} />
+          <Route path="/goals" element={<GoalsPage />} />
           <Route path="/progress" element={<ProgressPage />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<Navigate to="/" replace />} />
