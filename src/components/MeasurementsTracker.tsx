@@ -1132,7 +1132,7 @@ export default function MeasurementsTracker() {
                         </div>
                       ) : (
                         /* Regular Entry Display - Restored Original Styling */
-                        <div className="border border-gray-200 rounded-lg p-4 lg:p-6 hover:bg-gray-50 transition-colors">
+                        <div className="border border-gray-200 rounded-lg p-4 lg:p-6">
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
                             <div className="flex items-center">
                               <Calendar className="h-4 w-4 lg:h-5 lg:w-5 text-gray-400 mr-2 flex-shrink-0" />
