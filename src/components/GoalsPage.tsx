@@ -966,7 +966,7 @@ export default function GoalsPage() {
                               </div>
                             )}
                             <div>
-                              <span className="font-medium">Created:</span> {formatDate(goal.created_at).toLocaleDateString()}
+                              <span className="font-medium">Created:</span> {new Date(goal.created_at).toLocaleDateString()}
                             </div>
                           </div>
                         </div>
