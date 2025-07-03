@@ -219,6 +219,9 @@ export default function GoalsPage() {
 
         if (error) throw error;
         setSuccess('Goal updated successfully!');
+        setTimeout(() => {
+          setSuccess('');
+        }, 5000);
       } else {
         // Deactivate current active goals of the same category
         const activeGoalsOfCategory = activeGoals.filter(g => g.goal_category === formData.goal_category);
@@ -236,6 +239,9 @@ export default function GoalsPage() {
 
         if (error) throw error;
         setSuccess('New goal created successfully!');
+        setTimeout(() => {
+          setSuccess('');
+        }, 5000);
       }
 
       resetForm();
@@ -280,6 +286,9 @@ export default function GoalsPage() {
       if (error) throw error;
       
       setSuccess('Active goal updated!');
+      setTimeout(() => {
+          setSuccess('');
+        }, 5000);
       loadGoalsData();
     } catch (error) {
       console.error('Error setting active goal:', error);
@@ -311,6 +320,9 @@ export default function GoalsPage() {
       if (error) throw error;
       
       setSuccess('Goal deleted successfully!');
+      setTimeout(() => {
+          setSuccess('');
+        }, 5000);
       loadGoalsData();
     } catch (error) {
       console.error('Error deleting goal:', error);
@@ -347,6 +359,9 @@ export default function GoalsPage() {
       if (error) throw error;
       
       setSuccess('Goal marked as complete! 🎉');
+      setTimeout(() => {
+          setSuccess('');
+        }, 5000);
       loadGoalsData();
     } catch (error) {
       console.error('Error completing goal:', error);
