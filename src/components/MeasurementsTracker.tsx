@@ -238,7 +238,7 @@ export default function MeasurementsTracker() {
 
     if (bodyFat > 0 && bodyFat < 50) {
       const roundedBodyFat = Math.round(bodyFat * 10) / 10;
-      setFormData(prev => ({ ...prev, getFieldKey("Body Fat %"): roundedBodyFat.toString() }));
+      setFormData(prev => ({ ...prev, [getFieldKey("Body Fat %")]: roundedBodyFat.toString() }));
       showNotification('success', 'Calculation Complete', `Body fat percentage calculated: ${roundedBodyFat}%`);
     } else {
       showNotification('error', 'Invalid Result', 'Invalid calculation result. Please check your measurements.');
