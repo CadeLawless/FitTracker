@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Target, TrendingUp, TrendingDown, Minus, Save, Edit2, Plus, Calendar, Scale, CheckCircle, AlertCircle } from 'lucide-react';
+import { Target, TrendingUp, TrendingDown, Minus, Save, Edit2, Plus, Calendar, Scale, CheckCircle, AlertCircle, Ruler, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
-import type { UserGoal, WeightEntry } from '../types';
+import type { UserGoal, WeightEntry, MeasurementField, BodyMeasurement } from '../types';
 
 export default function GoalsPage() {
   const [goals, setGoals] = useState<UserGoal[]>([]);
-  const [activeGoal, setActiveGoal] = useState<UserGoal | null>(null);
+  const [activeGoals, setActiveGoals] = useState<UserGoal[]>([]);
+  const [measurementFields, setMeasurementFields] = useState<MeasurementField[]>([]);
   const [latestWeight, setLatestWeight] = useState<WeightEntry | null>(null);
+  const [latestMeasurements, setLatestMeasurements] = useState<BodyMeasurement | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -16,8 +18,11 @@ export default function GoalsPage() {
   const [success, setSuccess] = useState('');
 
   const [formData, setFormData] = useState({
+    goal_category: 'weight',
     goal_type: '',
     target_weight: '',
+    target_value: '',
+    measurement_field_id: '',
     target_date: '',
     weekly_goal: '',
   });
@@ -31,14 +36,27 @@ export default function GoalsPage() {
       const user = await supabase.auth.getUser();
       if (!user.data.user) return;
 
-      // Load goals
+      // Load goals with measurement field info
       const { data: goalsData, error: goalsError } = await supabase
         .from('user_goals')
-        .select('*')
+        .select(`
+          *,
+          measurement_field:measurement_fields(*)
+        `)
         .eq('user_id', user.data.user.id)
         .order('created_at', { ascending: false });
 
       if (goalsError) throw goalsError;
+
+      // Load measurement fields
+      const { data: fieldsData, error: fieldsError } = await supabase
+        .from('measurement_fields')
+        .select('*')
+        .eq('user_id', user.data.user.id)
+        .eq('is_active', true)
+        .order('field_name');
+
+      if (fieldsError) throw fieldsError;
 
       // Load latest weight
       const { data: weightData, error: weightError } = await supabase
@@ -50,14 +68,60 @@ export default function GoalsPage() {
 
       if (weightError) throw weightError;
 
+      // Load latest measurements
+      const { data: measurementData, error: measurementError } = await supabase
+        .from('body_measurement_entries')
+        .select(`
+          *,
+          values:body_measurement_values(
+            *,
+            field:measurement_fields(*)
+          )
+        `)
+        .eq('user_id', user.data.user.id)
+        .order('date', { ascending: false })
+        .limit(1);
+
+      if (measurementError) throw measurementError;
+
       setGoals(goalsData || []);
-      setActiveGoal(goalsData?.find(g => g.is_active) || null);
+      setActiveGoals(goalsData?.filter(g => g.is_active) || []);
+      setMeasurementFields(fieldsData || []);
       setLatestWeight(weightData?.[0] || null);
+      setLatestMeasurements(measurementData?.[0] || null);
     } catch (error) {
       console.error('Error loading goals data:', error);
       setError('Failed to load goals data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getCurrentValue = (goal: UserGoal) => {
+    if (goal.goal_category === 'weight') {
+      return latestWeight?.weight || null;
+    } else if (goal.measurement_field_id && latestMeasurements) {
+      const value = latestMeasurements.values?.find(
+        v => v.field_id === goal.measurement_field_id
+      );
+      return value?.value || null;
+    }
+    return null;
+  };
+
+  const getStartingValue = (goal: UserGoal) => {
+    if (goal.goal_category === 'weight') {
+      return goal.starting_weight || null;
+    } else {
+      return goal.starting_value || null;
+    }
+  };
+
+  const getTargetValue = (goal: UserGoal) => {
+    if (goal.goal_category === 'weight') {
+      return goal.target_weight || null;
+    } else {
+      return goal.target_value || null;
     }
   };
 
@@ -71,15 +135,33 @@ export default function GoalsPage() {
       const user = await supabase.auth.getUser();
       if (!user.data.user) return;
 
-      const goalData = {
+      let goalData: any = {
         user_id: user.data.user.id,
+        goal_category: formData.goal_category,
         goal_type: formData.goal_type,
-        starting_weight: latestWeight?.weight || null,
-        target_weight: parseFloat(formData.target_weight),
         target_date: formData.target_date || null,
         weekly_goal: formData.weekly_goal ? parseFloat(formData.weekly_goal) : null,
         is_active: true,
       };
+
+      if (formData.goal_category === 'weight') {
+        goalData.starting_weight = latestWeight?.weight || null;
+        goalData.target_weight = parseFloat(formData.target_weight);
+        goalData.measurement_field_id = null;
+        goalData.starting_value = null;
+        goalData.target_value = null;
+      } else {
+        // Get current value for this measurement field
+        const currentValue = latestMeasurements?.values?.find(
+          v => v.field_id === formData.measurement_field_id
+        )?.value;
+
+        goalData.measurement_field_id = formData.measurement_field_id;
+        goalData.starting_value = currentValue || null;
+        goalData.target_value = parseFloat(formData.target_value);
+        goalData.starting_weight = null;
+        goalData.target_weight = null;
+      }
 
       if (editingGoal) {
         // Update existing goal
@@ -91,12 +173,13 @@ export default function GoalsPage() {
         if (error) throw error;
         setSuccess('Goal updated successfully!');
       } else {
-        // Deactivate current active goal
-        if (activeGoal) {
+        // Deactivate current active goals of the same category
+        const activeGoalsOfCategory = activeGoals.filter(g => g.goal_category === formData.goal_category);
+        if (activeGoalsOfCategory.length > 0) {
           await supabase
             .from('user_goals')
             .update({ is_active: false })
-            .eq('id', activeGoal.id);
+            .in('id', activeGoalsOfCategory.map(g => g.id));
         }
 
         // Create new goal
@@ -121,21 +204,25 @@ export default function GoalsPage() {
   const handleEdit = (goal: UserGoal) => {
     setEditingGoal(goal);
     setFormData({
+      goal_category: goal.goal_category,
       goal_type: goal.goal_type,
       target_weight: goal.target_weight?.toString() || '',
+      target_value: goal.target_value?.toString() || '',
+      measurement_field_id: goal.measurement_field_id || '',
       target_date: goal.target_date || '',
       weekly_goal: goal.weekly_goal?.toString() || '',
     });
     setShowForm(true);
   };
 
-  const handleSetActive = async (goalId: string) => {
+  const handleSetActive = async (goalId: string, category: string) => {
     try {
-      // Deactivate all goals
+      // Deactivate all goals of the same category
       await supabase
         .from('user_goals')
         .update({ is_active: false })
-        .neq('id', '00000000-0000-0000-0000-000000000000'); // Update all
+        .eq('goal_category', category)
+        .eq('user_id', (await supabase.auth.getUser()).data.user?.id);
 
       // Activate selected goal
       const { error } = await supabase
@@ -155,8 +242,11 @@ export default function GoalsPage() {
 
   const resetForm = () => {
     setFormData({
+      goal_category: 'weight',
       goal_type: '',
       target_weight: '',
+      target_value: '',
+      measurement_field_id: '',
       target_date: '',
       weekly_goal: '',
     });
@@ -165,23 +255,48 @@ export default function GoalsPage() {
   };
 
   const getGoalProgress = (goal: UserGoal) => {
-    if (!latestWeight || !goal.starting_weight || !goal.target_weight) return null;
+    const currentValue = getCurrentValue(goal);
+    const startingValue = getStartingValue(goal);
+    const targetValue = getTargetValue(goal);
 
-    const totalChange = goal.target_weight - goal.starting_weight;
-    const currentChange = latestWeight.weight - goal.starting_weight;
+    if (!currentValue || !startingValue || !targetValue) return null;
+
+    const totalChange = targetValue - startingValue;
+    const currentChange = currentValue - startingValue;
     const progressPercentage = Math.abs(totalChange) > 0 ? (currentChange / totalChange) * 100 : 0;
 
     return {
       progressPercentage: Math.min(Math.max(progressPercentage, 0), 100),
       currentChange,
       totalChange,
-      remaining: goal.target_weight - latestWeight.weight,
+      remaining: targetValue - currentValue,
+      currentValue,
+      startingValue,
+      targetValue,
     };
   };
 
   const getProgressColor = (goal: UserGoal, change: number) => {
     if (change === 0) return 'text-gray-600';
     
+    // For measurement goals, determine if increase/decrease is good based on the field
+    if (goal.goal_category === 'measurement') {
+      const fieldName = goal.measurement_field?.field_name?.toLowerCase() || '';
+      
+      // Generally, decreases are good for waist, body fat, etc.
+      // Increases are good for chest, biceps, etc.
+      const decreaseIsGood = fieldName.includes('waist') || 
+                            fieldName.includes('body fat') || 
+                            fieldName.includes('fat');
+      
+      if (decreaseIsGood) {
+        return change < 0 ? 'text-green-600' : 'text-red-600';
+      } else {
+        return change > 0 ? 'text-green-600' : 'text-red-600';
+      }
+    }
+    
+    // For weight goals, use the goal type
     switch (goal.goal_type) {
       case 'cutting':
         return change < 0 ? 'text-green-600' : 'text-red-600';
@@ -196,18 +311,14 @@ export default function GoalsPage() {
 
   const getProgressIcon = (goal: UserGoal, change: number) => {
     if (change === 0) return Minus;
-    
-    const isPositive = change > 0;
-    const isGoodProgress = 
-      (goal.goal_type === 'cutting' && change < 0) ||
-      (goal.goal_type === 'bulking' && change > 0) ||
-      (goal.goal_type === 'maintaining' && Math.abs(change) <= 2);
+    return change > 0 ? TrendingUp : TrendingDown;
+  };
 
-    if (isPositive) {
-      return isGoodProgress ? TrendingUp : TrendingUp;
-    } else {
-      return isGoodProgress ? TrendingDown : TrendingDown;
+  const getGoalUnit = (goal: UserGoal) => {
+    if (goal.goal_category === 'weight') {
+      return 'lbs';
     }
+    return goal.measurement_field?.unit || '';
   };
 
   const goalTypes = [
@@ -228,7 +339,7 @@ export default function GoalsPage() {
     {
       id: 'maintaining',
       name: 'Maintaining',
-      description: 'Maintain weight, improve body composition',
+      description: 'Maintain current levels',
       icon: Minus,
       color: 'text-blue-600 bg-blue-50 border-blue-200',
     },
@@ -248,7 +359,7 @@ export default function GoalsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Goals</h1>
-          <p className="mt-2 text-sm lg:text-base text-gray-600">Manage your fitness goals and track your progress.</p>
+          <p className="mt-2 text-sm lg:text-base text-gray-600">Set and track goals for weight and body measurements.</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
@@ -274,77 +385,89 @@ export default function GoalsPage() {
         </div>
       )}
 
-      {/* Current Active Goal */}
-      {activeGoal && (
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-4 lg:p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center">
-              <Target className="h-6 w-6 text-blue-600 mr-3" />
-              <div>
-                <h3 className="text-base lg:text-lg font-semibold text-gray-900">Current Active Goal</h3>
-                <p className="text-sm text-gray-600 capitalize">{activeGoal.goal_type} Goal</p>
-              </div>
-            </div>
-            <button
-              onClick={() => handleEdit(activeGoal)}
-              className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
-            >
-              <Edit2 className="h-4 w-4" />
-            </button>
-          </div>
-          
-          {(() => {
-            const progress = getGoalProgress(activeGoal);
-            if (!progress) return null;
-
-            const ProgressIcon = getProgressIcon(activeGoal, progress.currentChange);
-            const progressColor = getProgressColor(activeGoal, progress.currentChange);
+      {/* Active Goals */}
+      {activeGoals.length > 0 && (
+        <div className="space-y-4">
+          {activeGoals.map((goal) => {
+            const progress = getGoalProgress(goal);
+            const unit = getGoalUnit(goal);
+            const Icon = goal.goal_category === 'weight' ? Scale : Ruler;
 
             return (
-              <>
-                <div className="mb-4">
-                  <div className="flex justify-between text-sm text-gray-600 mb-2">
-                    <span>{activeGoal.starting_weight} lbs</span>
-                    <span>{activeGoal.target_weight} lbs</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div
-                      className="bg-blue-600 h-3 rounded-full transition-all duration-300"
-                      style={{ width: `${Math.min(progress.progressPercentage, 100)}%` }}
-                    />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <p className="text-gray-600">Current Weight</p>
-                    <p className="font-semibold text-gray-900">{latestWeight?.weight} lbs</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600">Progress</p>
-                    <div className="flex items-center">
-                      <ProgressIcon className={`h-4 w-4 mr-1 ${progressColor}`} />
-                      <p className={`font-semibold ${progressColor}`}>
-                        {progress.currentChange > 0 ? '+' : ''}{progress.currentChange.toFixed(1)} lbs
-                      </p>
+              <div key={goal.id} className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-4 lg:p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center">
+                    <Icon className="h-6 w-6 text-blue-600 mr-3" />
+                    <div>
+                      <h3 className="text-base lg:text-lg font-semibold text-gray-900">
+                        {goal.goal_category === 'weight' ? 'Weight Goal' : `${goal.measurement_field?.field_name} Goal`}
+                      </h3>
+                      <p className="text-sm text-gray-600 capitalize">{goal.goal_type} Goal</p>
                     </div>
                   </div>
-                  <div>
-                    <p className="text-gray-600">Remaining</p>
-                    <p className="font-semibold text-gray-900">
-                      {Math.abs(progress.remaining).toFixed(1)} lbs
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600">Completion</p>
-                    <p className="font-semibold text-gray-900">
-                      {progress.progressPercentage.toFixed(0)}%
-                    </p>
-                  </div>
+                  <button
+                    onClick={() => handleEdit(goal)}
+                    className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </button>
                 </div>
-              </>
+                
+                {progress && (
+                  <>
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>{progress.startingValue} {unit}</span>
+                        <span>{progress.targetValue} {unit}</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-3">
+                        <div
+                          className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+                          style={{ width: `${Math.min(progress.progressPercentage, 100)}%` }}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                      <div>
+                        <p className="text-gray-600">Current</p>
+                        <p className="font-semibold text-gray-900">{progress.currentValue} {unit}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600">Progress</p>
+                        <div className="flex items-center">
+                          {(() => {
+                            const ProgressIcon = getProgressIcon(goal, progress.currentChange);
+                            const progressColor = getProgressColor(goal, progress.currentChange);
+                            return (
+                              <>
+                                <ProgressIcon className={`h-4 w-4 mr-1 ${progressColor}`} />
+                                <p className={`font-semibold ${progressColor}`}>
+                                  {progress.currentChange > 0 ? '+' : ''}{progress.currentChange.toFixed(1)} {unit}
+                                </p>
+                              </>
+                            );
+                          })()}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-gray-600">Remaining</p>
+                        <p className="font-semibold text-gray-900">
+                          {Math.abs(progress.remaining).toFixed(1)} {unit}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600">Completion</p>
+                        <p className="font-semibold text-gray-900">
+                          {progress.progressPercentage.toFixed(0)}%
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             );
-          })()}
+          })}
         </div>
       )}
 
@@ -359,11 +482,86 @@ export default function GoalsPage() {
               onClick={resetForm}
               className="text-gray-400 hover:text-gray-600 p-1"
             >
-              <Plus className="h-5 w-5 rotate-45" />
+              <X className="h-5 w-5" />
             </button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Goal Category Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Goal Category
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
+                  formData.goal_category === 'weight'
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-300 bg-white hover:bg-gray-50'
+                }`}>
+                  <input
+                    type="radio"
+                    name="goal_category"
+                    value="weight"
+                    checked={formData.goal_category === 'weight'}
+                    onChange={(e) => setFormData({ ...formData, goal_category: e.target.value, measurement_field_id: '' })}
+                    className="sr-only"
+                  />
+                  <div className="flex items-center">
+                    <Scale className="h-5 w-5 mr-3 flex-shrink-0" />
+                    <div>
+                      <div className="text-sm font-medium">Weight Goal</div>
+                      <div className="text-sm text-gray-500">Target weight changes</div>
+                    </div>
+                  </div>
+                </label>
+
+                <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
+                  formData.goal_category === 'measurement'
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-300 bg-white hover:bg-gray-50'
+                }`}>
+                  <input
+                    type="radio"
+                    name="goal_category"
+                    value="measurement"
+                    checked={formData.goal_category === 'measurement'}
+                    onChange={(e) => setFormData({ ...formData, goal_category: e.target.value, target_weight: '' })}
+                    className="sr-only"
+                  />
+                  <div className="flex items-center">
+                    <Ruler className="h-5 w-5 mr-3 flex-shrink-0" />
+                    <div>
+                      <div className="text-sm font-medium">Measurement Goal</div>
+                      <div className="text-sm text-gray-500">Target body measurements</div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            {/* Measurement Field Selection (only for measurement goals) */}
+            {formData.goal_category === 'measurement' && (
+              <div>
+                <label htmlFor="measurement_field_id" className="block text-sm font-medium text-gray-700">
+                  Measurement Field
+                </label>
+                <select
+                  id="measurement_field_id"
+                  required
+                  value={formData.measurement_field_id}
+                  onChange={(e) => setFormData({ ...formData, measurement_field_id: e.target.value })}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                >
+                  <option value="">Select measurement field</option>
+                  {measurementFields.map((field) => (
+                    <option key={field.id} value={field.id}>
+                      {field.field_name} ({field.unit})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             {/* Goal Type Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -403,21 +601,29 @@ export default function GoalsPage() {
               </div>
             </div>
 
-            {/* Target Details */}
+            {/* Target Value */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="target_weight" className="block text-sm font-medium text-gray-700">
-                  Target Weight (lbs)
+                <label htmlFor={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'} className="block text-sm font-medium text-gray-700">
+                  Target {formData.goal_category === 'weight' ? 'Weight (lbs)' : 'Value'}
+                  {formData.goal_category === 'measurement' && formData.measurement_field_id && (
+                    <span className="text-gray-500">
+                      {' '}({measurementFields.find(f => f.id === formData.measurement_field_id)?.unit})
+                    </span>
+                  )}
                 </label>
                 <input
                   type="number"
-                  id="target_weight"
+                  id={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'}
                   step="0.1"
                   required
-                  value={formData.target_weight}
-                  onChange={(e) => setFormData({ ...formData, target_weight: e.target.value })}
+                  value={formData.goal_category === 'weight' ? formData.target_weight : formData.target_value}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    [formData.goal_category === 'weight' ? 'target_weight' : 'target_value']: e.target.value 
+                  })}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
-                  placeholder="Enter target weight"
+                  placeholder={`Enter target ${formData.goal_category === 'weight' ? 'weight' : 'value'}`}
                 />
               </div>
 
@@ -438,7 +644,7 @@ export default function GoalsPage() {
 
             <div>
               <label htmlFor="weekly_goal" className="block text-sm font-medium text-gray-700">
-                Weekly Goal (lbs per week, optional)
+                Weekly Goal (optional)
               </label>
               <input
                 type="number"
@@ -447,26 +653,52 @@ export default function GoalsPage() {
                 value={formData.weekly_goal}
                 onChange={(e) => setFormData({ ...formData, weekly_goal: e.target.value })}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
-                placeholder="e.g., 1.0 for cutting, 0.5 for bulking"
+                placeholder={`Units per week (${formData.goal_category === 'weight' ? 'lbs' : 'measurement units'})`}
               />
             </div>
 
-            {/* Current Weight Info */}
-            {latestWeight && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex items-center">
-                  <Scale className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0" />
-                  <div>
-                    <p className="text-sm font-medium text-blue-900">
-                      Starting from current weight: {latestWeight.weight} lbs
-                    </p>
-                    <p className="text-xs text-blue-700">
-                      Logged on {formatDate(latestWeight.date).toLocaleDateString()}
-                    </p>
+            {/* Current Value Info */}
+            {(() => {
+              let currentValue = null;
+              let unit = '';
+              let source = '';
+
+              if (formData.goal_category === 'weight' && latestWeight) {
+                currentValue = latestWeight.weight;
+                unit = 'lbs';
+                source = formatDate(latestWeight.date).toLocaleDateString();
+              } else if (formData.goal_category === 'measurement' && formData.measurement_field_id && latestMeasurements) {
+                const value = latestMeasurements.values?.find(v => v.field_id === formData.measurement_field_id);
+                if (value) {
+                  currentValue = value.value;
+                  unit = value.field?.unit || '';
+                  source = formatDate(latestMeasurements.date).toLocaleDateString();
+                }
+              }
+
+              if (currentValue) {
+                return (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-center">
+                      {formData.goal_category === 'weight' ? (
+                        <Scale className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0" />
+                      ) : (
+                        <Ruler className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0" />
+                      )}
+                      <div>
+                        <p className="text-sm font-medium text-blue-900">
+                          Starting from current value: {currentValue} {unit}
+                        </p>
+                        <p className="text-xs text-blue-700">
+                          Logged on {source}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            )}
+                );
+              }
+              return null;
+            })()}
 
             <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
               <button
@@ -499,6 +731,7 @@ export default function GoalsPage() {
             <div className="space-y-4">
               {goals.map((goal) => {
                 const progress = getGoalProgress(goal);
+                const unit = getGoalUnit(goal);
                 const ProgressIcon = progress ? getProgressIcon(goal, progress.currentChange) : Minus;
                 const progressColor = progress ? getProgressColor(goal, progress.currentChange) : 'text-gray-600';
 
@@ -514,9 +747,10 @@ export default function GoalsPage() {
                     <div className="flex items-center justify-between">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-medium text-gray-900 capitalize">
-                            {goal.goal_type} Goal
+                          <h3 className="font-medium text-gray-900">
+                            {goal.goal_category === 'weight' ? 'Weight' : goal.measurement_field?.field_name} Goal
                           </h3>
+                          <span className="text-sm text-gray-500 capitalize">({goal.goal_type})</span>
                           {goal.is_active && (
                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                               Active
@@ -526,7 +760,7 @@ export default function GoalsPage() {
                         
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
                           <div>
-                            <span className="font-medium">Target:</span> {goal.target_weight} lbs
+                            <span className="font-medium">Target:</span> {getTargetValue(goal)} {unit}
                           </div>
                           {goal.target_date && (
                             <div>
@@ -538,7 +772,7 @@ export default function GoalsPage() {
                               <span className="font-medium mr-2">Progress:</span>
                               <ProgressIcon className={`h-4 w-4 mr-1 ${progressColor}`} />
                               <span className={progressColor}>
-                                {progress.currentChange > 0 ? '+' : ''}{progress.currentChange.toFixed(1)} lbs
+                                {progress.currentChange > 0 ? '+' : ''}{progress.currentChange.toFixed(1)} {unit}
                               </span>
                             </div>
                           )}
@@ -551,7 +785,7 @@ export default function GoalsPage() {
                       <div className="flex items-center gap-2 ml-4">
                         {!goal.is_active && (
                           <button
-                            onClick={() => handleSetActive(goal.id)}
+                            onClick={() => handleSetActive(goal.id, goal.goal_category)}
                             className="px-3 py-1.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                           >
                             Set Active

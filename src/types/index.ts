@@ -25,13 +25,18 @@ export interface UserGoal {
   id: string;
   user_id: string;
   goal_type: 'cutting' | 'bulking' | 'maintaining';
+  goal_category: 'weight' | 'measurement';
   starting_weight?: number;
   target_weight?: number;
+  starting_value?: number;
+  target_value?: number;
+  measurement_field_id?: string;
   target_date?: string;
-  weekly_goal?: number; // lbs per week
+  weekly_goal?: number; // lbs per week or units per week
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  measurement_field?: MeasurementField; // Joined data
 }
 
 export interface WeightEntry {
