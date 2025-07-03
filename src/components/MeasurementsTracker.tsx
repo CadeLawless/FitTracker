@@ -764,7 +764,7 @@ export default function MeasurementsTracker() {
                     </p>
                     {change !== null && (
                       <p className="text-xs text-gray-500">
-                        {change > 0 ? '+' : ''}{change.toFixed(1)} {field.unit} all time
+                        All Time {change > 0 ? '+' : ''}{change.toFixed(1)} {field.unit}
                       </p>
                     )}
                   </div>
