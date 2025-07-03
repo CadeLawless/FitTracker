@@ -41,10 +41,11 @@ export default function WeightTracker() {
   // Auto-scroll to form when it becomes visible
   useEffect(() => {
     if (showForm && formRef.current) {
-      formRef.current.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'start',
-        inline: 'nearest'
+      const y = formRef.current.getBoundingClientRect().top + window.pageYOffset - 80;
+
+      window.scrollTo({
+        top: y,
+        behavior: 'smooth',
       });
     }
   }, [showForm]);
