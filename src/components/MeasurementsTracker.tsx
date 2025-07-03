@@ -494,8 +494,8 @@ export default function MeasurementsTracker() {
     if (entriesWithField.length < 2) return null;
     
     const latest = entriesWithField[0][fieldKey];
-    const previous = entriesWithField[1][fieldKey];
-    return latest - previous;
+    const first = entriesWithField[entriesWithField.length-1][fieldKey];
+    return latest - first;
   };
 
   const activeFields = measurementFields.filter(field => field.is_active);
