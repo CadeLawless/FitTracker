@@ -69,6 +69,15 @@ export default function GoalsPage() {
     }
   }, [showForm]);
 
+  useEffect(() => {
+    if (success !== '') {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }
+  }, [success]);
+
   const loadGoalsData = async () => {
     try {
       const user = await supabase.auth.getUser();
