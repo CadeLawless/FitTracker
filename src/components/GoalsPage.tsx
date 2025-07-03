@@ -51,9 +51,23 @@ export default function GoalsPage() {
     weekly_goal: '',
   });
 
+  // Ref for the form section to enable auto-scrolling
+  const formRef = useRef<HTMLDivElement>(null);
+  
   useEffect(() => {
     loadGoalsData();
   }, []);
+
+  useEffect(() => {
+    if (showForm && formRef.current) {
+      const y = formRef.current.getBoundingClientRect().top + window.pageYOffset - 80;
+
+      window.scrollTo({
+        top: y,
+        behavior: 'smooth',
+      });
+    }
+  }, [showForm]);
 
   const loadGoalsData = async () => {
     try {
@@ -662,7 +676,7 @@ export default function GoalsPage() {
 
         {/* Goal Form */}
         {showForm && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+          <div ref={formRef} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-base lg:text-lg font-semibold text-gray-900">
                 {editingGoal ? 'Edit Goal' : 'Create New Goal'}
