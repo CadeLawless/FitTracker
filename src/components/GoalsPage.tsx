@@ -72,6 +72,7 @@ export default function GoalsPage() {
   
   // Ref for the form section to enable auto-scrolling
   const formRef = useRef<HTMLDivElement>(null);
+  const editFormRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     loadGoalsData();
@@ -87,6 +88,17 @@ export default function GoalsPage() {
       });
     }
   }, [showForm]);
+
+  useEffect(() => {
+    if (editingGoal !== null && formRef.current) {
+      const y = editFormRef.current.getBoundingClientRect().top + window.pageYOffset - 80;
+
+      window.scrollTo({
+        top: y,
+        behavior: 'smooth',
+      });
+    }
+  }, [editingGoal]);
 
   useEffect(() => {
     if (success !== '') {
@@ -1026,7 +1038,7 @@ export default function GoalsPage() {
               // Check if this goal is being edited
               if (editingGoal?.id === goal.id) {
                 return (
-                  <div key={goal.id} className="bg-blue-50 border border-blue-200 rounded-lg p-4 lg:p-6">
+                  <div ref={editFormRef} key={goal.id} className="bg-blue-50 border border-blue-200 rounded-lg p-4 lg:p-6">
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="text-base lg:text-lg font-semibold text-gray-900">Edit Goal</h3>
                       <button
@@ -1303,7 +1315,7 @@ export default function GoalsPage() {
                   // Check if this goal is being edited
                   if (editingGoal?.id === goal.id) {
                     return (
-                      <div key={goal.id} className="bg-blue-50 border border-blue-200 rounded-lg p-4 lg:p-6">
+                      <div ref={editFormRef} key={goal.id} className="bg-blue-50 border border-blue-200 rounded-lg p-4 lg:p-6">
                         <div className="flex items-center justify-between mb-6">
                           <h3 className="text-base lg:text-lg font-semibold text-gray-900">Edit Goal</h3>
                           <button
