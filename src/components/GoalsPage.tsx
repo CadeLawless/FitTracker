@@ -432,6 +432,7 @@ export default function GoalsPage() {
     if (!deleteConfirmation.goalId) return;
 
     try {
+      console.log(deleteConfirmation.goalId);
       const { error } = await supabase
         .from('user_goals')
         .delete()
