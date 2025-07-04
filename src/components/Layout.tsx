@@ -34,10 +34,11 @@ export default function Layout({ children }: LayoutProps) {
 
   const loadUser = async () => {
     try {
-      const { data: { userInfo } } = await supabase.auth.getUser();
-      if (!userInfo) return;
-      setUser(userInfo);
-      console.log(UserInfo);
+      const { data, error } = await supabase.auth.getUser();
+      if (error) throw error;
+      if (!data.user) return;
+      setUser(data.user);
+      console.log(data.user); // optional for debugging
     } catch (error) {
       console.error('Error loading user data:', error);
     }
