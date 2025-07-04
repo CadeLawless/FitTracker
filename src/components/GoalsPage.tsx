@@ -194,7 +194,7 @@ export default function GoalsPage() {
       
       // Clear the old timeout if it exists
       if(fitnessPhaseTimeoutRef.current){
-        clearTimeout(timeoutRef.current);
+        clearTimeout(fitnessPhaseTimeoutRef.current);
       }
     
       // Set a new timeout
