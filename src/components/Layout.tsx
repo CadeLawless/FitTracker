@@ -137,7 +137,7 @@ export default function Layout({ children }: LayoutProps) {
                     <p className="text-xs text-gray-500 truncate">Fitness Enthusiast</p>
                   </>
                 ) : (
-                  <div className="h-7 w-full bg-gray-200 rounded animate-pulse"></div> // Skeleton loading
+                  <div className="h-7 w-[90%] bg-gray-200 rounded animate-pulse"></div> // Skeleton loading
                 )}
               </div>
               <button
