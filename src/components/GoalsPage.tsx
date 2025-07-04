@@ -67,9 +67,8 @@ export default function GoalsPage() {
   const [fitnessPhase, setFitnessPhase] = useState<'cutting' | 'bulking' | 'maintaining' | 'none'>('none');
   const [updatingPhase, setUpdatingPhase] = useState(false);
 
-  // Refs for the form section to enable auto-scrolling
+  // Ref for the form section to enable auto-scrolling
   const formRef = useRef<HTMLDivElement>(null);
-  const editFormRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     loadGoalsData();
@@ -85,19 +84,6 @@ export default function GoalsPage() {
       });
     }
   }, [showForm]);
-  
-  useEffect(() => {
-    if (editingGoal !== null && editFormRef.current) {
-    setTimeout(() => {
-        const y = editFormRef.current.getBoundingClientRect().top + window.pageYOffset - 80;
-
-      window.scrollTo({
-        top: y,
-        behavior: 'smooth',
-      });
-      }, 100);
-    }
-  }, [editingGoal]);
 
   useEffect(() => {
     if (success !== '') {
@@ -202,11 +188,7 @@ export default function GoalsPage() {
 
       setFitnessPhase(newPhase);
       setSuccess('Fitness phase updated successfully!');
-      setTimeout(() => {
-        if(fitnessPhase === newPhase){
-          setSuccess('');
-        }
-      }, 3000);
+      setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
       console.error('Error updating fitness phase:', error);
       setError('Failed to update fitness phase');
@@ -420,7 +402,7 @@ export default function GoalsPage() {
     const goalName = goal.goal_category === 'weight' 
       ? `Weight Goal` 
       : `${goal.measurement_field?.field_name} Goal`;
-    console.log(goal.id);
+    
     setDeleteConfirmation({
       isOpen: true,
       goalId: goal.id,
@@ -432,7 +414,6 @@ export default function GoalsPage() {
     if (!deleteConfirmation.goalId) return;
 
     try {
-      console.log(deleteConfirmation.goalId);
       const { error } = await supabase
         .from('user_goals')
         .delete()
@@ -528,7 +509,7 @@ export default function GoalsPage() {
     
     // For measurement goals, determine if increase/decrease is good based on the field
     if (goal.goal_category === 'measurement') {
-      const fieldName = goal.measurement_field?.field_name?.toLowerCase() || '';
+      /* const fieldName = goal.measurement_field?.field_name?.toLowerCase() || '';
       
       // Generally, decreases are good for waist, body fat, etc.
       // Increases are good for chest, biceps, etc.
@@ -540,11 +521,21 @@ export default function GoalsPage() {
         return change < 0 ? 'text-green-600' : 'text-red-600';
       } else {
         return change > 0 ? 'text-green-600' : 'text-red-600';
-      }
+      } */
+
+      const changeNeeded = goal.target_value - goal.starting_value;
+    }else{
+      const changeNeeded = goal.target_weight - goal.starting_weight;
+    }
+    
+    if(changeNeeded > 0){
+      return change > 0 ? 'text-green-600' : 'text-red-600';
+    }else{
+      return change < 0 ? 'text-green-600' : 'text-red-600';
     }
     
     // For weight goals, use the fitness phase
-    switch (fitnessPhase) {
+    /* switch (fitnessPhase) {
       case 'cutting':
         return change < 0 ? 'text-green-600' : 'text-red-600';
       case 'bulking':
@@ -553,7 +544,7 @@ export default function GoalsPage() {
         return Math.abs(change) <= 2 ? 'text-green-600' : 'text-orange-600';
       default:
         return 'text-gray-600';
-    }
+    } */
   };
 
   const getProgressIcon = (goal: UserGoal, change: number) => {
@@ -1021,7 +1012,7 @@ export default function GoalsPage() {
               // Check if this goal is being edited
               if (editingGoal?.id === goal.id) {
                 return (
-                  <div ref={editFormRef} key={goal.id} className="bg-blue-50 border border-blue-200 rounded-lg p-4 lg:p-6">
+                  <div key={goal.id} className="bg-blue-50 border border-blue-200 rounded-lg p-4 lg:p-6">
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="text-base lg:text-lg font-semibold text-gray-900">Edit Goal</h3>
                       <button
@@ -1298,7 +1289,7 @@ export default function GoalsPage() {
                   // Check if this goal is being edited
                   if (editingGoal?.id === goal.id) {
                     return (
-                      <div ref={editFormRef} key={goal.id} className="bg-blue-50 border border-blue-200 rounded-lg p-4 lg:p-6">
+                      <div key={goal.id} className="bg-blue-50 border border-blue-200 rounded-lg p-4 lg:p-6">
                         <div className="flex items-center justify-between mb-6">
                           <h3 className="text-base lg:text-lg font-semibold text-gray-900">Edit Goal</h3>
                           <button
