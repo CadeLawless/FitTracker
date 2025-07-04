@@ -188,7 +188,11 @@ export default function GoalsPage() {
 
       setFitnessPhase(newPhase);
       setSuccess('Fitness phase updated successfully!');
-      setTimeout(() => setSuccess(''), 3000);
+      setTimeout(() => {
+        if(fitnessPhase === newPhase){
+          setSuccess('');
+        }
+      }, 3000);
     } catch (error) {
       console.error('Error updating fitness phase:', error);
       setError('Failed to update fitness phase');
