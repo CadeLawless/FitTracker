@@ -16,9 +16,16 @@ interface CompleteConfirmation {
   goalName: string;
 }
 
+interface ConflictWarning {
+  isOpen: boolean;
+  category: string;
+  existingGoal: UserGoal | null;
+}
+
 export default function GoalsPage() {
   const [goals, setGoals] = useState<UserGoal[]>([]);
   const [activeGoals, setActiveGoals] = useState<UserGoal[]>([]);
+  const [inactiveGoals, setInactiveGoals] = useState<UserGoal[]>([]);
   const [measurementFields, setMeasurementFields] = useState<MeasurementField[]>([]);
   const [latestWeight, setLatestWeight] = useState<WeightEntry | null>(null);
   const [latestMeasurements, setLatestMeasurements] = useState<BodyMeasurement | null>(null);
@@ -41,6 +48,12 @@ export default function GoalsPage() {
     isOpen: false,
     goalId: null,
     goalName: '',
+  });
+
+  const [conflictWarning, setConflictWarning] = useState<ConflictWarning>({
+    isOpen: false,
+    category: '',
+    existingGoal: null,
   });
 
   const [formData, setFormData] = useState({
@@ -152,6 +165,7 @@ export default function GoalsPage() {
 
       setGoals(goalsData || []);
       setActiveGoals(goalsData?.filter(g => g.is_active) || []);
+      setInactiveGoals(goalsData?.filter(g => !g.is_active) || []);
       setMeasurementFields(fieldsData || []);
       setLatestWeight(weightData?.[0] || null);
       setLatestMeasurements(measurementData?.[0] || null);
@@ -191,6 +205,18 @@ export default function GoalsPage() {
     }
   };
 
+  const checkForConflicts = (category: string, measurementFieldId?: string) => {
+    const existingActiveGoal = activeGoals.find(goal => {
+      if (category === 'weight') {
+        return goal.goal_category === 'weight';
+      } else {
+        return goal.goal_category === 'measurement' && goal.measurement_field_id === measurementFieldId;
+      }
+    });
+
+    return existingActiveGoal;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -201,12 +227,30 @@ export default function GoalsPage() {
       const user = await supabase.auth.getUser();
       if (!user.data.user) return;
 
+      // Check for conflicts only when creating new goals (not editing)
+      if (!editingGoal) {
+        const conflictingGoal = checkForConflicts(
+          formData.goal_category, 
+          formData.measurement_field_id
+        );
+
+        if (conflictingGoal) {
+          setConflictWarning({
+            isOpen: true,
+            category: formData.goal_category,
+            existingGoal: conflictingGoal,
+          });
+          setSaving(false);
+          return;
+        }
+      }
+
       let goalData: any = {
         user_id: user.data.user.id,
         goal_category: formData.goal_category,
         target_date: formData.target_date || null,
         weekly_goal: formData.weekly_goal ? parseFloat(formData.weekly_goal) : null,
-        is_active: true,
+        is_active: !editingGoal, // Only set as active for new goals
       };
 
       if (formData.goal_category === 'weight') {
@@ -229,7 +273,8 @@ export default function GoalsPage() {
       }
 
       if (editingGoal) {
-        // Update existing goal
+        // Update existing goal (don't change active status)
+        delete goalData.is_active; // Don't update active status when editing
         const { error } = await supabase
           .from('user_goals')
           .update(goalData)
@@ -237,17 +282,26 @@ export default function GoalsPage() {
 
         if (error) throw error;
         setSuccess('Goal updated successfully!');
-        setTimeout(() => {
-          setSuccess('');
-        }, 5000);
       } else {
-        // Deactivate current active goals of the same category
-        const activeGoalsOfCategory = activeGoals.filter(g => g.goal_category === formData.goal_category);
-        if (activeGoalsOfCategory.length > 0) {
-          await supabase
-            .from('user_goals')
-            .update({ is_active: false })
-            .in('id', activeGoalsOfCategory.map(g => g.id));
+        // Deactivate current active goals of the same category/field
+        if (formData.goal_category === 'weight') {
+          const activeWeightGoals = activeGoals.filter(g => g.goal_category === 'weight');
+          if (activeWeightGoals.length > 0) {
+            await supabase
+              .from('user_goals')
+              .update({ is_active: false })
+              .in('id', activeWeightGoals.map(g => g.id));
+          }
+        } else {
+          const activeMeasurementGoals = activeGoals.filter(
+            g => g.goal_category === 'measurement' && g.measurement_field_id === formData.measurement_field_id
+          );
+          if (activeMeasurementGoals.length > 0) {
+            await supabase
+              .from('user_goals')
+              .update({ is_active: false })
+              .in('id', activeMeasurementGoals.map(g => g.id));
+          }
         }
 
         // Create new goal
@@ -257,10 +311,11 @@ export default function GoalsPage() {
 
         if (error) throw error;
         setSuccess('New goal created successfully!');
-        setTimeout(() => {
-          setSuccess('');
-        }, 5000);
       }
+
+      setTimeout(() => {
+        setSuccess('');
+      }, 5000);
 
       resetForm();
       loadGoalsData();
@@ -332,14 +387,35 @@ export default function GoalsPage() {
     setShowForm(true);
   };
 
-  const handleSetActive = async (goalId: string, category: string) => {
+  const handleSetActive = async (goalId: string, category: string, measurementFieldId?: string) => {
     try {
-      // Deactivate all goals of the same category
-      await supabase
-        .from('user_goals')
-        .update({ is_active: false })
-        .eq('goal_category', category)
-        .eq('user_id', (await supabase.auth.getUser()).data.user?.id);
+      // Check for conflicts
+      const conflictingGoal = checkForConflicts(category, measurementFieldId);
+      
+      if (conflictingGoal && conflictingGoal.id !== goalId) {
+        setConflictWarning({
+          isOpen: true,
+          category,
+          existingGoal: conflictingGoal,
+        });
+        return;
+      }
+
+      // Deactivate goals of the same category/field
+      if (category === 'weight') {
+        await supabase
+          .from('user_goals')
+          .update({ is_active: false })
+          .eq('goal_category', 'weight')
+          .eq('user_id', (await supabase.auth.getUser()).data.user?.id);
+      } else {
+        await supabase
+          .from('user_goals')
+          .update({ is_active: false })
+          .eq('goal_category', 'measurement')
+          .eq('measurement_field_id', measurementFieldId)
+          .eq('user_id', (await supabase.auth.getUser()).data.user?.id);
+      }
 
       // Activate selected goal
       const { error } = await supabase
@@ -616,6 +692,63 @@ export default function GoalsPage() {
         </div>
       )}
 
+      {/* Conflict Warning Modal */}
+      {conflictWarning.isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <div className="flex-shrink-0">
+                  <AlertTriangle className="h-6 w-6 text-orange-600" />
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-lg font-medium text-gray-900">Active Goal Conflict</h3>
+                </div>
+              </div>
+              <div className="mb-6">
+                <p className="text-sm text-gray-600">
+                  You already have an active goal for{' '}
+                  <span className="font-medium">
+                    {conflictWarning.category === 'weight' 
+                      ? 'weight' 
+                      : conflictWarning.existingGoal?.measurement_field?.field_name
+                    }
+                  </span>.
+                  You can only have one active goal per measurement type at a time.
+                </p>
+                <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                  <p className="text-sm text-orange-800">
+                    <span className="font-medium">Current active goal:</span>{' '}
+                    {conflictWarning.existingGoal?.goal_category === 'weight' 
+                      ? `${conflictWarning.existingGoal?.target_weight} lbs`
+                      : `${conflictWarning.existingGoal?.target_value} ${conflictWarning.existingGoal?.measurement_field?.unit}`
+                    }
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
+                <button
+                  onClick={() => setConflictWarning({ isOpen: false, category: '', existingGoal: null })}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setConflictWarning({ isOpen: false, category: '', existingGoal: null });
+                    // Continue with the action that would replace the existing goal
+                    handleSubmit(new Event('submit') as any);
+                  }}
+                  className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm lg:text-base"
+                >
+                  Replace Existing Goal
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-6 lg:space-y-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -743,6 +876,7 @@ export default function GoalsPage() {
         {/* Active Goals */}
         {activeGoals.length > 0 && (
           <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-gray-900">Active Goals</h2>
             {activeGoals.map((goal) => {
               const progress = getGoalProgress(goal);
               const unit = getGoalUnit(goal);
@@ -1060,9 +1194,9 @@ export default function GoalsPage() {
             <h2 className="text-base lg:text-lg font-semibold text-gray-900">Goals History</h2>
           </div>
           <div className="p-4 lg:p-6">
-            {goals.length > 0 ? (
+            {inactiveGoals.length > 0 ? (
               <div className="space-y-4">
-                {goals.map((goal) => {
+                {inactiveGoals.map((goal) => {
                   const progress = getGoalProgress(goal);
                   const unit = getGoalUnit(goal);
                   const ProgressIcon = progress ? getProgressIcon(goal, progress.currentChange) : Minus;
@@ -1071,11 +1205,7 @@ export default function GoalsPage() {
                   return (
                     <div
                       key={goal.id}
-                      className={`p-4 border rounded-lg transition-colors ${
-                        goal.is_active 
-                          ? 'border-blue-200 bg-blue-50' 
-                          : 'border-gray-200 hover:bg-gray-50'
-                      }`}
+                      className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                     >
                       <div className="flex items-center justify-between">
                         <div className="min-w-0 flex-1">
@@ -1083,11 +1213,6 @@ export default function GoalsPage() {
                             <h3 className="font-medium text-gray-900">
                               {goal.goal_category === 'weight' ? 'Weight' : goal.measurement_field?.field_name} Goal
                             </h3>
-                            {goal.is_active && (
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                Active
-                              </span>
-                            )}
                           </div>
                           
                           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
@@ -1115,23 +1240,12 @@ export default function GoalsPage() {
                         </div>
                         
                         <div className="flex items-center gap-2 ml-4">
-                          {!goal.is_active && (
-                            <button
-                              onClick={() => handleSetActive(goal.id, goal.goal_category)}
-                              className="px-3 py-1.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                            >
-                              Set Active
-                            </button>
-                          )}
-                          {goal.is_active && (
-                            <button
-                              onClick={() => handleCompleteClick(goal)}
-                              className="p-2 text-green-600 hover:bg-green-100 rounded transition-colors"
-                              title="Mark as complete"
-                            >
-                              <Check className="h-4 w-4" />
-                            </button>
-                          )}
+                          <button
+                            onClick={() => handleSetActive(goal.id, goal.goal_category, goal.measurement_field_id)}
+                            className="px-3 py-1.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                          >
+                            Set Active
+                          </button>
                           <button
                             onClick={() => handleEdit(goal)}
                             className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
@@ -1155,7 +1269,7 @@ export default function GoalsPage() {
             ) : (
               <div className="text-center py-8 lg:py-12">
                 <Target className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 mb-2 text-sm lg:text-base">No goals set yet</p>
+                <p className="text-gray-500 mb-2 text-sm lg:text-base">No completed goals yet</p>
                 <button
                   onClick={() => setShowForm(true)}
                   className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
