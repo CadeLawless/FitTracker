@@ -39,7 +39,7 @@ export default function Layout({ children }: LayoutProps) {
       if (error) throw error;
       if (!data.user) return;
       setUser(data.user);
-      console.log(data.user); // optional for debugging
+      //console.log(data.user); // optional for debugging
     } catch (error) {
       console.error('Error loading user data:', error);
     } finally {
