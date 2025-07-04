@@ -88,14 +88,12 @@ export default function GoalsPage() {
   
   useEffect(() => {
     if (editingGoal !== null && editFormRef.current) {
-      setTimeout(() => {
-        const y = editFormRef.current.getBoundingClientRect().top + window.pageYOffset - 80;
+      const y = editFormRef.current.getBoundingClientRect().top + window.pageYOffset - 80;
 
       window.scrollTo({
         top: y,
         behavior: 'smooth',
       });
-      }, 500);
     }
   }, [editingGoal]);
 
