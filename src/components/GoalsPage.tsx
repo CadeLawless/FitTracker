@@ -191,6 +191,7 @@ export default function GoalsPage() {
 
       setFitnessPhase(newPhase);
       setSuccess('Fitness phase updated successfully!');
+      
       // Clear the old timeout if it exists
       if(timeoutRef.current){
         clearTimeout(timeoutRef.current);
