@@ -16,7 +16,7 @@ import {
   Target
 } from 'lucide-react';
 import { auth } from '../lib/supabase';
-import type { User } from '../types';
+import type { User as UserInfo } from '../types';
 
 interface LayoutProps {
   children: React.ReactNode; // This allows us to wrap other components
@@ -26,9 +26,13 @@ export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserInfo | null>(null);
 
   useEffect(() => {
+    loadUser();
+  }, []);
+
+  const loadUser = async () => {
     try {
       const { data: { userInfo } } = await supabase.auth.getUser();
       if (!userInfo) return;
@@ -36,7 +40,7 @@ export default function Layout({ children }: LayoutProps) {
     } catch (error) {
       console.error('Error loading user data:', error);
     }
-  }, []);
+  };
   
   const handleSignOut = async () => {
     await auth.signOut();
