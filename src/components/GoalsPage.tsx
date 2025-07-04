@@ -508,7 +508,7 @@ export default function GoalsPage() {
     if (change === 0) return 'text-gray-600';
     
     // For measurement goals, determine if increase/decrease is good based on the field
-    const changeNeeded;
+    let changeNeeded;
     if (goal.goal_category === 'measurement') {
       /* const fieldName = goal.measurement_field?.field_name?.toLowerCase() || '';
       
