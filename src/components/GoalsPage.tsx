@@ -189,7 +189,7 @@ export default function GoalsPage() {
       setFitnessPhase(newPhase);
       setSuccess('Fitness phase updated successfully!');
       setTimeout(() => {
-        if(fitnessPhase === newPhase){
+        if(fitnessPhase !== newPhase){
           setSuccess('');
         }
       }, 3000);
