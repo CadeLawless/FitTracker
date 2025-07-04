@@ -67,6 +67,9 @@ export default function GoalsPage() {
   const [fitnessPhase, setFitnessPhase] = useState<'cutting' | 'bulking' | 'maintaining' | 'none'>('none');
   const [updatingPhase, setUpdatingPhase] = useState(false);
 
+  // Ref for timeout on fitness phase success messages
+  const fitnessPhaseTimeoutRef = useRef(null);
+  
   // Ref for the form section to enable auto-scrolling
   const formRef = useRef<HTMLDivElement>(null);
   
@@ -188,10 +191,15 @@ export default function GoalsPage() {
 
       setFitnessPhase(newPhase);
       setSuccess('Fitness phase updated successfully!');
-      setTimeout(() => {
-        if(fitnessPhase !== newPhase){
-          setSuccess('');
-        }
+      // Clear the old timeout if it exists
+      if(timeoutRef.current){
+        clearTimeout(timeoutRef.current);
+      }
+    
+      // Set a new timeout
+      timeoutRef.current = setTimeout(() => {
+        setSuccess('');
+        timeoutRef.current = null;
       }, 3000);
     } catch (error) {
       console.error('Error updating fitness phase:', error);
