@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Target, TrendingUp, TrendingDown, Minus, Save, Edit2, Plus, Calendar, Scale, CheckCircle, AlertCircle, Ruler, X, Trash2, Check, AlertTriangle, User } from 'lucide-react';
+import { Target, TrendingUp, TrendingDown, Minus, Save, Edit2, Plus, Calendar, Scale, CheckCircle, AlertCircle, Ruler, X, Trash2, Check, AlertTriangle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
 import type { UserGoal, WeightEntry, MeasurementField, BodyMeasurement, UserProfile } from '../types';
@@ -16,10 +16,10 @@ interface CompleteConfirmation {
   goalName: string;
 }
 
-interface ConflictWarning {
+interface ConflictConfirmation {
   isOpen: boolean;
-  category: string;
-  existingGoal: UserGoal | null;
+  conflictingGoal: UserGoal | null;
+  newGoalData: any;
 }
 
 export default function GoalsPage() {
@@ -34,7 +34,6 @@ export default function GoalsPage() {
   const [saving, setSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingGoal, setEditingGoal] = useState<UserGoal | null>(null);
-  const [editingPhase, setEditingPhase] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -50,10 +49,10 @@ export default function GoalsPage() {
     goalName: '',
   });
 
-  const [conflictWarning, setConflictWarning] = useState<ConflictWarning>({
+  const [conflictConfirmation, setConflictConfirmation] = useState<ConflictConfirmation>({
     isOpen: false,
-    category: '',
-    existingGoal: null,
+    conflictingGoal: null,
+    newGoalData: null,
   });
 
   const [formData, setFormData] = useState({
@@ -65,9 +64,8 @@ export default function GoalsPage() {
     weekly_goal: '',
   });
 
-  const [phaseData, setPhaseData] = useState({
-    fitness_phase: 'none',
-  });
+  const [fitnessPhase, setFitnessPhase] = useState<'cutting' | 'bulking' | 'maintaining' | 'none'>('none');
+  const [updatingPhase, setUpdatingPhase] = useState(false);
 
   // Ref for the form section to enable auto-scrolling
   const formRef = useRef<HTMLDivElement>(null);
@@ -101,7 +99,7 @@ export default function GoalsPage() {
       const user = await supabase.auth.getUser();
       if (!user.data.user) return;
 
-      // Load user profile with fitness phase
+      // Load user profile for fitness phase
       const { data: profileData, error: profileError } = await supabase
         .from('user_profiles')
         .select('*')
@@ -109,11 +107,8 @@ export default function GoalsPage() {
         .maybeSingle();
 
       if (profileError && profileError.code !== 'PGRST116') throw profileError;
-
       setUserProfile(profileData);
-      setPhaseData({
-        fitness_phase: profileData?.fitness_phase || 'none',
-      });
+      setFitnessPhase(profileData?.fitness_phase || 'none');
 
       // Load goals with measurement field info
       const { data: goalsData, error: goalsError } = await supabase
@@ -163,9 +158,10 @@ export default function GoalsPage() {
 
       if (measurementError) throw measurementError;
 
-      setGoals(goalsData || []);
-      setActiveGoals(goalsData?.filter(g => g.is_active) || []);
-      setInactiveGoals(goalsData?.filter(g => !g.is_active) || []);
+      const allGoals = goalsData || [];
+      setGoals(allGoals);
+      setActiveGoals(allGoals.filter(g => g.is_active));
+      setInactiveGoals(allGoals.filter(g => !g.is_active));
       setMeasurementFields(fieldsData || []);
       setLatestWeight(weightData?.[0] || null);
       setLatestMeasurements(measurementData?.[0] || null);
@@ -174,6 +170,30 @@ export default function GoalsPage() {
       setError('Failed to load goals data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updateFitnessPhase = async (newPhase: 'cutting' | 'bulking' | 'maintaining' | 'none') => {
+    setUpdatingPhase(true);
+    try {
+      const user = await supabase.auth.getUser();
+      if (!user.data.user) return;
+
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ fitness_phase: newPhase, updated_at: new Date().toISOString() })
+        .eq('user_id', user.data.user.id);
+
+      if (error) throw error;
+
+      setFitnessPhase(newPhase);
+      setSuccess('Fitness phase updated successfully!');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (error) {
+      console.error('Error updating fitness phase:', error);
+      setError('Failed to update fitness phase');
+    } finally {
+      setUpdatingPhase(false);
     }
   };
 
@@ -205,16 +225,17 @@ export default function GoalsPage() {
     }
   };
 
-  const checkForConflicts = (category: string, measurementFieldId?: string) => {
-    const existingActiveGoal = activeGoals.find(goal => {
-      if (category === 'weight') {
+  const checkForConflictingGoal = (goalData: any): UserGoal | null => {
+    return activeGoals.find(goal => {
+      if (editingGoal && goal.id === editingGoal.id) return false; // Skip self when editing
+      
+      if (goalData.goal_category === 'weight') {
         return goal.goal_category === 'weight';
       } else {
-        return goal.goal_category === 'measurement' && goal.measurement_field_id === measurementFieldId;
+        return goal.goal_category === 'measurement' && 
+               goal.measurement_field_id === goalData.measurement_field_id;
       }
-    });
-
-    return existingActiveGoal;
+    }) || null;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -227,30 +248,11 @@ export default function GoalsPage() {
       const user = await supabase.auth.getUser();
       if (!user.data.user) return;
 
-      // Check for conflicts only when creating new goals (not editing)
-      if (!editingGoal) {
-        const conflictingGoal = checkForConflicts(
-          formData.goal_category, 
-          formData.measurement_field_id
-        );
-
-        if (conflictingGoal) {
-          setConflictWarning({
-            isOpen: true,
-            category: formData.goal_category,
-            existingGoal: conflictingGoal,
-          });
-          setSaving(false);
-          return;
-        }
-      }
-
       let goalData: any = {
         user_id: user.data.user.id,
         goal_category: formData.goal_category,
         target_date: formData.target_date || null,
         weekly_goal: formData.weekly_goal ? parseFloat(formData.weekly_goal) : null,
-        is_active: !editingGoal, // Only set as active for new goals
       };
 
       if (formData.goal_category === 'weight') {
@@ -273,8 +275,7 @@ export default function GoalsPage() {
       }
 
       if (editingGoal) {
-        // Update existing goal (don't change active status)
-        delete goalData.is_active; // Don't update active status when editing
+        // Update existing goal (don't change is_active status)
         const { error } = await supabase
           .from('user_goals')
           .update(goalData)
@@ -283,28 +284,21 @@ export default function GoalsPage() {
         if (error) throw error;
         setSuccess('Goal updated successfully!');
       } else {
-        // Deactivate current active goals of the same category/field
-        if (formData.goal_category === 'weight') {
-          const activeWeightGoals = activeGoals.filter(g => g.goal_category === 'weight');
-          if (activeWeightGoals.length > 0) {
-            await supabase
-              .from('user_goals')
-              .update({ is_active: false })
-              .in('id', activeWeightGoals.map(g => g.id));
-          }
-        } else {
-          const activeMeasurementGoals = activeGoals.filter(
-            g => g.goal_category === 'measurement' && g.measurement_field_id === formData.measurement_field_id
-          );
-          if (activeMeasurementGoals.length > 0) {
-            await supabase
-              .from('user_goals')
-              .update({ is_active: false })
-              .in('id', activeMeasurementGoals.map(g => g.id));
-          }
+        // Check for conflicting active goal
+        const conflictingGoal = checkForConflictingGoal(goalData);
+        
+        if (conflictingGoal) {
+          setConflictConfirmation({
+            isOpen: true,
+            conflictingGoal,
+            newGoalData: { ...goalData, is_active: true },
+          });
+          setSaving(false);
+          return;
         }
 
-        // Create new goal
+        // Create new goal as active
+        goalData.is_active = true;
         const { error } = await supabase
           .from('user_goals')
           .insert([goalData]);
@@ -313,10 +307,7 @@ export default function GoalsPage() {
         setSuccess('New goal created successfully!');
       }
 
-      setTimeout(() => {
-        setSuccess('');
-      }, 5000);
-
+      setTimeout(() => setSuccess(''), 5000);
       resetForm();
       loadGoalsData();
     } catch (error: any) {
@@ -327,50 +318,32 @@ export default function GoalsPage() {
     }
   };
 
-  const handlePhaseSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-    setError('');
-    setSuccess('');
+  const handleConflictConfirm = async () => {
+    if (!conflictConfirmation.newGoalData || !conflictConfirmation.conflictingGoal) return;
 
     try {
-      const user = await supabase.auth.getUser();
-      if (!user.data.user) return;
+      // Deactivate conflicting goal
+      await supabase
+        .from('user_goals')
+        .update({ is_active: false })
+        .eq('id', conflictConfirmation.conflictingGoal.id);
 
-      if (userProfile) {
-        // Update existing profile
-        const { error } = await supabase
-          .from('user_profiles')
-          .update({
-            fitness_phase: phaseData.fitness_phase,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', userProfile.id);
+      // Create new goal
+      const { error } = await supabase
+        .from('user_goals')
+        .insert([conflictConfirmation.newGoalData]);
 
-        if (error) throw error;
-      } else {
-        // Create new profile
-        const { error } = await supabase
-          .from('user_profiles')
-          .insert([{
-            user_id: user.data.user.id,
-            fitness_phase: phaseData.fitness_phase,
-          }]);
+      if (error) throw error;
 
-        if (error) throw error;
-      }
-
-      setSuccess('Fitness phase updated successfully!');
-      setTimeout(() => {
-        setSuccess('');
-      }, 5000);
-      setEditingPhase(false);
+      setSuccess('New goal created and previous goal deactivated!');
+      setTimeout(() => setSuccess(''), 5000);
+      resetForm();
       loadGoalsData();
     } catch (error: any) {
-      console.error('Error updating fitness phase:', error);
-      setError(error.message || 'Failed to update fitness phase');
+      console.error('Error creating goal:', error);
+      setError(error.message || 'Failed to create goal');
     } finally {
-      setSaving(false);
+      setConflictConfirmation({ isOpen: false, conflictingGoal: null, newGoalData: null });
     }
   };
 
@@ -384,37 +357,28 @@ export default function GoalsPage() {
       target_date: goal.target_date || '',
       weekly_goal: goal.weekly_goal?.toString() || '',
     });
-    setShowForm(true);
+    setShowForm(false); // Hide the main form when editing inline
   };
 
-  const handleSetActive = async (goalId: string, category: string, measurementFieldId?: string) => {
+  const handleSetActive = async (goalId: string, category: string) => {
     try {
-      // Check for conflicts
-      const conflictingGoal = checkForConflicts(category, measurementFieldId);
-      
-      if (conflictingGoal && conflictingGoal.id !== goalId) {
-        setConflictWarning({
-          isOpen: true,
-          category,
-          existingGoal: conflictingGoal,
-        });
-        return;
-      }
+      // Check for conflicting active goal
+      const conflictingGoal = activeGoals.find(goal => {
+        if (category === 'weight') {
+          return goal.goal_category === 'weight';
+        } else {
+          const targetGoal = goals.find(g => g.id === goalId);
+          return goal.goal_category === 'measurement' && 
+                 goal.measurement_field_id === targetGoal?.measurement_field_id;
+        }
+      });
 
-      // Deactivate goals of the same category/field
-      if (category === 'weight') {
+      if (conflictingGoal) {
+        // Deactivate conflicting goal first
         await supabase
           .from('user_goals')
           .update({ is_active: false })
-          .eq('goal_category', 'weight')
-          .eq('user_id', (await supabase.auth.getUser()).data.user?.id);
-      } else {
-        await supabase
-          .from('user_goals')
-          .update({ is_active: false })
-          .eq('goal_category', 'measurement')
-          .eq('measurement_field_id', measurementFieldId)
-          .eq('user_id', (await supabase.auth.getUser()).data.user?.id);
+          .eq('id', conflictingGoal.id);
       }
 
       // Activate selected goal
@@ -426,9 +390,7 @@ export default function GoalsPage() {
       if (error) throw error;
       
       setSuccess('Active goal updated!');
-      setTimeout(() => {
-          setSuccess('');
-        }, 5000);
+      setTimeout(() => setSuccess(''), 5000);
       loadGoalsData();
     } catch (error) {
       console.error('Error setting active goal:', error);
@@ -460,9 +422,7 @@ export default function GoalsPage() {
       if (error) throw error;
       
       setSuccess('Goal deleted successfully!');
-      setTimeout(() => {
-          setSuccess('');
-        }, 5000);
+      setTimeout(() => setSuccess(''), 5000);
       loadGoalsData();
     } catch (error) {
       console.error('Error deleting goal:', error);
@@ -499,9 +459,7 @@ export default function GoalsPage() {
       if (error) throw error;
       
       setSuccess('Goal marked as complete! 🎉');
-      setTimeout(() => {
-          setSuccess('');
-        }, 5000);
+      setTimeout(() => setSuccess(''), 5000);
       loadGoalsData();
     } catch (error) {
       console.error('Error completing goal:', error);
@@ -549,17 +507,34 @@ export default function GoalsPage() {
   const getProgressColor = (goal: UserGoal, change: number) => {
     if (change === 0) return 'text-gray-600';
     
-    // For individual goals, determine if we're moving toward the target
-    const targetValue = getTargetValue(goal);
-    const startingValue = getStartingValue(goal);
-    
-    if (targetValue && startingValue) {
-      const targetDirection = targetValue > startingValue ? 'increase' : 'decrease';
-      const actualDirection = change > 0 ? 'increase' : 'decrease';
-      return targetDirection === actualDirection ? 'text-green-600' : 'text-red-600';
+    // For measurement goals, determine if increase/decrease is good based on the field
+    if (goal.goal_category === 'measurement') {
+      const fieldName = goal.measurement_field?.field_name?.toLowerCase() || '';
+      
+      // Generally, decreases are good for waist, body fat, etc.
+      // Increases are good for chest, biceps, etc.
+      const decreaseIsGood = fieldName.includes('waist') || 
+                            fieldName.includes('body fat') || 
+                            fieldName.includes('fat');
+      
+      if (decreaseIsGood) {
+        return change < 0 ? 'text-green-600' : 'text-red-600';
+      } else {
+        return change > 0 ? 'text-green-600' : 'text-red-600';
+      }
     }
     
-    return 'text-gray-600';
+    // For weight goals, use the fitness phase
+    switch (fitnessPhase) {
+      case 'cutting':
+        return change < 0 ? 'text-green-600' : 'text-red-600';
+      case 'bulking':
+        return change > 0 ? 'text-green-600' : 'text-red-600';
+      case 'maintaining':
+        return Math.abs(change) <= 2 ? 'text-green-600' : 'text-orange-600';
+      default:
+        return 'text-gray-600';
+    }
   };
 
   const getProgressIcon = (goal: UserGoal, change: number) => {
@@ -574,35 +549,36 @@ export default function GoalsPage() {
     return goal.measurement_field?.unit || '';
   };
 
-  const getFitnessPhaseLabel = (phase: string) => {
-    const labels = {
-      cutting: 'Cutting',
-      bulking: 'Bulking', 
-      maintaining: 'Maintaining',
-      none: 'No specific phase',
-    };
-    return labels[phase as keyof typeof labels] || phase;
-  };
-
-  const getFitnessPhaseDescription = (phase: string) => {
-    const descriptions = {
-      cutting: 'Focused on losing weight and reducing body fat',
-      bulking: 'Focused on gaining weight and building muscle',
-      maintaining: 'Focused on maintaining current weight and body composition',
-      none: 'Just living life without a specific fitness focus',
-    };
-    return descriptions[phase as keyof typeof descriptions] || '';
-  };
-
-  const getFitnessPhaseColor = (phase: string) => {
-    const colors = {
-      cutting: 'text-red-600 bg-red-50 border-red-200',
-      bulking: 'text-green-600 bg-green-50 border-green-200',
-      maintaining: 'text-blue-600 bg-blue-50 border-blue-200',
-      none: 'text-gray-600 bg-gray-50 border-gray-200',
-    };
-    return colors[phase as keyof typeof colors] || 'text-gray-600 bg-gray-50 border-gray-200';
-  };
+  const fitnessPhases = [
+    {
+      id: 'cutting',
+      name: 'Cutting',
+      description: 'Losing weight while maintaining muscle',
+      icon: TrendingDown,
+      color: 'text-red-600 bg-red-50 border-red-200',
+    },
+    {
+      id: 'bulking',
+      name: 'Bulking',
+      description: 'Gaining weight to build muscle',
+      icon: TrendingUp,
+      color: 'text-green-600 bg-green-50 border-green-200',
+    },
+    {
+      id: 'maintaining',
+      name: 'Maintaining',
+      description: 'Maintaining current weight/composition',
+      icon: Minus,
+      color: 'text-blue-600 bg-blue-50 border-blue-200',
+    },
+    {
+      id: 'none',
+      name: 'None',
+      description: 'Not following a specific phase',
+      icon: Target,
+      color: 'text-gray-600 bg-gray-50 border-gray-200',
+    },
+  ];
 
   if (loading) {
     return (
@@ -692,8 +668,8 @@ export default function GoalsPage() {
         </div>
       )}
 
-      {/* Conflict Warning Modal */}
-      {conflictWarning.isOpen && (
+      {/* Conflict Confirmation Modal */}
+      {conflictConfirmation.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="p-6">
@@ -706,42 +682,37 @@ export default function GoalsPage() {
                 </div>
               </div>
               <div className="mb-6">
-                <p className="text-sm text-gray-600">
-                  You already have an active goal for{' '}
-                  <span className="font-medium">
-                    {conflictWarning.category === 'weight' 
-                      ? 'weight' 
-                      : conflictWarning.existingGoal?.measurement_field?.field_name
-                    }
-                  </span>.
-                  You can only have one active goal per measurement type at a time.
+                <p className="text-sm text-gray-600 mb-4">
+                  You already have an active goal for this {conflictConfirmation.newGoalData?.goal_category === 'weight' ? 'weight' : 'measurement'}:
                 </p>
-                <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                  <p className="text-sm text-orange-800">
-                    <span className="font-medium">Current active goal:</span>{' '}
-                    {conflictWarning.existingGoal?.goal_category === 'weight' 
-                      ? `${conflictWarning.existingGoal?.target_weight} lbs`
-                      : `${conflictWarning.existingGoal?.target_value} ${conflictWarning.existingGoal?.measurement_field?.unit}`
-                    }
-                  </p>
-                </div>
+                {conflictConfirmation.conflictingGoal && (
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-4">
+                    <p className="font-medium text-orange-900">
+                      {conflictConfirmation.conflictingGoal.goal_category === 'weight' 
+                        ? 'Weight Goal' 
+                        : `${conflictConfirmation.conflictingGoal.measurement_field?.field_name} Goal`}
+                    </p>
+                    <p className="text-sm text-orange-700">
+                      Target: {getTargetValue(conflictConfirmation.conflictingGoal)} {getGoalUnit(conflictConfirmation.conflictingGoal)}
+                    </p>
+                  </div>
+                )}
+                <p className="text-sm text-gray-600">
+                  Would you like to replace it with your new goal? The current goal will be moved to your history.
+                </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
                 <button
-                  onClick={() => setConflictWarning({ isOpen: false, category: '', existingGoal: null })}
+                  onClick={() => setConflictConfirmation({ isOpen: false, conflictingGoal: null, newGoalData: null })}
                   className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={() => {
-                    setConflictWarning({ isOpen: false, category: '', existingGoal: null });
-                    // Continue with the action that would replace the existing goal
-                    handleSubmit(new Event('submit') as any);
-                  }}
+                  onClick={handleConflictConfirm}
                   className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm lg:text-base"
                 >
-                  Replace Existing Goal
+                  Replace Goal
                 </button>
               </div>
             </div>
@@ -780,210 +751,41 @@ export default function GoalsPage() {
           </div>
         )}
 
-        {/* Fitness Phase Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="p-4 lg:p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h2 className="text-base lg:text-lg font-semibold text-gray-900">Current Fitness Phase</h2>
-              <button
-                onClick={() => setEditingPhase(true)}
-                className="flex items-center px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-sm"
-              >
-                <Edit2 className="h-4 w-4 mr-2" />
-                Edit Phase
-              </button>
-            </div>
-          </div>
-          <div className="p-4 lg:p-6">
-            {editingPhase ? (
-              <form onSubmit={handlePhaseSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
-                    Select Your Current Fitness Phase
-                  </label>
-                  <div className="grid grid-cols-1 gap-3">
-                    {[
-                      { id: 'cutting', name: 'Cutting', description: 'Focused on losing weight and reducing body fat', icon: TrendingDown },
-                      { id: 'bulking', name: 'Bulking', description: 'Focused on gaining weight and building muscle', icon: TrendingUp },
-                      { id: 'maintaining', name: 'Maintaining', description: 'Focused on maintaining current weight and body composition', icon: Minus },
-                      { id: 'none', name: 'No Specific Phase', description: 'Just living life without a specific fitness focus', icon: User },
-                    ].map((phase) => {
-                      const Icon = phase.icon;
-                      return (
-                        <label
-                          key={phase.id}
-                          className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
-                            phaseData.fitness_phase === phase.id
-                              ? getFitnessPhaseColor(phase.id)
-                              : 'border-gray-300 bg-white hover:bg-gray-50'
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name="fitness_phase"
-                            value={phase.id}
-                            checked={phaseData.fitness_phase === phase.id}
-                            onChange={(e) => setPhaseData({ fitness_phase: e.target.value })}
-                            className="sr-only"
-                          />
-                          <div className="flex items-center">
-                            <Icon className="h-5 w-5 lg:h-6 lg:w-6 mr-3 lg:mr-4 flex-shrink-0" />
-                            <div>
-                              <div className="text-sm font-medium">{phase.name}</div>
-                              <div className="text-sm text-gray-500">{phase.description}</div>
-                            </div>
-                          </div>
-                        </label>
-                      );
-                    })}
-                  </div>
-                </div>
-                <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200">
-                  <button
-                    type="button"
-                    onClick={() => setEditingPhase(false)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm lg:text-base"
-                  >
-                    <Save className="h-4 w-4 mr-2" />
-                    {saving ? 'Saving...' : 'Save Phase'}
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <div className={`p-4 rounded-lg border ${getFitnessPhaseColor(phaseData.fitness_phase)}`}>
-                <div className="flex items-center">
-                  {phaseData.fitness_phase === 'cutting' && <TrendingDown className="h-6 w-6 mr-3" />}
-                  {phaseData.fitness_phase === 'bulking' && <TrendingUp className="h-6 w-6 mr-3" />}
-                  {phaseData.fitness_phase === 'maintaining' && <Minus className="h-6 w-6 mr-3" />}
-                  {phaseData.fitness_phase === 'none' && <User className="h-6 w-6 mr-3" />}
-                  <div>
-                    <h3 className="font-medium">{getFitnessPhaseLabel(phaseData.fitness_phase)}</h3>
-                    <p className="text-sm opacity-75">{getFitnessPhaseDescription(phaseData.fitness_phase)}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Active Goals */}
-        {activeGoals.length > 0 && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900">Active Goals</h2>
-            {activeGoals.map((goal) => {
-              const progress = getGoalProgress(goal);
-              const unit = getGoalUnit(goal);
-              const Icon = goal.goal_category === 'weight' ? Scale : Ruler;
-
+        {/* Fitness Phase Selection */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+          <h2 className="text-base lg:text-lg font-semibold text-gray-900 mb-4">Current Fitness Phase</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            This affects how progress indicators are colored when you don't have specific goals set.
+          </p>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {fitnessPhases.map((phase) => {
+              const Icon = phase.icon;
               return (
-                <div key={goal.id} className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-4 lg:p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center">
-                      <Icon className="h-6 w-6 text-blue-600 mr-3" />
-                      <div>
-                        <h3 className="text-base lg:text-lg font-semibold text-gray-900">
-                          {goal.goal_category === 'weight' ? 'Weight Goal' : `${goal.measurement_field?.field_name} Goal`}
-                        </h3>
-                        <p className="text-sm text-gray-600">Active Goal</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleCompleteClick(goal)}
-                        className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
-                        title="Mark as complete"
-                      >
-                        <Check className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleEdit(goal)}
-                        className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
-                        title="Edit goal"
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(goal)}
-                        className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
-                        title="Delete goal"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                  
-                  {progress && (
-                    <>
-                      <div className="mb-4">
-                        <div className="flex justify-between text-sm text-gray-600 mb-2">
-                          <span>{progress.startingValue} {unit}</span>
-                          <span>{progress.targetValue} {unit}</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-3">
-                          <div
-                            className="bg-blue-600 h-3 rounded-full transition-all duration-300"
-                            style={{ width: `${Math.min(progress.progressPercentage, 100)}%` }}
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                        <div>
-                          <p className="text-gray-600">Current</p>
-                          <p className="font-semibold text-gray-900">{progress.currentValue} {unit}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-600">Progress</p>
-                          <div className="flex items-center">
-                            {(() => {
-                              const ProgressIcon = getProgressIcon(goal, progress.currentChange);
-                              const progressColor = getProgressColor(goal, progress.currentChange);
-                              return (
-                                <>
-                                  <ProgressIcon className={`h-4 w-4 mr-1 ${progressColor}`} />
-                                  <p className={`font-semibold ${progressColor}`}>
-                                    {progress.currentChange > 0 ? '+' : ''}{progress.currentChange.toFixed(1)} {unit}
-                                  </p>
-                                </>
-                              );
-                            })()}
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-gray-600">Remaining</p>
-                          <p className="font-semibold text-gray-900">
-                            {Math.abs(progress.remaining).toFixed(1)} {unit}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-gray-600">Completion</p>
-                          <p className="font-semibold text-gray-900">
-                            {progress.progressPercentage.toFixed(0)}%
-                          </p>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
+                <button
+                  key={phase.id}
+                  onClick={() => updateFitnessPhase(phase.id as any)}
+                  disabled={updatingPhase}
+                  className={`relative flex flex-col items-center p-4 border rounded-lg transition-colors disabled:opacity-50 ${
+                    fitnessPhase === phase.id
+                      ? phase.color
+                      : 'border-gray-300 bg-white hover:bg-gray-50'
+                  }`}
+                >
+                  <Icon className="h-6 w-6 mb-2" />
+                  <div className="text-sm font-medium">{phase.name}</div>
+                  <div className="text-xs text-center mt-1 opacity-75">{phase.description}</div>
+                </button>
               );
             })}
           </div>
-        )}
+        </div>
 
-        {/* Goal Form */}
+        {/* Add Goal Form */}
         {showForm && (
           <div ref={formRef} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-base lg:text-lg font-semibold text-gray-900">
-                {editingGoal ? 'Edit Goal' : 'Create New Goal'}
-              </h2>
+              <h2 className="text-base lg:text-lg font-semibold text-gray-900">Create New Goal</h2>
               <button
                 onClick={resetForm}
                 className="text-gray-400 hover:text-gray-600 p-1"
@@ -1181,10 +983,282 @@ export default function GoalsPage() {
                   className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm lg:text-base"
                 >
                   <Save className="h-4 w-4 mr-2" />
-                  {saving ? 'Saving...' : (editingGoal ? 'Update Goal' : 'Create Goal')}
+                  {saving ? 'Creating...' : 'Create Goal'}
                 </button>
               </div>
             </form>
+          </div>
+        )}
+
+        {/* Active Goals */}
+        {activeGoals.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-gray-900">Active Goals</h2>
+            {activeGoals.map((goal) => {
+              const progress = getGoalProgress(goal);
+              const unit = getGoalUnit(goal);
+              const Icon = goal.goal_category === 'weight' ? Scale : Ruler;
+
+              // Check if this goal is being edited
+              if (editingGoal?.id === goal.id) {
+                return (
+                  <div key={goal.id} className="bg-blue-50 border border-blue-200 rounded-lg p-4 lg:p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-base lg:text-lg font-semibold text-gray-900">Edit Goal</h3>
+                      <button
+                        onClick={() => setEditingGoal(null)}
+                        className="text-gray-400 hover:text-gray-600 p-1"
+                      >
+                        <X className="h-5 w-5" />
+                      </button>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                      {/* Goal Category Selection */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-3">
+                          Goal Category
+                        </label>
+                        <div className="grid grid-cols-2 gap-3">
+                          <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
+                            formData.goal_category === 'weight'
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-gray-300 bg-white hover:bg-gray-50'
+                          }`}>
+                            <input
+                              type="radio"
+                              name="goal_category"
+                              value="weight"
+                              checked={formData.goal_category === 'weight'}
+                              onChange={(e) => setFormData({ ...formData, goal_category: e.target.value, measurement_field_id: '' })}
+                              className="sr-only"
+                            />
+                            <div className="flex items-center">
+                              <Scale className="h-5 w-5 mr-3 flex-shrink-0" />
+                              <div>
+                                <div className="text-sm font-medium">Weight Goal</div>
+                                <div className="text-sm text-gray-500">Target weight changes</div>
+                              </div>
+                            </div>
+                          </label>
+
+                          <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
+                            formData.goal_category === 'measurement'
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-gray-300 bg-white hover:bg-gray-50'
+                          }`}>
+                            <input
+                              type="radio"
+                              name="goal_category"
+                              value="measurement"
+                              checked={formData.goal_category === 'measurement'}
+                              onChange={(e) => setFormData({ ...formData, goal_category: e.target.value, target_weight: '' })}
+                              className="sr-only"
+                            />
+                            <div className="flex items-center">
+                              <Ruler className="h-5 w-5 mr-3 flex-shrink-0" />
+                              <div>
+                                <div className="text-sm font-medium">Measurement Goal</div>
+                                <div className="text-sm text-gray-500">Target body measurements</div>
+                              </div>
+                            </div>
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* Measurement Field Selection (only for measurement goals) */}
+                      {formData.goal_category === 'measurement' && (
+                        <div>
+                          <label htmlFor="measurement_field_id" className="block text-sm font-medium text-gray-700">
+                            Measurement Field
+                          </label>
+                          <select
+                            id="measurement_field_id"
+                            required
+                            value={formData.measurement_field_id}
+                            onChange={(e) => setFormData({ ...formData, measurement_field_id: e.target.value })}
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                          >
+                            <option value="">Select measurement field</option>
+                            {measurementFields.map((field) => (
+                              <option key={field.id} value={field.id}>
+                                {field.field_name} ({field.unit})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+
+                      {/* Target Value */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div>
+                          <label htmlFor={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'} className="block text-sm font-medium text-gray-700">
+                            Target {formData.goal_category === 'weight' ? 'Weight (lbs)' : 'Value'}
+                            {formData.goal_category === 'measurement' && formData.measurement_field_id && (
+                              <span className="text-gray-500">
+                                {' '}({measurementFields.find(f => f.id === formData.measurement_field_id)?.unit})
+                              </span>
+                            )}
+                          </label>
+                          <input
+                            type="number"
+                            id={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'}
+                            step="0.1"
+                            required
+                            value={formData.goal_category === 'weight' ? formData.target_weight : formData.target_value}
+                            onChange={(e) => setFormData({ 
+                              ...formData, 
+                              [formData.goal_category === 'weight' ? 'target_weight' : 'target_value']: e.target.value 
+                            })}
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                            placeholder={`Enter target ${formData.goal_category === 'weight' ? 'weight' : 'value'}`}
+                          />
+                        </div>
+
+                        <div>
+                          <label htmlFor="target_date" className="block text-sm font-medium text-gray-700">
+                            Target Date (optional)
+                          </label>
+                          <input
+                            type="date"
+                            id="target_date"
+                            value={formData.target_date}
+                            onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
+                            min={new Date().toISOString().split('T')[0]}
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label htmlFor="weekly_goal" className="block text-sm font-medium text-gray-700">
+                          Weekly Goal (optional)
+                        </label>
+                        <input
+                          type="number"
+                          id="weekly_goal"
+                          step="0.1"
+                          value={formData.weekly_goal}
+                          onChange={(e) => setFormData({ ...formData, weekly_goal: e.target.value })}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                          placeholder={`Units per week (${formData.goal_category === 'weight' ? 'lbs' : 'measurement units'})`}
+                        />
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
+                        <button
+                          type="button"
+                          onClick={() => setEditingGoal(null)}
+                          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={saving}
+                          className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm lg:text-base"
+                        >
+                          <Save className="h-4 w-4 mr-2" />
+                          {saving ? 'Updating...' : 'Update Goal'}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                );
+              }
+
+              return (
+                <div key={goal.id} className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-4 lg:p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <Icon className="h-6 w-6 text-blue-600 mr-3" />
+                      <div>
+                        <h3 className="text-base lg:text-lg font-semibold text-gray-900">
+                          {goal.goal_category === 'weight' ? 'Weight Goal' : `${goal.measurement_field?.field_name} Goal`}
+                        </h3>
+                        <p className="text-sm text-gray-600">Active Goal</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleCompleteClick(goal)}
+                        className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
+                        title="Mark as complete"
+                      >
+                        <Check className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleEdit(goal)}
+                        className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                        title="Edit goal"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(goal)}
+                        className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                        title="Delete goal"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {progress && (
+                    <>
+                      <div className="mb-4">
+                        <div className="flex justify-between text-sm text-gray-600 mb-2">
+                          <span>{progress.startingValue} {unit}</span>
+                          <span>{progress.targetValue} {unit}</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-3">
+                          <div
+                            className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+                            style={{ width: `${Math.min(progress.progressPercentage, 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                        <div>
+                          <p className="text-gray-600">Current</p>
+                          <p className="font-semibold text-gray-900">{progress.currentValue} {unit}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">Progress</p>
+                          <div className="flex items-center">
+                            {(() => {
+                              const ProgressIcon = getProgressIcon(goal, progress.currentChange);
+                              const progressColor = getProgressColor(goal, progress.currentChange);
+                              return (
+                                <>
+                                  <ProgressIcon className={`h-4 w-4 mr-1 ${progressColor}`} />
+                                  <p className={`font-semibold ${progressColor}`}>
+                                    {progress.currentChange > 0 ? '+' : ''}{progress.currentChange.toFixed(1)} {unit}
+                                  </p>
+                                </>
+                              );
+                            })()}
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">Remaining</p>
+                          <p className="font-semibold text-gray-900">
+                            {Math.abs(progress.remaining).toFixed(1)} {unit}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">Completion</p>
+                          <p className="font-semibold text-gray-900">
+                            {progress.progressPercentage.toFixed(0)}%
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
 
@@ -1201,6 +1275,174 @@ export default function GoalsPage() {
                   const unit = getGoalUnit(goal);
                   const ProgressIcon = progress ? getProgressIcon(goal, progress.currentChange) : Minus;
                   const progressColor = progress ? getProgressColor(goal, progress.currentChange) : 'text-gray-600';
+
+                  // Check if this goal is being edited
+                  if (editingGoal?.id === goal.id) {
+                    return (
+                      <div key={goal.id} className="bg-blue-50 border border-blue-200 rounded-lg p-4 lg:p-6">
+                        <div className="flex items-center justify-between mb-6">
+                          <h3 className="text-base lg:text-lg font-semibold text-gray-900">Edit Goal</h3>
+                          <button
+                            onClick={() => setEditingGoal(null)}
+                            className="text-gray-400 hover:text-gray-600 p-1"
+                          >
+                            <X className="h-5 w-5" />
+                          </button>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                          {/* Goal Category Selection */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-3">
+                              Goal Category
+                            </label>
+                            <div className="grid grid-cols-2 gap-3">
+                              <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
+                                formData.goal_category === 'weight'
+                                  ? 'border-blue-500 bg-blue-50'
+                                  : 'border-gray-300 bg-white hover:bg-gray-50'
+                              }`}>
+                                <input
+                                  type="radio"
+                                  name="goal_category"
+                                  value="weight"
+                                  checked={formData.goal_category === 'weight'}
+                                  onChange={(e) => setFormData({ ...formData, goal_category: e.target.value, measurement_field_id: '' })}
+                                  className="sr-only"
+                                />
+                                <div className="flex items-center">
+                                  <Scale className="h-5 w-5 mr-3 flex-shrink-0" />
+                                  <div>
+                                    <div className="text-sm font-medium">Weight Goal</div>
+                                    <div className="text-sm text-gray-500">Target weight changes</div>
+                                  </div>
+                                </div>
+                              </label>
+
+                              <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
+                                formData.goal_category === 'measurement'
+                                  ? 'border-blue-500 bg-blue-50'
+                                  : 'border-gray-300 bg-white hover:bg-gray-50'
+                              }`}>
+                                <input
+                                  type="radio"
+                                  name="goal_category"
+                                  value="measurement"
+                                  checked={formData.goal_category === 'measurement'}
+                                  onChange={(e) => setFormData({ ...formData, goal_category: e.target.value, target_weight: '' })}
+                                  className="sr-only"
+                                />
+                                <div className="flex items-center">
+                                  <Ruler className="h-5 w-5 mr-3 flex-shrink-0" />
+                                  <div>
+                                    <div className="text-sm font-medium">Measurement Goal</div>
+                                    <div className="text-sm text-gray-500">Target body measurements</div>
+                                  </div>
+                                </div>
+                              </label>
+                            </div>
+                          </div>
+
+                          {/* Measurement Field Selection (only for measurement goals) */}
+                          {formData.goal_category === 'measurement' && (
+                            <div>
+                              <label htmlFor="measurement_field_id" className="block text-sm font-medium text-gray-700">
+                                Measurement Field
+                              </label>
+                              <select
+                                id="measurement_field_id"
+                                required
+                                value={formData.measurement_field_id}
+                                onChange={(e) => setFormData({ ...formData, measurement_field_id: e.target.value })}
+                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                              >
+                                <option value="">Select measurement field</option>
+                                {measurementFields.map((field) => (
+                                  <option key={field.id} value={field.id}>
+                                    {field.field_name} ({field.unit})
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
+
+                          {/* Target Value */}
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div>
+                              <label htmlFor={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'} className="block text-sm font-medium text-gray-700">
+                                Target {formData.goal_category === 'weight' ? 'Weight (lbs)' : 'Value'}
+                                {formData.goal_category === 'measurement' && formData.measurement_field_id && (
+                                  <span className="text-gray-500">
+                                    {' '}({measurementFields.find(f => f.id === formData.measurement_field_id)?.unit})
+                                  </span>
+                                )}
+                              </label>
+                              <input
+                                type="number"
+                                id={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'}
+                                step="0.1"
+                                required
+                                value={formData.goal_category === 'weight' ? formData.target_weight : formData.target_value}
+                                onChange={(e) => setFormData({ 
+                                  ...formData, 
+                                  [formData.goal_category === 'weight' ? 'target_weight' : 'target_value']: e.target.value 
+                                })}
+                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                                placeholder={`Enter target ${formData.goal_category === 'weight' ? 'weight' : 'value'}`}
+                              />
+                            </div>
+
+                            <div>
+                              <label htmlFor="target_date" className="block text-sm font-medium text-gray-700">
+                                Target Date (optional)
+                              </label>
+                              <input
+                                type="date"
+                                id="target_date"
+                                value={formData.target_date}
+                                onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
+                                min={new Date().toISOString().split('T')[0]}
+                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label htmlFor="weekly_goal" className="block text-sm font-medium text-gray-700">
+                              Weekly Goal (optional)
+                            </label>
+                            <input
+                              type="number"
+                              id="weekly_goal"
+                              step="0.1"
+                              value={formData.weekly_goal}
+                              onChange={(e) => setFormData({ ...formData, weekly_goal: e.target.value })}
+                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                              placeholder={`Units per week (${formData.goal_category === 'weight' ? 'lbs' : 'measurement units'})`}
+                            />
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
+                            <button
+                              type="button"
+                              onClick={() => setEditingGoal(null)}
+                              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="submit"
+                              disabled={saving}
+                              className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm lg:text-base"
+                            >
+                              <Save className="h-4 w-4 mr-2" />
+                              {saving ? 'Updating...' : 'Update Goal'}
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    );
+                  }
 
                   return (
                     <div
@@ -1241,7 +1483,7 @@ export default function GoalsPage() {
                         
                         <div className="flex items-center gap-2 ml-4">
                           <button
-                            onClick={() => handleSetActive(goal.id, goal.goal_category, goal.measurement_field_id)}
+                            onClick={() => handleSetActive(goal.id, goal.goal_category)}
                             className="px-3 py-1.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                           >
                             Set Active
@@ -1269,7 +1511,7 @@ export default function GoalsPage() {
             ) : (
               <div className="text-center py-8 lg:py-12">
                 <Target className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 mb-2 text-sm lg:text-base">No completed goals yet</p>
+                <p className="text-gray-500 mb-2 text-sm lg:text-base">No goals in history yet</p>
                 <button
                   onClick={() => setShowForm(true)}
                   className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
