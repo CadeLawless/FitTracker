@@ -90,7 +90,7 @@ export default function GoalsPage() {
   }, [showForm]);
 
   useEffect(() => {
-    if (editingGoal !== null && formRef.current) {
+    if (editingGoal !== null && editFormRef.current) {
       const y = editFormRef.current.getBoundingClientRect().top + window.pageYOffset - 80;
 
       window.scrollTo({
