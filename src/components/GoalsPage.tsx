@@ -429,6 +429,7 @@ export default function GoalsPage() {
   };
 
   const handleDeleteConfirm = async () => {
+    console.log(deleteConfirmation.goalId);
     if (!deleteConfirmation.goalId) return;
 
     try {
