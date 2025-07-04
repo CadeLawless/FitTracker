@@ -1,7 +1,7 @@
 // Layout component - this wraps around all our pages
 // React components are reusable pieces of UI that can accept props (properties)
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, 
@@ -16,6 +16,7 @@ import {
   Target
 } from 'lucide-react';
 import { auth } from '../lib/supabase';
+import type { User } from '../types';
 
 interface LayoutProps {
   children: React.ReactNode; // This allows us to wrap other components
@@ -25,7 +26,18 @@ export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
+  useEffect(() => {
+    try {
+      const { data: { userInfo } } = await supabase.auth.getUser();
+      if (!userInfo) return;
+      setUser(userInfo);
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    }
+  }, []);
+  
   const handleSignOut = async () => {
     await auth.signOut();
     navigate('/auth');
