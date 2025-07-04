@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Target, TrendingUp, TrendingDown, Minus, Save, Edit2, Plus, Calendar, Scale, CheckCircle, AlertCircle, Ruler, X, Trash2, Check, AlertTriangle } from 'lucide-react';
+import { Target, TrendingUp, TrendingDown, Minus, Save, Edit2, Plus, Calendar, Scale, CheckCircle, AlertCircle, Ruler, X, Trash2, Check, AlertTriangle, User } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
-import type { UserGoal, WeightEntry, MeasurementField, BodyMeasurement } from '../types';
+import type { UserGoal, WeightEntry, MeasurementField, BodyMeasurement, UserProfile } from '../types';
 
 interface DeleteConfirmation {
   isOpen: boolean;
@@ -22,10 +22,12 @@ export default function GoalsPage() {
   const [measurementFields, setMeasurementFields] = useState<MeasurementField[]>([]);
   const [latestWeight, setLatestWeight] = useState<WeightEntry | null>(null);
   const [latestMeasurements, setLatestMeasurements] = useState<BodyMeasurement | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingGoal, setEditingGoal] = useState<UserGoal | null>(null);
+  const [editingPhase, setEditingPhase] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -43,12 +45,15 @@ export default function GoalsPage() {
 
   const [formData, setFormData] = useState({
     goal_category: 'weight',
-    goal_type: '',
     target_weight: '',
     target_value: '',
     measurement_field_id: '',
     target_date: '',
     weekly_goal: '',
+  });
+
+  const [phaseData, setPhaseData] = useState({
+    fitness_phase: 'none',
   });
 
   // Ref for the form section to enable auto-scrolling
@@ -82,6 +87,20 @@ export default function GoalsPage() {
     try {
       const user = await supabase.auth.getUser();
       if (!user.data.user) return;
+
+      // Load user profile with fitness phase
+      const { data: profileData, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', user.data.user.id)
+        .maybeSingle();
+
+      if (profileError && profileError.code !== 'PGRST116') throw profileError;
+
+      setUserProfile(profileData);
+      setPhaseData({
+        fitness_phase: profileData?.fitness_phase || 'none',
+      });
 
       // Load goals with measurement field info
       const { data: goalsData, error: goalsError } = await supabase
@@ -185,7 +204,6 @@ export default function GoalsPage() {
       let goalData: any = {
         user_id: user.data.user.id,
         goal_category: formData.goal_category,
-        goal_type: formData.goal_type,
         target_date: formData.target_date || null,
         weekly_goal: formData.weekly_goal ? parseFloat(formData.weekly_goal) : null,
         is_active: true,
@@ -254,11 +272,57 @@ export default function GoalsPage() {
     }
   };
 
+  const handlePhaseSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const user = await supabase.auth.getUser();
+      if (!user.data.user) return;
+
+      if (userProfile) {
+        // Update existing profile
+        const { error } = await supabase
+          .from('user_profiles')
+          .update({
+            fitness_phase: phaseData.fitness_phase,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', userProfile.id);
+
+        if (error) throw error;
+      } else {
+        // Create new profile
+        const { error } = await supabase
+          .from('user_profiles')
+          .insert([{
+            user_id: user.data.user.id,
+            fitness_phase: phaseData.fitness_phase,
+          }]);
+
+        if (error) throw error;
+      }
+
+      setSuccess('Fitness phase updated successfully!');
+      setTimeout(() => {
+        setSuccess('');
+      }, 5000);
+      setEditingPhase(false);
+      loadGoalsData();
+    } catch (error: any) {
+      console.error('Error updating fitness phase:', error);
+      setError(error.message || 'Failed to update fitness phase');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleEdit = (goal: UserGoal) => {
     setEditingGoal(goal);
     setFormData({
       goal_category: goal.goal_category,
-      goal_type: goal.goal_type,
       target_weight: goal.target_weight?.toString() || '',
       target_value: goal.target_value?.toString() || '',
       measurement_field_id: goal.measurement_field_id || '',
@@ -298,8 +362,8 @@ export default function GoalsPage() {
 
   const handleDeleteClick = (goal: UserGoal) => {
     const goalName = goal.goal_category === 'weight' 
-      ? `Weight Goal (${goal.goal_type})` 
-      : `${goal.measurement_field?.field_name} Goal (${goal.goal_type})`;
+      ? `Weight Goal` 
+      : `${goal.measurement_field?.field_name} Goal`;
     
     setDeleteConfirmation({
       isOpen: true,
@@ -334,8 +398,8 @@ export default function GoalsPage() {
 
   const handleCompleteClick = (goal: UserGoal) => {
     const goalName = goal.goal_category === 'weight' 
-      ? `Weight Goal (${goal.goal_type})` 
-      : `${goal.measurement_field?.field_name} Goal (${goal.goal_type})`;
+      ? `Weight Goal` 
+      : `${goal.measurement_field?.field_name} Goal`;
     
     setCompleteConfirmation({
       isOpen: true,
@@ -374,7 +438,6 @@ export default function GoalsPage() {
   const resetForm = () => {
     setFormData({
       goal_category: 'weight',
-      goal_type: '',
       target_weight: '',
       target_value: '',
       measurement_field_id: '',
@@ -410,34 +473,17 @@ export default function GoalsPage() {
   const getProgressColor = (goal: UserGoal, change: number) => {
     if (change === 0) return 'text-gray-600';
     
-    // For measurement goals, determine if increase/decrease is good based on the field
-    if (goal.goal_category === 'measurement') {
-      const fieldName = goal.measurement_field?.field_name?.toLowerCase() || '';
-      
-      // Generally, decreases are good for waist, body fat, etc.
-      // Increases are good for chest, biceps, etc.
-      const decreaseIsGood = fieldName.includes('waist') || 
-                            fieldName.includes('body fat') || 
-                            fieldName.includes('fat');
-      
-      if (decreaseIsGood) {
-        return change < 0 ? 'text-green-600' : 'text-red-600';
-      } else {
-        return change > 0 ? 'text-green-600' : 'text-red-600';
-      }
+    // For individual goals, determine if we're moving toward the target
+    const targetValue = getTargetValue(goal);
+    const startingValue = getStartingValue(goal);
+    
+    if (targetValue && startingValue) {
+      const targetDirection = targetValue > startingValue ? 'increase' : 'decrease';
+      const actualDirection = change > 0 ? 'increase' : 'decrease';
+      return targetDirection === actualDirection ? 'text-green-600' : 'text-red-600';
     }
     
-    // For weight goals, use the goal type
-    switch (goal.goal_type) {
-      case 'cutting':
-        return change < 0 ? 'text-green-600' : 'text-red-600';
-      case 'bulking':
-        return change > 0 ? 'text-green-600' : 'text-red-600';
-      case 'maintaining':
-        return Math.abs(change) <= 2 ? 'text-green-600' : 'text-orange-600';
-      default:
-        return 'text-gray-600';
-    }
+    return 'text-gray-600';
   };
 
   const getProgressIcon = (goal: UserGoal, change: number) => {
@@ -452,29 +498,35 @@ export default function GoalsPage() {
     return goal.measurement_field?.unit || '';
   };
 
-  const goalTypes = [
-    {
-      id: 'cutting',
-      name: 'Cutting',
-      description: 'Lose weight while maintaining muscle',
-      icon: TrendingDown,
-      color: 'text-red-600 bg-red-50 border-red-200',
-    },
-    {
-      id: 'bulking',
-      name: 'Bulking',
-      description: 'Gain weight to build muscle',
-      icon: TrendingUp,
-      color: 'text-green-600 bg-green-50 border-green-200',
-    },
-    {
-      id: 'maintaining',
-      name: 'Maintaining',
-      description: 'Maintain current levels',
-      icon: Minus,
-      color: 'text-blue-600 bg-blue-50 border-blue-200',
-    },
-  ];
+  const getFitnessPhaseLabel = (phase: string) => {
+    const labels = {
+      cutting: 'Cutting',
+      bulking: 'Bulking', 
+      maintaining: 'Maintaining',
+      none: 'No specific phase',
+    };
+    return labels[phase as keyof typeof labels] || phase;
+  };
+
+  const getFitnessPhaseDescription = (phase: string) => {
+    const descriptions = {
+      cutting: 'Focused on losing weight and reducing body fat',
+      bulking: 'Focused on gaining weight and building muscle',
+      maintaining: 'Focused on maintaining current weight and body composition',
+      none: 'Just living life without a specific fitness focus',
+    };
+    return descriptions[phase as keyof typeof descriptions] || '';
+  };
+
+  const getFitnessPhaseColor = (phase: string) => {
+    const colors = {
+      cutting: 'text-red-600 bg-red-50 border-red-200',
+      bulking: 'text-green-600 bg-green-50 border-green-200',
+      maintaining: 'text-blue-600 bg-blue-50 border-blue-200',
+      none: 'text-gray-600 bg-gray-50 border-gray-200',
+    };
+    return colors[phase as keyof typeof colors] || 'text-gray-600 bg-gray-50 border-gray-200';
+  };
 
   if (loading) {
     return (
@@ -595,6 +647,99 @@ export default function GoalsPage() {
           </div>
         )}
 
+        {/* Fitness Phase Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="p-4 lg:p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base lg:text-lg font-semibold text-gray-900">Current Fitness Phase</h2>
+              <button
+                onClick={() => setEditingPhase(true)}
+                className="flex items-center px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-sm"
+              >
+                <Edit2 className="h-4 w-4 mr-2" />
+                Edit Phase
+              </button>
+            </div>
+          </div>
+          <div className="p-4 lg:p-6">
+            {editingPhase ? (
+              <form onSubmit={handlePhaseSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Select Your Current Fitness Phase
+                  </label>
+                  <div className="grid grid-cols-1 gap-3">
+                    {[
+                      { id: 'cutting', name: 'Cutting', description: 'Focused on losing weight and reducing body fat', icon: TrendingDown },
+                      { id: 'bulking', name: 'Bulking', description: 'Focused on gaining weight and building muscle', icon: TrendingUp },
+                      { id: 'maintaining', name: 'Maintaining', description: 'Focused on maintaining current weight and body composition', icon: Minus },
+                      { id: 'none', name: 'No Specific Phase', description: 'Just living life without a specific fitness focus', icon: User },
+                    ].map((phase) => {
+                      const Icon = phase.icon;
+                      return (
+                        <label
+                          key={phase.id}
+                          className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
+                            phaseData.fitness_phase === phase.id
+                              ? getFitnessPhaseColor(phase.id)
+                              : 'border-gray-300 bg-white hover:bg-gray-50'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="fitness_phase"
+                            value={phase.id}
+                            checked={phaseData.fitness_phase === phase.id}
+                            onChange={(e) => setPhaseData({ fitness_phase: e.target.value })}
+                            className="sr-only"
+                          />
+                          <div className="flex items-center">
+                            <Icon className="h-5 w-5 lg:h-6 lg:w-6 mr-3 lg:mr-4 flex-shrink-0" />
+                            <div>
+                              <div className="text-sm font-medium">{phase.name}</div>
+                              <div className="text-sm text-gray-500">{phase.description}</div>
+                            </div>
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200">
+                  <button
+                    type="button"
+                    onClick={() => setEditingPhase(false)}
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm lg:text-base"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    {saving ? 'Saving...' : 'Save Phase'}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className={`p-4 rounded-lg border ${getFitnessPhaseColor(phaseData.fitness_phase)}`}>
+                <div className="flex items-center">
+                  {phaseData.fitness_phase === 'cutting' && <TrendingDown className="h-6 w-6 mr-3" />}
+                  {phaseData.fitness_phase === 'bulking' && <TrendingUp className="h-6 w-6 mr-3" />}
+                  {phaseData.fitness_phase === 'maintaining' && <Minus className="h-6 w-6 mr-3" />}
+                  {phaseData.fitness_phase === 'none' && <User className="h-6 w-6 mr-3" />}
+                  <div>
+                    <h3 className="font-medium">{getFitnessPhaseLabel(phaseData.fitness_phase)}</h3>
+                    <p className="text-sm opacity-75">{getFitnessPhaseDescription(phaseData.fitness_phase)}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Active Goals */}
         {activeGoals.length > 0 && (
           <div className="space-y-4">
@@ -612,7 +757,7 @@ export default function GoalsPage() {
                         <h3 className="text-base lg:text-lg font-semibold text-gray-900">
                           {goal.goal_category === 'weight' ? 'Weight Goal' : `${goal.measurement_field?.field_name} Goal`}
                         </h3>
-                        <p className="text-sm text-gray-600 capitalize">{goal.goal_type} Goal</p>
+                        <p className="text-sm text-gray-600">Active Goal</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -789,45 +934,6 @@ export default function GoalsPage() {
                 </div>
               )}
 
-              {/* Goal Type Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Goal Type
-                </label>
-                <div className="grid grid-cols-1 gap-3">
-                  {goalTypes.map((goal) => {
-                    const Icon = goal.icon;
-                    return (
-                      <label
-                        key={goal.id}
-                        className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
-                          formData.goal_type === goal.id
-                            ? goal.color
-                            : 'border-gray-300 bg-white hover:bg-gray-50'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="goal_type"
-                          value={goal.id}
-                          checked={formData.goal_type === goal.id}
-                          onChange={(e) => setFormData({ ...formData, goal_type: e.target.value })}
-                          className="sr-only"
-                          required
-                        />
-                        <div className="flex items-center">
-                          <Icon className="h-5 w-5 lg:h-6 lg:w-6 mr-3 lg:mr-4 flex-shrink-0" />
-                          <div>
-                            <div className="text-sm font-medium">{goal.name}</div>
-                            <div className="text-sm text-gray-500">{goal.description}</div>
-                          </div>
-                        </div>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* Target Value */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div>
@@ -977,7 +1083,6 @@ export default function GoalsPage() {
                             <h3 className="font-medium text-gray-900">
                               {goal.goal_category === 'weight' ? 'Weight' : goal.measurement_field?.field_name} Goal
                             </h3>
-                            <span className="text-sm text-gray-500 capitalize">({goal.goal_type})</span>
                             {goal.is_active && (
                               <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                 Active

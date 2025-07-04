@@ -17,6 +17,7 @@ export interface UserProfile {
   gender?: 'male' | 'female' | 'other';
   height_inches?: number;
   activity_level?: 'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active' | 'extremely_active';
+  fitness_phase?: 'cutting' | 'bulking' | 'maintaining' | 'none';
   created_at: string;
   updated_at: string;
 }
@@ -24,7 +25,7 @@ export interface UserProfile {
 export interface UserGoal {
   id: string;
   user_id: string;
-  goal_type: 'cutting' | 'bulking' | 'maintaining';
+  goal_type?: 'cutting' | 'bulking' | 'maintaining'; // Now optional
   goal_category: 'weight' | 'measurement';
   starting_weight?: number;
   target_weight?: number;
