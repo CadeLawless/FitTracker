@@ -15,7 +15,7 @@ import {
   X,
   Target
 } from 'lucide-react';
-import { auth } from '../lib/supabase';
+import { supabase, auth } from '../lib/supabase';
 import type { User as UserInfo } from '../types';
 
 interface LayoutProps {
