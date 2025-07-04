@@ -420,7 +420,7 @@ export default function GoalsPage() {
     const goalName = goal.goal_category === 'weight' 
       ? `Weight Goal` 
       : `${goal.measurement_field?.field_name} Goal`;
-    
+    console.log(goal.id);
     setDeleteConfirmation({
       isOpen: true,
       goalId: goal.id,
