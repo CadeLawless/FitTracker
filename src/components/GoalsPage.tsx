@@ -508,6 +508,7 @@ export default function GoalsPage() {
     if (change === 0) return 'text-gray-600';
     
     // For measurement goals, determine if increase/decrease is good based on the field
+    const changeNeeded;
     if (goal.goal_category === 'measurement') {
       /* const fieldName = goal.measurement_field?.field_name?.toLowerCase() || '';
       
@@ -523,9 +524,9 @@ export default function GoalsPage() {
         return change > 0 ? 'text-green-600' : 'text-red-600';
       } */
 
-      const changeNeeded = goal.target_value - goal.starting_value;
+      changeNeeded = goal.target_value - goal.starting_value;
     }else{
-      const changeNeeded = goal.target_weight - goal.starting_weight;
+      changeNeeded = goal.target_weight - goal.starting_weight;
     }
     
     if(changeNeeded > 0){
