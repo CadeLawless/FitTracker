@@ -73,14 +73,7 @@ export default function MeasurementsTracker() {
   }, []);
 
   useEffect(() => {
-    if (showForm && formRef.current) {
-      const y = formRef.current.getBoundingClientRect().top + window.pageYOffset - 80;
-
-      window.scrollTo({
-        top: y,
-        behavior: 'smooth',
-      });
-    }
+    scrollToElement(formRef, showForm && formRef.current);
   }, [showForm]);
 
   // Notification system
