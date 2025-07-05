@@ -128,7 +128,7 @@ export default function Layout({ children }: LayoutProps) {
       }`}>
         <div className="flex h-full flex-col">
           {/* Logo/Header - Hidden on mobile (shown in top bar) */}
-          <div className="lg:flex h-16 items-center justify-center border-b border-gray-200">
+          <div className="flex h-16 items-center justify-center border-b border-gray-200">
             <Dumbbell className="h-8 w-8 text-blue-600" />
             <span className="ml-2 text-xl font-bold text-gray-900">FitTracker</span>
           </div>
