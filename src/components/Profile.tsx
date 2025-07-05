@@ -225,7 +225,7 @@ export default function Profile() {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         {editing ? (
           /* Edit Form */
-          <form onSubmit={handleSubmit} className="p-4 lg:p-6 space-y-6">
+          <form ref={formRef} onSubmit={handleSubmit} className="p-4 lg:p-6 space-y-6">
             <div className="flex items-center justify-between border-b border-gray-200 pb-4">
               <h2 className="text-base lg:text-lg font-semibold text-gray-900">Edit Profile Information</h2>
               <button
