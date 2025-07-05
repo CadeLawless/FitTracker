@@ -81,8 +81,8 @@ export default function GoalsPage() {
 
   useEffect(() => {
     if (showForm && formRef.current) {
-      const y = formRef.current.getBoundingClientRect().top + window.pageYOffset - 80;
-
+      const offset = getNavbarOffset();
+      const y = formRef.current.getBoundingClientRect().top + window.pageYOffset - offset;
       window.scrollTo({
         top: y,
         behavior: 'smooth',
