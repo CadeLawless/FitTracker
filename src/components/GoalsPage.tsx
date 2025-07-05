@@ -80,26 +80,11 @@ export default function GoalsPage() {
   }, []);
 
   useEffect(() => {
-    if (showForm && formRef.current) {
-      const offset = getNavbarOffset();
-      const y = formRef.current.getBoundingClientRect().top + window.pageYOffset - offset;
-      window.scrollTo({
-        top: y,
-        behavior: 'smooth',
-      });
-    }
+    scrollToElement(formRef, showForm && formRef.current);
   }, [showForm]);
 
   useEffect(() => {
-    if (editingGoal !== null && editFormRef.current) {
-      const offset = getNavbarOffset();
-      const y = editFormRef.current.getBoundingClientRect().top + window.pageYOffset - offset;
-
-      window.scrollTo({
-        top: y,
-        behavior: 'smooth',
-      });
-    }
+    scrollToElement(editFormRef, editingGoal !== null && editFormRef.current);
   }, [editingGoal]);
 
   useEffect(() => {
