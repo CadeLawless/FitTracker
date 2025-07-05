@@ -430,7 +430,7 @@ export default function Profile() {
                       <p className="text-sm lg:text-base text-gray-900">
                         {formData.birth_date ? (
                           <>
-                            {new Date(formData.birth_date).toLocaleDateString()} 
+                            {formatDate(formData.birth_date).toLocaleDateString()} 
                             <span className="text-gray-500 ml-2">
                               (Age {calculateAge(formatDate(formData.birth_date))})
                             </span>
