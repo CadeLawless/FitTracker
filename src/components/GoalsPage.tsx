@@ -73,6 +73,7 @@ export default function GoalsPage() {
   // Ref for the form section to enable auto-scrolling
   const formRef = useRef<HTMLDivElement>(null);
   const editFormRef = useRef<HTMLDivElement>(null);
+  const navBarRef = useRef<HTMLDIVElement>(null);
   
   useEffect(() => {
     loadGoalsData();
