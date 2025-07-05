@@ -83,13 +83,14 @@ export default function Profile() {
         : null;
 
       // Update auth user metadata
-      const { error: authError } = await supabase.auth.updateUser({
+      const { data: authData, error: authError } = await supabase.auth.updateUser({
         data: {
           name: formData.name,
           birth_date: formData.birth_date || null,
           gender: formData.gender || null,
         }
       });
+      console.log('Update User Response:', { authData, authError });
 
       if (authError) throw authError;
 
