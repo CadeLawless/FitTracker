@@ -74,6 +74,8 @@ export default function Profile() {
         reject(new Error('Auth update timed out'));
       }, timeoutMs);
 
+      const sessionResult = await supabase.auth.getSession();
+console.log('Session:', sessionResult);
       supabase.auth.updateUser({ data: updateData })
         .then((result) => {
           clearTimeout(timeout);
