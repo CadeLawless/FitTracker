@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Target, TrendingUp, TrendingDown, Minus, Save, Edit2, Plus, Calendar, Scale, CheckCircle, AlertCircle, Ruler, X, Trash2, Check, AlertTriangle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
+import { getNavbarOffset } from '../lib/navbarOffset';
 import type { UserGoal, WeightEntry, MeasurementField, BodyMeasurement, UserProfile } from '../types';
 
 interface DeleteConfirmation {
