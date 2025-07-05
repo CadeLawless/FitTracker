@@ -99,6 +99,8 @@ export default function Profile() {
           }
         });
 
+        console.log('Update result:', { error: authError });
+
         if (authError) {
           console.error('Auth update error:', authError);
           throw new Error(`Failed to update profile: ${authError.message}`);
