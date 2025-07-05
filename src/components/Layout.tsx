@@ -126,7 +126,7 @@ export default function Layout({ children }: LayoutProps) {
       <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
-        <div className="flex h-full flex-col">
+        <div className="grid grid-rows-[auto_1fr_auto] h-screen">
           {/* Logo/Header - Hidden on mobile (shown in top bar) */}
           <div className="flex h-16 items-center justify-center border-b border-gray-200">
             <Dumbbell className="h-8 w-8 text-blue-600" />
