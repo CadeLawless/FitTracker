@@ -31,7 +31,7 @@ export default function Profile() {
 
   useEffect(() => {
     scrollToElement(formRef, editing && formRef.current);
-  }, [showForm]);
+  }, [editing]);
   
   const loadProfile = async () => {
     try {
