@@ -35,12 +35,20 @@ export default function Layout({ children }: LayoutProps) {
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
     console.log('[Auth State Changed]', event);
-    if (session?.user) {
+    if (event === 'USER_UPDATED') {
+      try {
+        // Optionally delay to avoid race condition
+        setTimeout(() => {
+          loadUser().catch(e => console.error('[USER_UPDATED loadUser error]', e));
+        }, 100);
+      } catch (e) {
+        console.error('[USER_UPDATED error]', e);
+      }
+    } else if (session?.user) {
       try {
         await loadUser();
-        console.log('[loadUser] completed after auth change');
       } catch (e) {
-        console.error('[loadUser] failed:', e);
+        console.error('[Other auth change error]', e);
       }
     } else {
       setUser(null);
