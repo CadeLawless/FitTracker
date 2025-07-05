@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { User, Save, Calendar, Ruler, Activity, Mail, Edit2, X, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { scrollToElement } from '../lib/htmlElement';
