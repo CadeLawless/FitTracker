@@ -33,19 +33,19 @@ export default function Layout({ children }: LayoutProps) {
     loadUser();
 
     // Listen for auth state changes
-    supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[Auth State Changed]', event);
-      if (session?.user) {
-        try {
-          await loadUser();
-          console.log('[loadUser] completed after auth change');
-        } catch (e) {
-          console.error('[loadUser] failed:', e);
-        }
-      } else {
-        setUser(null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    console.log('[Auth State Changed]', event);
+    if (session?.user) {
+      try {
+        await loadUser();
+        console.log('[loadUser] completed after auth change');
+      } catch (e) {
+        console.error('[loadUser] failed:', e);
       }
-    });
+    } else {
+      setUser(null);
+    }
+  });
 
     // Listen for profile updates
     const handleStorageChange = (e: StorageEvent) => {
