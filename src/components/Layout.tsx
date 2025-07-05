@@ -134,7 +134,7 @@ export default function Layout({ children }: LayoutProps) {
           </div>
 
           {/* Navigation Links */}
-          <nav className="flex-1 space-y-1 px-4 py-6 lg:py-6 lg:pt-6">
+          <nav className="flex-1 space-y-1 px-4 overflow-y-auto py-6 lg:py-6 lg:pt-6">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
