@@ -92,7 +92,8 @@ export default function GoalsPage() {
 
   useEffect(() => {
     if (editingGoal !== null && editFormRef.current) {
-      const y = editFormRef.current.getBoundingClientRect().top + window.pageYOffset - 80;
+      const offset = getNavbarOffset();
+      const y = editFormRef.current.getBoundingClientRect().top + window.pageYOffset - offset;
 
       window.scrollTo({
         top: y,
