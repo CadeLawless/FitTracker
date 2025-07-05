@@ -2,7 +2,7 @@ export const scrollToElement = (elementRef: React.RefObject<HTMLDivElement>, con
   if (condition) {
     const navbar = document.getElementById('navbar');
     const isNavbarVisible = navbar && window.getComputedStyle(navbar).display !== 'none';
-    const offset = isNavbarVisible ? 80 : 10;
+    const offset = isNavbarVisible ? 70 : 10;
     
     const y = elementRef.current.getBoundingClientRect().top + window.pageYOffset - offset;
     window.scrollTo({
