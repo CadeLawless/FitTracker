@@ -30,7 +30,7 @@ export default function Layout({ children }: LayoutProps) {
   const [loadingUser, setLoadingUser] = useState(true);
 
   useEffect(() => {
-    loadUser();
+    safeLoadUser();
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -79,6 +79,17 @@ export default function Layout({ children }: LayoutProps) {
       setLoadingUser(false);
     }
   };
+
+  const safeLoadUser = async () => {
+    try {
+      console.log('[Layout] Loading user...');
+      await loadUser();
+      console.log('[Layout] User loaded');
+    } catch (e) {
+      console.error('[Layout] Failed to load user', e);
+    }
+  };
+
   
   const handleSignOut = async () => {
     await auth.signOut();
