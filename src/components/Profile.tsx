@@ -66,26 +66,6 @@ export default function Profile() {
       setLoading(false);
     }
   };
-  
-  // Helper function to update auth with timeout
-  const updateAuthWithTimeout = async (updateData: any, timeoutMs = 10000) => {
-    return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        reject(new Error('Auth update timed out'));
-      }, timeoutMs);
-
-    
-      supabase.auth.updateUser({ data: updateData })
-        .then((result) => {
-          clearTimeout(timeout);
-          resolve(result);
-        })
-        .catch((error) => {
-          clearTimeout(timeout);
-          reject(error);
-        });
-    });
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,29 +82,16 @@ export default function Profile() {
         ? parseInt(formData.height_feet) * 12 + parseInt(formData.height_inches)
         : null;
 
-      // Check if auth metadata needs updating
-      const currentMetadata = user.user_metadata || {};
-      const needsAuthUpdate = 
-        currentMetadata.name !== formData.name ||
-        currentMetadata.birth_date !== (formData.birth_date || null) ||
-        currentMetadata.gender !== (formData.gender || null);
-
-      // Update auth user metadata with timeout - but don't let it block the whole process
-      if (needsAuthUpdate) {
-        console.log('Updating auth metadata...');
-        try {
-          await updateAuthWithTimeout({
-            name: formData.name || null,
-            birth_date: formData.birth_date || null,
-            gender: formData.gender || null,
-          }, 8000); // 8 second timeout
-          console.log('Auth metadata updated successfully');
-        } catch (authError: any) {
-          console.warn('Auth update failed or timed out, continuing with profile update:', authError.message);
-          // Don't throw here - continue with profile update
-          // The name will still be updated in the profile and can be displayed from there
+      // Update auth user metadata
+      const { error: authError } = await supabase.auth.updateUser({
+        data: {
+          name: formData.name,
+          birth_date: formData.birth_date || null,
+          gender: formData.gender || null,
         }
-      }
+      });
+
+      if (authError) throw authError;
 
       // Update or create user profile
       const profileData = {
@@ -136,36 +103,24 @@ export default function Profile() {
 
       if (profile) {
         // Update existing profile
-        console.log('Updating existing profile...');
         const { error: updateError } = await supabase
           .from('user_profiles')
           .update(profileData)
           .eq('id', profile.id);
 
-        if (updateError) {
-          console.error('Profile update error:', updateError);
-          throw new Error(`Failed to update profile: ${updateError.message}`);
-        }
-        console.log('Profile updated successfully');
+        if (updateError) throw updateError;
       } else {
         // Create new profile
-        console.log('Creating new profile...');
         const { error: insertError } = await supabase
           .from('user_profiles')
           .insert([profileData]);
 
-        if (insertError) {
-          console.error('Profile insert error:', insertError);
-          throw new Error(`Failed to create profile: ${insertError.message}`);
-        }
-        console.log('Profile created successfully');
+        if (insertError) throw insertError;
       }
 
       setSuccess('Profile updated successfully!');
       setEditing(false);
-      
-      // Reload profile data
-      await loadProfile();
+      await loadProfile(); // Reload to get updated data
 
       // Notify other components that the profile was updated
       // This will trigger the Layout component to refresh the user name
@@ -173,7 +128,6 @@ export default function Profile() {
       
       // Also set localStorage for cross-tab communication
       localStorage.setItem('profile-updated', Date.now().toString());
-      
     } catch (error: any) {
       console.error('Error updating profile:', error);
       setError(error.message || 'Failed to update profile');
