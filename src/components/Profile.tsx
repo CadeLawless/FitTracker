@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, Save, Calendar, Ruler, Activity, Mail, Edit2, X, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { scrollToElement } from '../lib/htmlElement';
 import type { UserProfile } from '../types';
 
 export default function Profile() {
@@ -22,10 +23,16 @@ export default function Profile() {
     activity_level: '',
   });
 
+  const formRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     loadProfile();
   }, []);
 
+  useEffect(() => {
+    scrollToElement(formRef, editing && formRef.current);
+  }, [showForm]);
+  
   const loadProfile = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
