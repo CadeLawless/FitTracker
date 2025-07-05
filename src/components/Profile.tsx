@@ -67,6 +67,25 @@ export default function Profile() {
     }
   };
 
+  // Helper function to update auth with timeout
+  const updateAuthWithTimeout = async (updateData: any, timeoutMs = 10000) => {
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error('Auth update timed out'));
+      }, timeoutMs);
+
+      supabase.auth.updateUser({ data: updateData })
+        .then((result) => {
+          clearTimeout(timeout);
+          resolve(result);
+        })
+        .catch((error) => {
+          clearTimeout(timeout);
+          reject(error);
+        });
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -82,30 +101,28 @@ export default function Profile() {
         ? parseInt(formData.height_feet) * 12 + parseInt(formData.height_inches)
         : null;
 
-      // Update auth user metadata - only if name, birth_date, or gender changed
+      // Check if auth metadata needs updating
       const currentMetadata = user.user_metadata || {};
       const needsAuthUpdate = 
         currentMetadata.name !== formData.name ||
         currentMetadata.birth_date !== (formData.birth_date || null) ||
         currentMetadata.gender !== (formData.gender || null);
 
+      // Update auth user metadata with timeout - but don't let it block the whole process
       if (needsAuthUpdate) {
         console.log('Updating auth metadata...');
-        const { error: authError } = await supabase.auth.updateUser({
-          data: {
+        try {
+          await updateAuthWithTimeout({
             name: formData.name || null,
             birth_date: formData.birth_date || null,
             gender: formData.gender || null,
-          }
-        });
-
-        console.log('Update result:', { error: authError });
-
-        if (authError) {
-          console.error('Auth update error:', authError);
-          throw new Error(`Failed to update profile: ${authError.message}`);
+          }, 8000); // 8 second timeout
+          console.log('Auth metadata updated successfully');
+        } catch (authError: any) {
+          console.warn('Auth update failed or timed out, continuing with profile update:', authError.message);
+          // Don't throw here - continue with profile update
+          // The name will still be updated in the profile and can be displayed from there
         }
-        console.log('Auth metadata updated successfully');
       }
 
       // Update or create user profile
