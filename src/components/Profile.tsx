@@ -121,6 +121,13 @@ export default function Profile() {
       setSuccess('Profile updated successfully!');
       setEditing(false);
       await loadProfile(); // Reload to get updated data
+
+      // Notify other components that the profile was updated
+      // This will trigger the Layout component to refresh the user name
+      window.dispatchEvent(new CustomEvent('profile-updated'));
+      
+      // Also set localStorage for cross-tab communication
+      localStorage.setItem('profile-updated', Date.now().toString());
     } catch (error: any) {
       console.error('Error updating profile:', error);
       setError(error.message || 'Failed to update profile');

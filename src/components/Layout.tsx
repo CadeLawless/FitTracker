@@ -1,5 +1,5 @@
 // Layout component - this wraps around all our pages
-// React components are reusable pieces of UI that can accept props (properties)
+// React Router handles navigation between different pages
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -31,6 +31,40 @@ export default function Layout({ children }: LayoutProps) {
 
   useEffect(() => {
     loadUser();
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          await loadUser();
+        } else {
+          setUser(null);
+        }
+      }
+    );
+
+    // Listen for profile updates
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'profile-updated') {
+        loadUser();
+        localStorage.removeItem('profile-updated'); // Clean up
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    // Also listen for custom events within the same tab
+    const handleProfileUpdate = () => {
+      loadUser();
+    };
+
+    window.addEventListener('profile-updated', handleProfileUpdate);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('profile-updated', handleProfileUpdate);
+    };
   }, []);
 
   const loadUser = async () => {
@@ -39,7 +73,6 @@ export default function Layout({ children }: LayoutProps) {
       if (error) throw error;
       if (!data.user) return;
       setUser(data.user);
-      //console.log(data.user); // optional for debugging
     } catch (error) {
       console.error('Error loading user data:', error);
     } finally {
