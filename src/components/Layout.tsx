@@ -33,7 +33,7 @@ export default function Layout({ children }: LayoutProps) {
     loadUser();
 
     // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('[Auth State Changed]', event);
       if (session?.user) {
         try {
@@ -45,7 +45,7 @@ export default function Layout({ children }: LayoutProps) {
       } else {
         setUser(null);
       }
-    );
+    });
 
     // Listen for profile updates
     const handleStorageChange = (e: StorageEvent) => {
