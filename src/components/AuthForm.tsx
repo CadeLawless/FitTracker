@@ -57,7 +57,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-4 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-6 lg:space-y-8 p-6 lg:p-8 bg-white rounded-xl shadow-lg">
         {/* Header */}
         <div className="text-center">
