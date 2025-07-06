@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, GripVertical, Save, X, Search, Dumbbell, Edit2 } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Save, X, Search, Dumbbell, Edit2, Timer } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { WorkoutRoutine, Exercise, RoutineExercise } from '../types';
@@ -195,6 +195,22 @@ export default function RoutineBuilder() {
     const updated = [...routineExercises];
     updated[index] = { ...updated[index], [field]: value };
     setRoutineExercises(updated);
+  };
+
+  // Helper functions for rest timer
+  const getRestMinutes = (restSeconds: number | null | undefined): number => {
+    if (!restSeconds) return 0;
+    return Math.floor(restSeconds / 60);
+  };
+
+  const getRestSecondsRemainder = (restSeconds: number | null | undefined): number => {
+    if (!restSeconds) return 0;
+    return restSeconds % 60;
+  };
+
+  const updateRestTime = (index: number, minutes: number, seconds: number) => {
+    const totalSeconds = minutes * 60 + seconds;
+    updateExercise(index, 'rest_seconds', totalSeconds);
   };
 
   const filteredExercises = availableExercises.filter(exercise =>
@@ -504,17 +520,52 @@ export default function RoutineBuilder() {
                               />
                             </div>
                           )}
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Rest (sec)</label>
-                            <input
-                              type="number"
-                              min="0"
-                              step="15"
-                              value={routineExercise.rest_seconds || ''}
-                              onChange={(e) => updateExercise(index, 'rest_seconds', e.target.value ? parseInt(e.target.value) : null)}
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                              placeholder="60"
-                            />
+                        </div>
+
+                        {/* Rest Timer - Minutes and Seconds */}
+                        <div className="mt-3">
+                          <label className="block text-xs font-medium text-gray-700 mb-2">
+                            <Timer className="h-3 w-3 inline mr-1" />
+                            Rest Time
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
+                              <input
+                                type="number"
+                                min="0"
+                                max="59"
+                                value={getRestMinutes(routineExercise.rest_seconds)}
+                                onChange={(e) => updateRestTime(
+                                  index, 
+                                  parseInt(e.target.value) || 0, 
+                                  getRestSecondsRemainder(routineExercise.rest_seconds)
+                                )}
+                                className="w-16 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                placeholder="2"
+                              />
+                              <span className="text-xs text-gray-500">min</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <input
+                                type="number"
+                                min="0"
+                                max="59"
+                                value={getRestSecondsRemainder(routineExercise.rest_seconds)}
+                                onChange={(e) => updateRestTime(
+                                  index, 
+                                  getRestMinutes(routineExercise.rest_seconds), 
+                                  parseInt(e.target.value) || 0
+                                )}
+                                className="w-16 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                placeholder="0"
+                              />
+                              <span className="text-xs text-gray-500">sec</span>
+                            </div>
+                            {routineExercise.rest_seconds && routineExercise.rest_seconds > 0 && (
+                              <span className="text-xs text-gray-400 ml-2">
+                                ({routineExercise.rest_seconds}s total)
+                              </span>
+                            )}
                           </div>
                         </div>
                         
