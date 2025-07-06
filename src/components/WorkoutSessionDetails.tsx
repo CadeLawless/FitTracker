@@ -333,7 +333,7 @@ export default function WorkoutSessionDetails() {
       </div>
 
       {/* Workout Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 lg:gap-6">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
           <div className="flex items-center">
             <Dumbbell className="h-6 w-6 lg:h-8 lg:w-8 text-purple-600 flex-shrink-0" />
