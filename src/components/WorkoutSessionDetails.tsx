@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Clock, Calendar, Dumbbell, Target, TrendingUp, Edit2, Trash2, Save, X, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Clock, Calendar, Dumbbell, Target, TrendingUp, Edit2, Trash2, Save, X, RotateCcw, Timer } from 'lucide-react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
@@ -15,7 +15,11 @@ export default function WorkoutSessionDetails() {
   const [session, setSession] = useState<WorkoutSessionWithSets | null>(null);
   const [loading, setLoading] = useState(true);
   const [editingSet, setEditingSet] = useState<string | null>(null);
-  const [editFormData, setEditFormData] = useState({ weight: '', reps: '' });
+  const [editFormData, setEditFormData] = useState({ 
+    weight: '', 
+    reps: '', 
+    durationMinutes: '' 
+  });
 
   useEffect(() => {
     if (id) {
@@ -70,17 +74,29 @@ export default function WorkoutSessionDetails() {
     setEditFormData({
       weight: set.weight?.toString() || '',
       reps: set.reps?.toString() || '',
+      durationMinutes: set.duration_seconds ? (set.duration_seconds / 60).toString() : '',
     });
   };
 
   const handleSaveSet = async (setId: string) => {
     try {
+      const updateData: any = {};
+      
+      if (editFormData.weight) {
+        updateData.weight = parseFloat(editFormData.weight);
+      }
+      
+      if (editFormData.reps) {
+        updateData.reps = parseInt(editFormData.reps);
+      }
+      
+      if (editFormData.durationMinutes) {
+        updateData.duration_seconds = parseFloat(editFormData.durationMinutes) * 60;
+      }
+
       const { error } = await supabase
         .from('exercise_sets')
-        .update({
-          weight: editFormData.weight ? parseFloat(editFormData.weight) : null,
-          reps: editFormData.reps ? parseInt(editFormData.reps) : null,
-        })
+        .update(updateData)
         .eq('id', setId);
 
       if (error) throw error;
@@ -161,12 +177,47 @@ export default function WorkoutSessionDetails() {
     return session.sets.reduce((total, set) => total + (set.reps || 0), 0);
   };
 
+  const getTotalDuration = () => {
+    if (!session) return 0;
+    return session.sets.reduce((total, set) => total + (set.duration_seconds || 0), 0);
+  };
+
   const getAverageWeight = () => {
     if (!session || session.sets.length === 0) return 0;
     const setsWithWeight = session.sets.filter(set => set.weight);
     if (setsWithWeight.length === 0) return 0;
     const totalWeight = setsWithWeight.reduce((total, set) => total + (set.weight || 0), 0);
     return totalWeight / setsWithWeight.length;
+  };
+
+  const formatSetDisplay = (set: ExerciseSet) => {
+    const parts = [];
+    
+    if (set.weight) {
+      parts.push(`${set.weight} lbs`);
+    }
+    
+    if (set.reps) {
+      parts.push(`${set.reps} reps`);
+    }
+    
+    if (set.duration_seconds) {
+      const minutes = Math.round(set.duration_seconds / 60 * 10) / 10; // Round to 1 decimal
+      parts.push(`${minutes}min`);
+    }
+    
+    if (parts.length === 0) {
+      return 'Completed';
+    }
+    
+    return parts.join(' × ');
+  };
+
+  const getVolumeForSet = (set: ExerciseSet) => {
+    if (set.weight && set.reps) {
+      return `(${(set.weight * set.reps).toLocaleString()} lbs volume)`;
+    }
+    return '';
   };
 
   const getSessionStatusBadge = () => {
@@ -219,6 +270,7 @@ export default function WorkoutSessionDetails() {
   }
 
   const exerciseGroups = getExerciseGroups();
+  const totalDurationMinutes = Math.round(getTotalDuration() / 60);
 
   return (
     <div className="space-y-6 lg:space-y-8">
@@ -314,10 +366,12 @@ export default function WorkoutSessionDetails() {
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
           <div className="flex items-center">
-            <Clock className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 flex-shrink-0" />
+            <Timer className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-              <p className="text-xs lg:text-sm font-medium text-gray-600">Avg Weight</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900">{getAverageWeight().toFixed(1)} lbs</p>
+              <p className="text-xs lg:text-sm font-medium text-gray-600">Exercise Time</p>
+              <p className="text-lg lg:text-2xl font-bold text-gray-900">
+                {totalDurationMinutes > 0 ? `${totalDurationMinutes}min` : `${getAverageWeight().toFixed(1)} lbs avg`}
+              </p>
             </div>
           </div>
         </div>
@@ -339,7 +393,12 @@ export default function WorkoutSessionDetails() {
                 <div className="text-right">
                   <p className="text-sm font-medium text-gray-900">{group.sets.length} sets</p>
                   <p className="text-xs text-gray-500">
-                    {group.sets.reduce((total, set) => total + (set.reps || 0), 0)} total reps
+                    {group.sets.reduce((total, set) => total + (set.reps || 0), 0) > 0 && 
+                      `${group.sets.reduce((total, set) => total + (set.reps || 0), 0)} total reps`
+                    }
+                    {group.sets.reduce((total, set) => total + (set.duration_seconds || 0), 0) > 0 && 
+                      `${Math.round(group.sets.reduce((total, set) => total + (set.duration_seconds || 0), 0) / 60)}min total`
+                    }
                   </p>
                 </div>
               </div>
@@ -355,7 +414,8 @@ export default function WorkoutSessionDetails() {
                       </span>
                       
                       {editingSet === set.id ? (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {/* Weight Input */}
                           <div className="flex items-center gap-1">
                             <input
                               type="number"
@@ -367,7 +427,8 @@ export default function WorkoutSessionDetails() {
                             />
                             <span className="text-xs text-gray-500">lbs</span>
                           </div>
-                          <span className="text-gray-400">×</span>
+                          
+                          {/* Reps Input */}
                           <div className="flex items-center gap-1">
                             <input
                               type="number"
@@ -378,19 +439,29 @@ export default function WorkoutSessionDetails() {
                             />
                             <span className="text-xs text-gray-500">reps</span>
                           </div>
+                          
+                          {/* Duration Input */}
+                          <div className="flex items-center gap-1">
+                            <Timer className="h-3 w-3 text-gray-400" />
+                            <input
+                              type="number"
+                              step="0.5"
+                              value={editFormData.durationMinutes}
+                              onChange={(e) => setEditFormData({ ...editFormData, durationMinutes: e.target.value })}
+                              className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                              placeholder="Min"
+                            />
+                            <span className="text-xs text-gray-500">min</span>
+                          </div>
                         </div>
                       ) : (
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium text-gray-900">
-                            {set.weight ? `${set.weight} lbs` : 'No weight'}
+                            {formatSetDisplay(set)}
                           </span>
-                          <span className="text-gray-400">×</span>
-                          <span className="text-sm font-medium text-gray-900">
-                            {set.reps || 0} reps
-                          </span>
-                          {set.weight && set.reps && (
+                          {getVolumeForSet(set) && (
                             <span className="text-xs text-gray-500 ml-2">
-                              ({(set.weight * set.reps).toLocaleString()} lbs volume)
+                              {getVolumeForSet(set)}
                             </span>
                           )}
                         </div>
