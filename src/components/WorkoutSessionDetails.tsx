@@ -366,7 +366,11 @@ export default function WorkoutSessionDetails() {
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
           <div className="flex items-center">
-            <Timer className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 flex-shrink-0" />
+            {totalDurationMinutes > 0 ? (
+              <Timer className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 flex-shrink-0" />
+            ) : (
+              <Clock className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 flex-shrink-0" />
+            )}
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
               <p className="text-xs lg:text-sm font-medium text-gray-600">{totalDurationMinutes > 0 ? "Exercise Time" : "Avg Weight"}</p>
               <p className="text-lg lg:text-2xl font-bold text-gray-900">
