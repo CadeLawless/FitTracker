@@ -374,7 +374,7 @@ export default function WorkoutSessionDetails() {
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
               <p className="text-xs lg:text-sm font-medium text-gray-600">{totalDurationMinutes > 0 ? "Exercise Time" : "Avg Weight"}</p>
               <p className="text-lg lg:text-2xl font-bold text-gray-900">
-                {totalDurationMinutes > 0 ? `${totalDurationMinutes}min` : `${getAverageWeight().toFixed(1)} lbs avg`}
+                {totalDurationMinutes > 0 ? `${totalDurationMinutes}min` : `${getAverageWeight().toFixed(1)} lbs`}
               </p>
             </div>
           </div>
