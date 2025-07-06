@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Clock, Calendar, Dumbbell, Target, TrendingUp, Edit2, Trash2, Save, X, RotateCcw, Timer } from 'lucide-react';
+import { ArrowLeft, Clock, Scale, Calendar, Dumbbell, Target, TrendingUp, Edit2, Trash2, Save, X, RotateCcw, Timer } from 'lucide-react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
