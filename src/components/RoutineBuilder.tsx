@@ -18,6 +18,7 @@ export default function RoutineBuilder() {
   const [saving, setSaving] = useState(false);
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -211,6 +212,53 @@ export default function RoutineBuilder() {
   const updateRestTime = (index: number, minutes: number, seconds: number) => {
     const totalSeconds = minutes * 60 + seconds;
     updateExercise(index, 'rest_seconds', totalSeconds);
+  };
+
+  // Drag and drop handlers
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', '');
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      return;
+    }
+
+    const newExercises = [...routineExercises];
+    const draggedExercise = newExercises[draggedIndex];
+    
+    // Remove the dragged exercise
+    newExercises.splice(draggedIndex, 1);
+    
+    // Insert at new position
+    newExercises.splice(dropIndex, 0, draggedExercise);
+    
+    // Update order_index for all exercises
+    const updatedExercises = newExercises.map((exercise, index) => ({
+      ...exercise,
+      order_index: index,
+    }));
+    
+    setRoutineExercises(updatedExercises);
+    setDraggedIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
   };
 
   const filteredExercises = availableExercises.filter(exercise =>
@@ -427,10 +475,21 @@ export default function RoutineBuilder() {
             {routineExercises.length > 0 ? (
               <div className="space-y-4">
                 {routineExercises.map((routineExercise, index) => (
-                  <div key={routineExercise.id} className="border border-gray-200 rounded-lg p-4">
+                  <div 
+                    key={routineExercise.id} 
+                    className={`border border-gray-200 rounded-lg p-4 transition-all duration-200 ${
+                      draggedIndex === index ? 'opacity-50 scale-95' : 'hover:shadow-md'
+                    }`}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, index)}
+                    onDragOver={handleDragOver}
+                    onDragEnter={handleDragEnter}
+                    onDrop={(e) => handleDrop(e, index)}
+                    onDragEnd={handleDragEnd}
+                  >
                     <div className="flex items-start gap-4">
-                      <div className="flex items-center">
-                        <GripVertical className="h-5 w-5 text-gray-400" />
+                      <div className="flex items-center cursor-move">
+                        <GripVertical className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
                         <span className="ml-2 text-sm font-medium text-gray-500">#{index + 1}</span>
                       </div>
                       
