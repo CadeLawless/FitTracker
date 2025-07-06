@@ -10,4 +10,5 @@ export const scrollToElement = (elementRef: React.RefObject<HTMLDivElement>, con
       behavior: 'smooth',
     });
   }
+  return condition;
 }
