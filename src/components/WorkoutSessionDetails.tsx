@@ -283,7 +283,7 @@ export default function WorkoutSessionDetails() {
           <ArrowLeft className="h-5 w-5 text-gray-600" />
         </button>
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex flex-wrap items-center gap-3 mb-2">
             <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">{session.name}</h1>
             {getSessionStatusBadge()}
           </div>
