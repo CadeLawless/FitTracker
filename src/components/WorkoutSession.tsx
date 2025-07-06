@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Play, Pause, Square, Plus, Check, Timer, RotateCcw, X, ArrowLeft, ArrowRight, Dumbbell, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { scrollToElement } from '../lib/htmlElement';
 import type { WorkoutRoutine, RoutineExercise, ExerciseSet, WorkoutSession as WorkoutSessionType } from '../types';
 
 interface WorkoutState {
@@ -55,14 +56,9 @@ export default function WorkoutSession() {
   const navbarHeight = 80;
 
   useEffect(() => {
-    if (workoutState.isResting && restTimerDiv.current && !hasScrolledToRestTimer.current) {
-      const y = restTimerDiv.current.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
-
-      window.scrollTo({
-        top: y,
-        behavior: 'smooth',
-      });
-      
+    const condition = workoutState.isResting && restTimerDiv.current && !hasScrolledToRestTimer.current;
+    scrollToElement(restTimerDiv, condition);
+    if (condition) {      
       hasScrolledToRestTimer.current = true;
     }
   }, [workoutState]);
