@@ -275,7 +275,7 @@ export default function WorkoutSessionDetails() {
   return (
     <div className="space-y-6 lg:space-y-8">
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <div className="flex gap-4">
         <button
           onClick={() => navigate('/workouts')}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
