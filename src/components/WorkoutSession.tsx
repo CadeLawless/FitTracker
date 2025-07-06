@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Play, Pause, Square, Plus, Check, Timer, RotateCcw, X, ArrowLeft, ArrowRight, Dumbbell, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Play, Pause, Square, Plus, Check, Timer, RotateCcw, X, ArrowLeft, ArrowRight, Dumbbell, CheckCircle, AlertTriangle, Clock } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { scrollToElement } from '../lib/htmlElement';
@@ -233,7 +233,7 @@ export default function WorkoutSession() {
     // Loop through routine exercises in order
     for(let i = 0; i < routineExercises.length; i++){
       const routineExercise = routineExercises[i];
-      const expectedSets = routineExercise.sets || 3; // default to 3 if undefined
+      const expectedSets = routineExercise.target_sets || 3; // default to 3 if undefined
       const completedSets = exerciseIdToSetCounts[routineExercise.exercise_id] || 0;
   
       if(completedSets < expectedSets){
@@ -321,22 +321,37 @@ export default function WorkoutSession() {
     }
   };
 
-  const logSet = async (weight: number, reps: number) => {
+  const logSet = async (weight?: number, reps?: number, durationMinutes?: number) => {
     if (!workoutState.session) return;
 
     const currentExercise = routineExercises[workoutState.currentExerciseIndex];
     if (!currentExercise) return;
 
     try {
+      const setData: any = {
+        workout_session_id: workoutState.session.id,
+        exercise_id: currentExercise.exercise_id,
+        set_number: workoutState.currentSet,
+      };
+
+      // Only include weight if required
+      if (currentExercise.requires_weight && weight !== undefined) {
+        setData.weight = weight;
+      }
+
+      // Only include reps if required
+      if (currentExercise.requires_reps && reps !== undefined) {
+        setData.reps = reps;
+      }
+
+      // Include duration if provided (for cardio/time-based exercises)
+      if (durationMinutes !== undefined) {
+        setData.duration_seconds = durationMinutes * 60;
+      }
+
       const { data, error } = await supabase
         .from('exercise_sets')
-        .insert([{
-          workout_session_id: workoutState.session.id,
-          exercise_id: currentExercise.exercise_id,
-          set_number: workoutState.currentSet,
-          weight,
-          reps,
-        }])
+        .insert([setData])
         .select()
         .single();
 
@@ -705,7 +720,7 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
               )}
             </div>
   
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
               {/* Set Logging */}
               <div>
                 {workoutState.currentSet <= currentExercise.target_sets ? (
@@ -717,6 +732,8 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
                     <SetLogger
                       targetWeight={currentExercise.target_weight}
                       targetReps={currentExercise.target_reps}
+                      requiresWeight={currentExercise.requires_weight}
+                      requiresReps={currentExercise.requires_reps}
                       onLogSet={logSet}
                       disabled={workoutState.isResting}
                     />
@@ -740,7 +757,11 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
                       <div key={set.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                         <span className="text-sm text-gray-600">Set {set.set_number}</span>
                         <span className="text-sm font-medium">
-                          {set.weight}lbs × {set.reps} reps
+                          {set.weight && `${set.weight}lbs`}
+                          {set.weight && set.reps && ' × '}
+                          {set.reps && `${set.reps} reps`}
+                          {set.duration_seconds && `${Math.round(set.duration_seconds / 60)}min`}
+                          {!set.weight && !set.reps && !set.duration_seconds && 'Completed'}
                         </span>
                       </div>
                     ))}
@@ -847,58 +868,102 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
 interface SetLoggerProps {
   targetWeight?: number | null;
   targetReps?: number | null;
-  onLogSet: (weight: number, reps: number) => void;
+  requiresWeight?: boolean;
+  requiresReps?: boolean;
+  onLogSet: (weight?: number, reps?: number, durationMinutes?: number) => void;
   disabled: boolean;
 }
 
-function SetLogger({ targetWeight, targetReps, onLogSet, disabled }: SetLoggerProps) {
+function SetLogger({ targetWeight, targetReps, requiresWeight = true, requiresReps = true, onLogSet, disabled }: SetLoggerProps) {
   const [weight, setWeight] = useState(targetWeight?.toString() || '');
   const [reps, setReps] = useState(targetReps?.toString() || '');
+  const [durationMinutes, setDurationMinutes] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!weight || !reps) return;
     
-    onLogSet(parseFloat(weight), parseInt(reps));
+    // Validate required fields
+    if (requiresWeight && !weight) return;
+    if (requiresReps && !reps) return;
+    
+    onLogSet(
+      requiresWeight && weight ? parseFloat(weight) : undefined,
+      requiresReps && reps ? parseInt(reps) : undefined,
+      !requiresReps && durationMinutes ? parseFloat(durationMinutes) : undefined
+    );
+    
     // Keep the same weight for next set, reset reps to target
-    setReps(targetReps?.toString() || '');
+    if (requiresReps) {
+      setReps(targetReps?.toString() || '');
+    } else {
+      setDurationMinutes('');
+    }
+  };
+
+  const isFormValid = () => {
+    if (requiresWeight && !weight) return false;
+    if (requiresReps && !reps) return false;
+    if (!requiresReps && !requiresWeight) return true; // Bodyweight exercises
+    return true;
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Weight (lbs)
-          </label>
-          <input
-            type="number"
-            step="0.5"
-            value={weight}
-            onChange={(e) => setWeight(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="135"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Reps
-          </label>
-          <input
-            type="number"
-            min="1"
-            value={reps}
-            onChange={(e) => setReps(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="10"
-            required
-          />
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {requiresWeight && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Weight (lbs)
+            </label>
+            <input
+              type="number"
+              step="0.5"
+              value={weight}
+              onChange={(e) => setWeight(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="135"
+              required
+            />
+          </div>
+        )}
+        
+        {requiresReps ? (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Reps
+            </label>
+            <input
+              type="number"
+              min="1"
+              value={reps}
+              onChange={(e) => setReps(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="10"
+              required
+            />
+          </div>
+        ) : (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <Clock className="h-4 w-4 inline mr-1" />
+              Duration (minutes)
+            </label>
+            <input
+              type="number"
+              step="0.5"
+              min="0"
+              value={durationMinutes}
+              onChange={(e) => setDurationMinutes(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="30"
+            />
+          </div>
+        )}
       </div>
+      
       <button
         type="submit"
-        disabled={disabled || !weight || !reps}
+        disabled={disabled || !isFormValid()}
         className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         <Check className="h-4 w-4 mr-2" />

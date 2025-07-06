@@ -24,16 +24,18 @@ export default function RoutineBuilder() {
   });
 
   const addExercise = (exercise: Exercise) => {
-    const nonWeightMuscleGroups = ['Cardio', 'Core', 'Full Body']
-    const skipWeightReps = nonWeightMuscleGroups.includes(exercise.muscle_group);
+    // Determine default skip settings based on muscle group
+    const shouldSkipWeight = ['Cardio', 'Core', 'Full Body'].includes(exercise.muscle_group);
+    const shouldSkipReps = ['Cardio', 'Full Body'].includes(exercise.muscle_group);
+
     const newRoutineExercise: RoutineExercise = {
       id: `temp-${Date.now()}`,
       routine_id: id || '',
       exercise_id: exercise.id,
       order_index: routineExercises.length,
       target_sets: 3,
-      require_weight: skipWeightReps,
-      require_reps: skipWeightReps,
+      requires_weight: !shouldSkipWeight,
+      requires_reps: !shouldSkipReps,
       created_at: new Date().toISOString(),
       exercise,
     };
@@ -166,6 +168,8 @@ export default function RoutineBuilder() {
           target_weight: re.target_weight,
           rest_seconds: re.rest_seconds,
           notes: re.notes,
+          requires_weight: re.requires_weight,
+          requires_reps: re.requires_reps,
         }));
 
         const { error } = await supabase
@@ -437,6 +441,30 @@ export default function RoutineBuilder() {
                             <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
+
+                        {/* Skip Weight/Reps Checkboxes */}
+                        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                          <div className="flex flex-wrap gap-4">
+                            <label className="flex items-center">
+                              <input
+                                type="checkbox"
+                                checked={!routineExercise.requires_weight}
+                                onChange={(e) => updateExercise(index, 'requires_weight', !e.target.checked)}
+                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              />
+                              <span className="ml-2 text-sm text-gray-700">Skip Weight</span>
+                            </label>
+                            <label className="flex items-center">
+                              <input
+                                type="checkbox"
+                                checked={!routineExercise.requires_reps}
+                                onChange={(e) => updateExercise(index, 'requires_reps', !e.target.checked)}
+                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              />
+                              <span className="ml-2 text-sm text-gray-700">Skip Reps</span>
+                            </label>
+                          </div>
+                        </div>
                         
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                           <div>
@@ -449,29 +477,33 @@ export default function RoutineBuilder() {
                               className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                             />
                           </div>
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Reps</label>
-                            <input
-                              type="number"
-                              min="1"
-                              value={routineExercise.target_reps || ''}
-                              onChange={(e) => updateExercise(index, 'target_reps', e.target.value ? parseInt(e.target.value) : null)}
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                              placeholder="10"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Weight (lbs)</label>
-                            <input
-                              type="number"
-                              step="0.5"
-                              min="0"
-                              value={routineExercise.target_weight || ''}
-                              onChange={(e) => updateExercise(index, 'target_weight', e.target.value ? parseFloat(e.target.value) : null)}
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                              placeholder="135"
-                            />
-                          </div>
+                          {routineExercise.requires_reps && (
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">Reps</label>
+                              <input
+                                type="number"
+                                min="1"
+                                value={routineExercise.target_reps || ''}
+                                onChange={(e) => updateExercise(index, 'target_reps', e.target.value ? parseInt(e.target.value) : null)}
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                placeholder="10"
+                              />
+                            </div>
+                          )}
+                          {routineExercise.requires_weight && (
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">Weight (lbs)</label>
+                              <input
+                                type="number"
+                                step="0.5"
+                                min="0"
+                                value={routineExercise.target_weight || ''}
+                                onChange={(e) => updateExercise(index, 'target_weight', e.target.value ? parseFloat(e.target.value) : null)}
+                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                placeholder="135"
+                              />
+                            </div>
+                          )}
                           <div>
                             <label className="block text-xs font-medium text-gray-700 mb-1">Rest (sec)</label>
                             <input
