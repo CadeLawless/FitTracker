@@ -5,6 +5,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Plus, Scale, TrendingUp, TrendingDown, X, Edit2, Trash2, Calendar, AlertTriangle, Save } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
+import { scrollToElement } from '../lib/htmlElement';
 import type { WeightEntry } from '../types';
 
 interface DeleteConfirmation {
@@ -40,14 +41,7 @@ export default function WeightTracker() {
 
   // Auto-scroll to form when it becomes visible
   useEffect(() => {
-    if (showForm && formRef.current) {
-      const y = formRef.current.getBoundingClientRect().top + window.pageYOffset - 80;
-
-      window.scrollTo({
-        top: y,
-        behavior: 'smooth',
-      });
-    }
+    scrollToElement(formRef, showForm && formRef.current);
   }, [showForm]);
 
   const loadWeightEntries = async () => {
