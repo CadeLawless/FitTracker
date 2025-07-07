@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Dumbbell, Clock, Calendar, Play, Edit2, Trash2, X, AlertTriangle, ChevronRight, RotateCcw, Square } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Plus, Dumbbell, Clock, Calendar, Play, Edit2, Trash2, X, AlertTriangle, ChevronRight, RotateCcw, Square, Search } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
 import type { WorkoutSession, WorkoutRoutine, Exercise } from '../types';
@@ -16,10 +16,14 @@ interface DeleteConfirmation {
 }
 
 export default function WorkoutsPage() {
+  const navigate = useNavigate();
   const [sessions, setSessions] = useState<WorkoutSession[]>([]);
   const [routines, setRoutines] = useState<WorkoutRoutine[]>([]);
   const [customExercises, setCustomExercises] = useState<Exercise[]>([]);
-  const [showStartWorkout, setShowSetWorkout] = useState(false);
+  const [allExercises, setAllExercises] = useState<Exercise[]>([]);
+  const [showStartWorkout, setShowStartWorkout] = useState(false);
+  const [startWorkoutTab, setStartWorkoutTab] = useState<'routines' | 'exercises'>('routines');
+  const [exerciseSearchTerm, setExerciseSearchTerm] = useState('');
   const {
     muscleGroups,
     customExerciseData,
@@ -34,7 +38,7 @@ export default function WorkoutsPage() {
     setShowCustomExerciseForm,
   } = useCustomExercises(setCustomExercises);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'sessions' | 'routines' | 'custom_exercises'>('sessions');
+  const [activeTab, setActiveTab] = useState<'sessions' | 'routines' | 'log_exercise' | 'custom_exercises'>('sessions');
   const [deleteConfirmation, setDeleteConfirmation] = useState<DeleteConfirmation>({
     isOpen: false,
     type: 'session',
@@ -82,9 +86,18 @@ export default function WorkoutsPage() {
   
       if (exercisesError) throw exercisesError;
 
+      // Load all exercises (global + custom)
+      const { data: allExercisesData, error: allExercisesError } = await supabase
+        .from('exercises')
+        .select('*')
+        .order('name');
+
+      if (allExercisesError) throw allExercisesError;
+
       setSessions(sessionsData || []);
       setRoutines(routinesData || []);
       setCustomExercises(exercisesData || []);
+      setAllExercises(allExercisesData || []);
     } catch (error) {
       console.error('Error loading workout data:', error);
     } finally {
@@ -106,7 +119,7 @@ export default function WorkoutsPage() {
     if (!deleteConfirmation.id) return;
 
     try {
-      const table = deleteConfirmation.type === 'session' ? 'workout_sessions' : (deleteConfirmation.type === 'routines' ? 'workout_routines' : 'exercises');
+      const table = deleteConfirmation.type === 'session' ? 'workout_sessions' : (deleteConfirmation.type === 'routine' ? 'workout_routines' : 'exercises');
       const { error } = await supabase
         .from(table)
         .delete()
@@ -140,6 +153,11 @@ export default function WorkoutsPage() {
     } catch (error) {
       console.error('Error completing session:', error);
     }
+  };
+
+  const handleExerciseSelect = (exercise: Exercise) => {
+    navigate(`/workouts/log-exercise?exercise=${exercise.id}`);
+    setShowStartWorkout(false);
   };
 
   const getSessionStatusBadge = (session: WorkoutSession) => {
@@ -184,6 +202,11 @@ export default function WorkoutsPage() {
   const getCompletedSessionsCount = () => {
     return sessions.filter(session => session.status === 'completed').length;
   };
+
+  const filteredExercises = allExercises.filter(exercise =>
+    exercise.name.toLowerCase().includes(exerciseSearchTerm.toLowerCase()) ||
+    exercise.muscle_group.toLowerCase().includes(exerciseSearchTerm.toLowerCase())
+  );
 
   if (loading) {
     return (
@@ -234,7 +257,7 @@ export default function WorkoutsPage() {
                   onClick={handleDeleteConfirm}
                   className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm lg:text-base"
                 >
-                  Delete {deleteConfirmation.type === 'session' ? 'Workout' : (deleteConfirmation.type === 'routines' ? 'Routine' : 'Exercise')}
+                  Delete {deleteConfirmation.type === 'session' ? 'Workout' : (deleteConfirmation.type === 'routine' ? 'Routine' : 'Exercise')}
                 </button>
               </div>
             </div>
@@ -245,34 +268,65 @@ export default function WorkoutsPage() {
       {/* Start Workout Modal */}
       {showStartWorkout && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center mb-2 justify-between">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-4 lg:p-6">
+              <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium text-gray-900">
                   Start Workout
                 </h3>
                 <button
-                  onClick={() => setShowSetWorkout(false)}
+                  onClick={() => setShowStartWorkout(false)}
                   className="text-gray-400 hover:text-gray-600 p-1"
                 >
                   <X className="h-5 w-5 lg:h-6 lg:w-6" />
                 </button>
               </div>
-              <div className="mb-6">
-                <p className="text-base mb-1 text-gray-600">
-                  Select a Routine:
-                </p>
-                <div className="flex justify-end pt-2 border-t border-gray-200"></div>
-                <div className="py-1 space-y-2">
-                  {routines.map((routine) => (
-                      <div key={routine.id} className="border border-gray-200 rounded-lg p-2 hover:bg-gray-50 transition-colors">
-                        <div className="flex items-start justify-between">
+
+              {/* Tabs */}
+              <div className="border-b border-gray-200 mb-4">
+                <nav className="-mb-px flex">
+                  <button
+                    onClick={() => setStartWorkoutTab('routines')}
+                    className={`flex-1 py-2 px-1 text-center border-b-2 font-medium text-sm ${
+                      startWorkoutTab === 'routines'
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    Routines
+                  </button>
+                  <button
+                    onClick={() => setStartWorkoutTab('exercises')}
+                    className={`flex-1 py-2 px-1 text-center border-b-2 font-medium text-sm ${
+                      startWorkoutTab === 'exercises'
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    Log Exercise
+                  </button>
+                </nav>
+              </div>
+
+              {/* Tab Content */}
+              {startWorkoutTab === 'routines' ? (
+                <div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Select a routine to start a full workout:
+                  </p>
+                  <div className="space-y-2 mb-4">
+                    {routines.map((routine) => (
+                      <div key={routine.id} className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors">
+                        <div className="flex items-center justify-between">
                           <div className="min-w-0 flex-1">
                             <h3 className="font-medium text-gray-900 text-sm lg:text-base truncate">{routine.name}</h3>
+                            {routine.description && (
+                              <p className="text-xs text-gray-600 truncate">{routine.description}</p>
+                            )}
                           </div>
                           <Link
                             to={`/workouts/start?routine=${routine.id}`}
-                            className="flex items-center px-3 py-1.5 bg-blue-600 text-white rounded text-xs lg:text-sm hover:bg-blue-700 transition-colors"
+                            className="flex items-center px-3 py-1.5 bg-blue-600 text-white rounded text-xs lg:text-sm hover:bg-blue-700 transition-colors ml-3"
                           >
                             <Play className="h-3 w-3 mr-1" />
                             Start
@@ -280,24 +334,78 @@ export default function WorkoutsPage() {
                         </div>
                       </div>
                     ))}
-                </div>
-                <div className="my-4 text-base text-center">
+                  </div>
                   <Link
                     to="/workouts/routines/new"
-                    className="flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm lg:text-base"
+                    className="flex items-center justify-center w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm lg:text-base"
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Make a New Routine
+                    Create New Routine
                   </Link>
                 </div>
-                <div className="my-4 text-right">
-                  <button
-                    onClick={() => setShowSetWorkout(false)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
-                  >
-                    Cancel
-                  </button>
+              ) : (
+                <div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Select an exercise to log:
+                  </p>
+                  
+                  {/* Exercise Search */}
+                  <div className="relative mb-4">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search exercises..."
+                      value={exerciseSearchTerm}
+                      onChange={(e) => setExerciseSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    />
+                  </div>
+
+                  {/* Exercise List */}
+                  <div className="max-h-64 overflow-y-auto space-y-2 mb-4">
+                    {filteredExercises.map((exercise) => (
+                      <div 
+                        key={exercise.id} 
+                        className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors cursor-pointer"
+                        onClick={() => handleExerciseSelect(exercise)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-medium text-gray-900 text-sm">{exercise.name}</h3>
+                              {exercise.is_custom && (
+                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                  Custom
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-600">{exercise.muscle_group}</p>
+                            {exercise.equipment && (
+                              <p className="text-xs text-gray-500">{exercise.equipment}</p>
+                            )}
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-gray-400" />
+                        </div>
+                      </div>
+                    ))}
+                    {filteredExercises.length === 0 && (
+                      <div className="text-center py-8">
+                        <Dumbbell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                        <p className="text-gray-500 mb-2">No exercises found</p>
+                        <p className="text-sm text-gray-400">Try adjusting your search</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
+              )}
+
+              <div className="flex justify-end pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => setShowStartWorkout(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>
@@ -307,7 +415,7 @@ export default function WorkoutsPage() {
       {/* Custom Exercise Form Modal */}
       {showCustomExerciseForm && (
         <>
-          {/* Custom Exerise edit/add form */}
+          {/* Custom Exercise edit/add form */}
           <CustomExerciseForm
             customExerciseData={customExerciseData}
             setCustomExerciseData={setCustomExerciseData}
@@ -337,7 +445,7 @@ export default function WorkoutsPage() {
               New Routine
             </Link>
             <button
-              onClick={() => setShowSetWorkout(true)}
+              onClick={() => setShowStartWorkout(true)}
               className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm lg:text-base whitespace-nowrap"
             >
               <Play className="h-4 w-4 mr-2" />
@@ -393,10 +501,10 @@ export default function WorkoutsPage() {
   
         {/* Tabs */}
         <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
+          <nav className="-mb-px flex space-x-4 lg:space-x-8 overflow-x-auto">
             <button
               onClick={() => setActiveTab('sessions')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'sessions'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -406,7 +514,7 @@ export default function WorkoutsPage() {
             </button>
             <button
               onClick={() => setActiveTab('routines')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'routines'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -415,14 +523,24 @@ export default function WorkoutsPage() {
               My Routines ({routines.length})
             </button>
             <button
+              onClick={() => setActiveTab('log_exercise')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+                activeTab === 'log_exercise'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Log Exercise
+            </button>
+            <button
               onClick={() => setActiveTab('custom_exercises')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'custom_exercises'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              Manage Custom Exercises ({customExercises.length})
+              Custom Exercises ({customExercises.length})
             </button>
           </nav>
         </div>
@@ -522,12 +640,12 @@ export default function WorkoutsPage() {
                 <div className="text-center py-8 lg:py-12">
                   <Dumbbell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                   <p className="text-gray-500 mb-2 text-sm lg:text-base">No workouts logged yet</p>
-                  <Link
-                    to="/workouts/start"
+                  <button
+                    onClick={() => setShowStartWorkout(true)}
                     className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
                   >
                     Start your first workout
-                  </Link>
+                  </button>
                 </div>
               )}
             </div>
@@ -596,6 +714,9 @@ export default function WorkoutsPage() {
             </div>
           </div>
         )}
+        {activeTab === 'log_exercise' && (
+          <LogExerciseTab allExercises={allExercises} />
+        )}
         {activeTab === 'custom_exercises' && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 lg:p-6 border-b border-gray-200">
@@ -654,5 +775,77 @@ export default function WorkoutsPage() {
         )}
       </div>
     </>
+  );
+}
+
+// Log Exercise Tab Component
+function LogExerciseTab({ allExercises }: { allExercises: Exercise[] }) {
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredExercises = allExercises.filter(exercise =>
+    exercise.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    exercise.muscle_group.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleExerciseSelect = (exercise: Exercise) => {
+    navigate(`/workouts/log-exercise?exercise=${exercise.id}`);
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="p-4 lg:p-6 border-b border-gray-200">
+        <h2 className="text-base lg:text-lg font-semibold text-gray-900">Log Single Exercise</h2>
+        <p className="text-sm text-gray-600 mt-1">Quickly log a single exercise without creating a full routine.</p>
+      </div>
+      <div className="p-4 lg:p-6">
+        {/* Search */}
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search exercises..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        {/* Exercise Grid */}
+        {filteredExercises.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredExercises.map((exercise) => (
+              <div 
+                key={exercise.id} 
+                className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                onClick={() => handleExerciseSelect(exercise)}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-medium text-gray-900 text-sm">{exercise.name}</h3>
+                    {exercise.is_custom && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Custom
+                      </span>
+                    )}
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-gray-400" />
+                </div>
+                <p className="text-sm text-gray-600">{exercise.muscle_group}</p>
+                {exercise.equipment && (
+                  <p className="text-xs text-gray-500 mt-1">{exercise.equipment}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <Dumbbell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500 mb-2">No exercises found</p>
+            <p className="text-sm text-gray-400">Try adjusting your search terms</p>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

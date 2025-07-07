@@ -14,6 +14,7 @@ import WorkoutsPage from './components/WorkoutsPage';
 import RoutineBuilder from './components/RoutineBuilder';
 import WorkoutSession from './components/WorkoutSession';
 import WorkoutSessionDetails from './components/WorkoutSessionDetails';
+import LogExercise from './components/LogExercise';
 import GoalsPage from './components/GoalsPage';
 import ProgressPage from './components/ProgressPage';
 import Profile from './components/Profile';
@@ -116,6 +117,7 @@ function App() {
           <Route path="/workouts/routines/new" element={<RoutineBuilder />} />
           <Route path="/workouts/routines/:id/edit" element={<RoutineBuilder />} />
           <Route path="/workouts/start" element={<WorkoutSession />} />
+          <Route path="/workouts/log-exercise" element={<LogExercise />} />
           <Route path="/workouts/session/:id" element={<WorkoutSessionDetails />} />
           <Route path="/goals" element={<GoalsPage />} />
           <Route path="/progress" element={<ProgressPage />} />
