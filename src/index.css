@@ -31,4 +31,7 @@
   .text-heading-theme {
     @apply text-gray-900 dark:text-white;
   }
+  .bg-theme {
+    @apply bg-white dark:bg-gray-800;
+  }
 }
