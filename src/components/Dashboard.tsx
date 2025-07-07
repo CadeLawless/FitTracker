@@ -118,7 +118,7 @@ export default function Dashboard() {
         {/* Latest Weight */}
         <div className="bg-theme rounded-lg shadow-sm border border-theme p-4 lg:p-6">
           <div className="flex items-center">
-            <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600 flex-shrink-0" />
+            <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-link-theme flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
               <p className="text-xs lg:text-sm font-medium text-subheading-theme">Latest Weight</p>
               <p className="text-lg lg:text-2xl font-bold text-theme dark:text-white truncate">
@@ -189,7 +189,7 @@ export default function Dashboard() {
               <h2 className="text-base lg:text-lg font-semibold text-theme">Recent Workouts</h2>
               <Link 
                 to="/workouts"
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                className="text-link-theme hover:text-blue-700 text-sm font-medium"
               >
                 View All
               </Link>
@@ -217,7 +217,7 @@ export default function Dashboard() {
                 <p className="text-label-theme mb-2">No workouts yet</p>
                 <Link
                   to="/workouts"
-                  className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
+                  className="mt-2 text-link-theme hover:text-blue-700 text-sm font-medium"
                 >
                   Start your first workout
                 </Link>
@@ -237,7 +237,7 @@ export default function Dashboard() {
                 to="/weight"
                 className="flex flex-col items-center p-3 lg:p-4 border border-theme rounded-lg hover:bg-gray-50 transition-colors"
               >
-                <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600 mb-2" />
+                <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-link-theme mb-2" />
                 <span className="text-xs lg:text-sm font-medium text-theme text-center">Log Weight</span>
               </Link>
               <Link
