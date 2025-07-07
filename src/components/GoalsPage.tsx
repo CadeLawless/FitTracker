@@ -623,7 +623,7 @@ export default function GoalsPage() {
                   <AlertTriangle className="h-6 w-6 text-red-600" />
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-gray-900">Delete Goal</h3>
+                  <h3 className="text-lg font-medium text-gray-900 text-gray-900">Delete Goal</h3>
                 </div>
               </div>
               <div className="mb-6">
@@ -662,7 +662,7 @@ export default function GoalsPage() {
                   <CheckCircle className="h-6 w-6 text-green-600" />
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-gray-900">Mark Goal as Complete</h3>
+                  <h3 className="text-lg font-medium text-gray-900 text-gray-900">Mark Goal as Complete</h3>
                 </div>
               </div>
               <div className="mb-6">
@@ -701,7 +701,7 @@ export default function GoalsPage() {
                   <AlertTriangle className="h-6 w-6 text-orange-600" />
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-gray-900">Active Goal Conflict</h3>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">Active Goal Conflict</h3>
                 </div>
               </div>
               <div className="mb-6">
@@ -747,7 +747,7 @@ export default function GoalsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Goals</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">Goals</h1>
             <p className="mt-2 text-sm lg:text-base text-gray-600">Set and track goals for weight and body measurements.</p>
           </div>
           <button
@@ -776,7 +776,7 @@ export default function GoalsPage() {
 
         {/* Fitness Phase Selection */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
-          <h2 className="text-base lg:text-lg font-semibold text-gray-900 mb-4">Current Fitness Phase</h2>
+          <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-white mb-4">Current Fitness Phase</h2>
           <p className="text-sm text-gray-600 mb-4">
             This affects how progress indicators are colored when you don't have specific goals set.
           </p>
@@ -808,7 +808,7 @@ export default function GoalsPage() {
         {showForm && (
           <div ref={formRef} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-base lg:text-lg font-semibold text-gray-900">Create New Goal</h2>
+              <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-white">Create New Goal</h2>
               <button
                 onClick={resetForm}
                 className="text-gray-400 hover:text-gray-600 p-1"
@@ -1016,7 +1016,7 @@ export default function GoalsPage() {
         {/* Active Goals */}
         {activeGoals.length > 0 && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900">Active Goals</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Active Goals</h2>
             {activeGoals.map((goal) => {
               const progress = getGoalProgress(goal);
               const unit = getGoalUnit(goal);
@@ -1027,7 +1027,7 @@ export default function GoalsPage() {
                 return (
                   <div ref={editFormRef} key={goal.id} className="bg-blue-50 border border-blue-200 rounded-lg p-4 lg:p-6">
                     <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-base lg:text-lg font-semibold text-gray-900">Edit Goal</h3>
+                      <h3 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-white">Edit Goal</h3>
                       <button
                         onClick={() => setEditingGoal(null)}
                         className="text-gray-400 hover:text-gray-600 p-1"
@@ -1196,7 +1196,7 @@ export default function GoalsPage() {
                     <div className="flex items-center">
                       <Icon className="h-6 w-6 text-blue-600 mr-3" />
                       <div>
-                        <h3 className="text-base lg:text-lg font-semibold text-gray-900">
+                        <h3 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-white">
                           {goal.goal_category === 'weight' ? 'Weight Goal' : `${goal.measurement_field?.field_name} Goal`}
                         </h3>
                         <p className="text-sm text-gray-600">Active Goal</p>
@@ -1245,7 +1245,7 @@ export default function GoalsPage() {
                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                         <div>
                           <p className="text-gray-600">Current</p>
-                          <p className="font-semibold text-gray-900">{progress.currentValue} {unit}</p>
+                          <p className="font-semibold text-gray-900 dark:text-white">{progress.currentValue} {unit}</p>
                         </div>
                         <div>
                           <p className="text-gray-600">Progress</p>
@@ -1266,13 +1266,13 @@ export default function GoalsPage() {
                         </div>
                         <div>
                           <p className="text-gray-600">Remaining</p>
-                          <p className="font-semibold text-gray-900">
+                          <p className="font-semibold text-gray-900 dark:text-white">
                             {Math.abs(progress.remaining).toFixed(1)} {unit}
                           </p>
                         </div>
                         <div>
                           <p className="text-gray-600">Completion</p>
-                          <p className="font-semibold text-gray-900">
+                          <p className="font-semibold text-gray-900 dark:text-white">
                             {progress.progressPercentage.toFixed(0)}%
                           </p>
                         </div>
