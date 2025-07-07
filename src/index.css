@@ -29,13 +29,13 @@
 
 @layer utilities {
   .text-theme {
-    @apply text-gray-900 dark:text-gray-100;
+    @apply text-gray-900 dark:text-gray-200;
   }
   .text-subheading-theme {
-    @apply text-gray-600 dark:text-gray-200;
+    @apply text-gray-600 dark:text-gray-300;
   }
   .text-label-theme {
-    @apply text-gray-500 dark:text-gray-300;
+    @apply text-gray-500 dark:text-gray-400;
   }
   .bg-theme {
     @apply bg-white dark:bg-gray-800;
