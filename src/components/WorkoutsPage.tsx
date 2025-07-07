@@ -248,7 +248,7 @@ export default function WorkoutsPage() {
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium mb-2 text-gray-900">
+                <h3 className="text-lg font-medium mb-3 text-gray-900">
                   Start Workout
                 </h3>
                 <button
@@ -258,7 +258,7 @@ export default function WorkoutsPage() {
                   <X className="h-5 w-5 lg:h-6 lg:w-6" />
                 </button>
               </div>
-              <div className="mb-6 mt-1">
+              <div className="mb-6">
                 <p className="text-base mb-1 text-gray-600">
                   Select a Routine:
                 </p>
