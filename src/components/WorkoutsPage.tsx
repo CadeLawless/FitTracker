@@ -258,7 +258,7 @@ export default function WorkoutsPage() {
                   <X className="h-5 w-5 lg:h-6 lg:w-6" />
                 </button>
               </div>
-              <div className="mb-6">
+              <div className="mb-6 mt-1">
                 <p className="text-base mb-1 text-gray-600">
                   Select a Routine:
                 </p>
