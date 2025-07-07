@@ -28,7 +28,7 @@
 }
 
 @layer utilities {
-  .text-heading-theme {
+  .text-theme {
     @apply text-gray-900 dark:text-white;
   }
   .text-subheading-theme {
