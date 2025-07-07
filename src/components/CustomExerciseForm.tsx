@@ -26,7 +26,7 @@ export const CustomExerciseForm = ({
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+            <h3 className="text-lg font-medium text-heading-theme">
               {editingExercise ? 'Edit Custom Exercise' : 'Create Custom Exercise'}
             </h3>
             <button onClick={resetCustomExerciseForm} className="text-gray-400 hover:text-gray-600">
