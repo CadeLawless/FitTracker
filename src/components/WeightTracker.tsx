@@ -204,7 +204,7 @@ export default function WeightTracker() {
               <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
                 <button
                   onClick={handleDeleteCancel}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-hover-theme transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -339,7 +339,7 @@ export default function WeightTracker() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-hover-theme transition-colors text-sm lg:text-base"
               >
                 Cancel
               </button>
@@ -424,7 +424,7 @@ export default function WeightTracker() {
                           <button
                             type="button"
                             onClick={() => setEditingEntry(null)}
-                            className="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm"
+                            className="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 bg-hover-theme transition-colors text-sm"
                           >
                             Cancel
                           </button>
@@ -440,7 +440,7 @@ export default function WeightTracker() {
                     </div>
                   ) : (
                     /* Regular Entry Display */
-                    <div className="flex items-center justify-between p-3 lg:p-4 border border-theme rounded-lg hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center justify-between p-3 lg:p-4 border border-theme rounded-lg bg-hover-theme transition-colors">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <p className="font-medium text-theme text-sm lg:text-base">{entry.weight} lbs</p>
