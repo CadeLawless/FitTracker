@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from './lib/supabase';
+import { ThemeProvider } from './contexts/ThemeContext';
 import Layout from './components/Layout';
 import AuthForm from './components/AuthForm';
 import GoalSetup from './components/GoalSetup';
@@ -107,26 +108,28 @@ function App() {
   }
 
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/weight" element={<WeightTracker />} />
-          <Route path="/measurements" element={<MeasurementsTracker />} />
-          <Route path="/workouts" element={<WorkoutsPage />} />
-          <Route path="/workouts/routines/new" element={<RoutineBuilder />} />
-          <Route path="/workouts/routines/:id/edit" element={<RoutineBuilder />} />
-          <Route path="/workouts/start" element={<WorkoutSession />} />
-          <Route path="/workouts/log-exercise" element={<LogExercise />} />
-          <Route path="/workouts/session/:id" element={<WorkoutSessionDetails />} />
-          <Route path="/goals" element={<GoalsPage />} />
-          <Route path="/progress" element={<ProgressPage />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Layout>
-      <ResetSessionButton />
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/weight" element={<WeightTracker />} />
+            <Route path="/measurements" element={<MeasurementsTracker />} />
+            <Route path="/workouts" element={<WorkoutsPage />} />
+            <Route path="/workouts/routines/new" element={<RoutineBuilder />} />
+            <Route path="/workouts/routines/:id/edit" element={<RoutineBuilder />} />
+            <Route path="/workouts/start" element={<WorkoutSession />} />
+            <Route path="/workouts/log-exercise" element={<LogExercise />} />
+            <Route path="/workouts/session/:id" element={<WorkoutSessionDetails />} />
+            <Route path="/goals" element={<GoalsPage />} />
+            <Route path="/progress" element={<ProgressPage />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Layout>
+        <ResetSessionButton />
+      </Router>
+    </ThemeProvider>
   );
 }
 
