@@ -116,7 +116,7 @@ export default function Dashboard() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         {/* Latest Weight */}
-        <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+        <div className="bg-white dark:bg-gray-1000 rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
           <div className="flex items-center">
             <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
@@ -134,7 +134,7 @@ export default function Dashboard() {
         </div>
 
         {/* Body Fat */}
-        <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+        <div className="bg-white dark:bg-gray-1000 rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
           <div className="flex items-center">
             <Ruler className="h-6 w-6 lg:h-8 lg:w-8 text-green-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
@@ -152,7 +152,7 @@ export default function Dashboard() {
         </div>
 
         {/* Total Workouts */}
-        <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+        <div className="bg-white dark:bg-gray-1000 rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
           <div className="flex items-center">
             <Dumbbell className="h-6 w-6 lg:h-8 lg:w-8 text-purple-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
@@ -164,7 +164,7 @@ export default function Dashboard() {
         </div>
 
         {/* Progress */}
-        <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+        <div className="bg-white dark:bg-gray-1000 rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
           <div className="flex items-center">
             <TrendingUp className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
@@ -183,7 +183,7 @@ export default function Dashboard() {
       {/* Recent Activity */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
         {/* Recent Workouts */}
-        <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-1000 rounded-lg shadow-sm border border-gray-200">
           <div className="p-4 lg:p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <h2 className="text-base lg:text-lg font-semibold text-gray-900">Recent Workouts</h2>
@@ -227,7 +227,7 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-1000 rounded-lg shadow-sm border border-gray-200">
           <div className="p-4 lg:p-6 border-b border-gray-200">
             <h2 className="text-base lg:text-lg font-semibold text-gray-900">Quick Actions</h2>
           </div>
