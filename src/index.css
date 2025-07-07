@@ -26,3 +26,9 @@
     @apply bg-gray-400 dark:bg-gray-500;
   }
 }
+
+@layer utilities {
+  .text-heading-theme {
+    @apply text-gray-900 dark:text-white;
+  }
+}
