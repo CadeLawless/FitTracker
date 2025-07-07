@@ -109,7 +109,7 @@ export default function Dashboard() {
     <div className="space-y-6 lg:space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
         <p className="mt-2 text-sm lg:text-base text-gray-600">Welcome back! Here's your fitness overview.</p>
       </div>
 
@@ -121,7 +121,7 @@ export default function Dashboard() {
             <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
               <p className="text-xs lg:text-sm font-medium text-gray-600">Latest Weight</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900 truncate">
+              <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white dark:text-white truncate">
                 {stats.latestWeight ? `${stats.latestWeight.weight} lbs` : 'No data'}
               </p>
               {stats.latestWeight && (
@@ -139,7 +139,7 @@ export default function Dashboard() {
             <Ruler className="h-6 w-6 lg:h-8 lg:w-8 text-green-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
               <p className="text-xs lg:text-sm font-medium text-gray-600">Body Fat</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900 truncate">
+              <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white truncate">
                 {bodyFatPercentage ? `${bodyFatPercentage}%` : 'No data'}
               </p>
               {stats.latestMeasurement && (
@@ -157,7 +157,7 @@ export default function Dashboard() {
             <Dumbbell className="h-6 w-6 lg:h-8 lg:w-8 text-purple-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
               <p className="text-xs lg:text-sm font-medium text-gray-600">Total Workouts</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900">{stats.totalWorkouts}</p>
+              <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">{stats.totalWorkouts}</p>
               <p className="text-xs text-gray-500">All time</p>
             </div>
           </div>
@@ -169,7 +169,7 @@ export default function Dashboard() {
             <TrendingUp className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
               <p className="text-xs lg:text-sm font-medium text-gray-600">This Week</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900">
+              <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
                 {stats.recentWorkouts.filter(w => 
                   new Date(w.date) >= new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
                 ).length}
