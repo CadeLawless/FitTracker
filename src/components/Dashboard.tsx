@@ -109,19 +109,19 @@ export default function Dashboard() {
     <div className="space-y-6 lg:space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+        <h1 className="text-2xl lg:text-3xl font-bold text-heading-theme">Dashboard</h1>
         <p className="mt-2 text-sm lg:text-base text-gray-600">Welcome back! Here's your fitness overview.</p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         {/* Latest Weight */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+        <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
           <div className="flex items-center">
             <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
               <p className="text-xs lg:text-sm font-medium text-gray-600">Latest Weight</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white dark:text-white truncate">
+              <p className="text-lg lg:text-2xl font-bold text-heading-theme dark:text-white truncate">
                 {stats.latestWeight ? `${stats.latestWeight.weight} lbs` : 'No data'}
               </p>
               {stats.latestWeight && (
@@ -134,12 +134,12 @@ export default function Dashboard() {
         </div>
 
         {/* Body Fat */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+        <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
           <div className="flex items-center">
             <Ruler className="h-6 w-6 lg:h-8 lg:w-8 text-green-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
               <p className="text-xs lg:text-sm font-medium text-gray-600">Body Fat</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white truncate">
+              <p className="text-lg lg:text-2xl font-bold text-heading-theme truncate">
                 {bodyFatPercentage ? `${bodyFatPercentage}%` : 'No data'}
               </p>
               {stats.latestMeasurement && (
@@ -152,24 +152,24 @@ export default function Dashboard() {
         </div>
 
         {/* Total Workouts */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+        <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
           <div className="flex items-center">
             <Dumbbell className="h-6 w-6 lg:h-8 lg:w-8 text-purple-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
               <p className="text-xs lg:text-sm font-medium text-gray-600">Total Workouts</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">{stats.totalWorkouts}</p>
+              <p className="text-lg lg:text-2xl font-bold text-heading-theme">{stats.totalWorkouts}</p>
               <p className="text-xs text-gray-500">All time</p>
             </div>
           </div>
         </div>
 
         {/* Progress */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+        <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
           <div className="flex items-center">
             <TrendingUp className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
               <p className="text-xs lg:text-sm font-medium text-gray-600">This Week</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-lg lg:text-2xl font-bold text-heading-theme">
                 {stats.recentWorkouts.filter(w => 
                   new Date(w.date) >= new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
                 ).length}
@@ -183,7 +183,7 @@ export default function Dashboard() {
       {/* Recent Activity */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
         {/* Recent Workouts */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200">
           <div className="p-4 lg:p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <h2 className="text-base lg:text-lg font-semibold text-gray-900">Recent Workouts</h2>
@@ -227,7 +227,7 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200">
           <div className="p-4 lg:p-6 border-b border-gray-200">
             <h2 className="text-base lg:text-lg font-semibold text-gray-900">Quick Actions</h2>
           </div>
