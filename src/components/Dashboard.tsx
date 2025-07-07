@@ -109,7 +109,7 @@ export default function Dashboard() {
     <div className="space-y-6 lg:space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-heading-theme">Dashboard</h1>
+        <h1 className="text-2xl lg:text-3xl font-bold text-theme">Dashboard</h1>
         <p className="mt-2 text-sm lg:text-base text-subheading-theme">Welcome back! Here's your fitness overview.</p>
       </div>
 
@@ -121,7 +121,7 @@ export default function Dashboard() {
             <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
               <p className="text-xs lg:text-sm font-medium text-subheading-theme">Latest Weight</p>
-              <p className="text-lg lg:text-2xl font-bold text-heading-theme dark:text-white truncate">
+              <p className="text-lg lg:text-2xl font-bold text-theme dark:text-white truncate">
                 {stats.latestWeight ? `${stats.latestWeight.weight} lbs` : 'No data'}
               </p>
               {stats.latestWeight && (
@@ -139,7 +139,7 @@ export default function Dashboard() {
             <Ruler className="h-6 w-6 lg:h-8 lg:w-8 text-green-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
               <p className="text-xs lg:text-sm font-medium text-subheading-theme">Body Fat</p>
-              <p className="text-lg lg:text-2xl font-bold text-heading-theme truncate">
+              <p className="text-lg lg:text-2xl font-bold text-theme truncate">
                 {bodyFatPercentage ? `${bodyFatPercentage}%` : 'No data'}
               </p>
               {stats.latestMeasurement && (
@@ -157,7 +157,7 @@ export default function Dashboard() {
             <Dumbbell className="h-6 w-6 lg:h-8 lg:w-8 text-purple-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
               <p className="text-xs lg:text-sm font-medium text-subheading-theme">Total Workouts</p>
-              <p className="text-lg lg:text-2xl font-bold text-heading-theme">{stats.totalWorkouts}</p>
+              <p className="text-lg lg:text-2xl font-bold text-theme">{stats.totalWorkouts}</p>
               <p className="text-xs text-label-theme">All time</p>
             </div>
           </div>
@@ -169,7 +169,7 @@ export default function Dashboard() {
             <TrendingUp className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
               <p className="text-xs lg:text-sm font-medium text-subheading-theme">This Week</p>
-              <p className="text-lg lg:text-2xl font-bold text-heading-theme">
+              <p className="text-lg lg:text-2xl font-bold text-theme">
                 {stats.recentWorkouts.filter(w => 
                   new Date(w.date) >= new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
                 ).length}
@@ -186,7 +186,7 @@ export default function Dashboard() {
         <div className="bg-theme rounded-lg shadow-sm border border-theme">
           <div className="p-4 lg:p-6 border-b border-theme">
             <div className="flex items-center justify-between">
-              <h2 className="text-base lg:text-lg font-semibold text-heading-theme">Recent Workouts</h2>
+              <h2 className="text-base lg:text-lg font-semibold text-theme">Recent Workouts</h2>
               <Link 
                 to="/workouts"
                 className="text-blue-600 hover:text-blue-700 text-sm font-medium"
@@ -201,7 +201,7 @@ export default function Dashboard() {
                 {stats.recentWorkouts.map((workout) => (
                   <div key={workout.id} className="flex items-center justify-between">
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-heading-theme truncate">{workout.name}</p>
+                      <p className="font-medium text-theme truncate">{workout.name}</p>
                       <p className="text-sm text-label-theme truncate">
                         {formatDate(workout.date).toLocaleDateString()}
                         {workout.duration_minutes && ` • ${workout.duration_minutes} min`}
@@ -229,7 +229,7 @@ export default function Dashboard() {
         {/* Quick Actions */}
         <div className="bg-theme rounded-lg shadow-sm border border-theme">
           <div className="p-4 lg:p-6 border-b border-theme">
-            <h2 className="text-base lg:text-lg font-semibold text-heading-theme">Quick Actions</h2>
+            <h2 className="text-base lg:text-lg font-semibold text-theme">Quick Actions</h2>
           </div>
           <div className="p-4 lg:p-6">
             <div className="grid grid-cols-2 gap-3 lg:gap-4">
@@ -238,28 +238,28 @@ export default function Dashboard() {
                 className="flex flex-col items-center p-3 lg:p-4 border border-theme rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600 mb-2" />
-                <span className="text-xs lg:text-sm font-medium text-heading-theme text-center">Log Weight</span>
+                <span className="text-xs lg:text-sm font-medium text-theme text-center">Log Weight</span>
               </Link>
               <Link
                 to="/measurements"
                 className="flex flex-col items-center p-3 lg:p-4 border border-theme rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <Ruler className="h-6 w-6 lg:h-8 lg:w-8 text-green-600 mb-2" />
-                <span className="text-xs lg:text-sm font-medium text-heading-theme text-center">Measurements</span>
+                <span className="text-xs lg:text-sm font-medium text-theme text-center">Measurements</span>
               </Link>
               <Link
                 to="/workouts"
                 className="flex flex-col items-center p-3 lg:p-4 border border-theme rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <Dumbbell className="h-6 w-6 lg:h-8 lg:w-8 text-purple-600 mb-2" />
-                <span className="text-xs lg:text-sm font-medium text-heading-theme text-center">New Workout</span>
+                <span className="text-xs lg:text-sm font-medium text-theme text-center">New Workout</span>
               </Link>
               <Link
                 to="/progress"
                 className="flex flex-col items-center p-3 lg:p-4 border border-theme rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <TrendingUp className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 mb-2" />
-                <span className="text-xs lg:text-sm font-medium text-heading-theme text-center">View Progress</span>
+                <span className="text-xs lg:text-sm font-medium text-theme text-center">View Progress</span>
               </Link>
             </div>
           </div>
