@@ -235,28 +235,28 @@ export default function Dashboard() {
             <div className="grid grid-cols-2 gap-3 lg:gap-4">
               <Link
                 to="/weight"
-                className="flex flex-col items-center p-3 lg:p-4 border border-theme rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex flex-col items-center p-3 lg:p-4 border border-theme rounded-lg bg-hover-theme transition-colors"
               >
                 <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-link-theme mb-2" />
                 <span className="text-xs lg:text-sm font-medium text-theme text-center">Log Weight</span>
               </Link>
               <Link
                 to="/measurements"
-                className="flex flex-col items-center p-3 lg:p-4 border border-theme rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex flex-col items-center p-3 lg:p-4 border border-theme rounded-lg bg-hover-theme transition-colors"
               >
                 <Ruler className="h-6 w-6 lg:h-8 lg:w-8 text-green-600 mb-2" />
                 <span className="text-xs lg:text-sm font-medium text-theme text-center">Measurements</span>
               </Link>
               <Link
                 to="/workouts"
-                className="flex flex-col items-center p-3 lg:p-4 border border-theme rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex flex-col items-center p-3 lg:p-4 border border-theme rounded-lg bg-hover-theme transition-colors"
               >
                 <Dumbbell className="h-6 w-6 lg:h-8 lg:w-8 text-purple-600 mb-2" />
                 <span className="text-xs lg:text-sm font-medium text-theme text-center">New Workout</span>
               </Link>
               <Link
                 to="/progress"
-                className="flex flex-col items-center p-3 lg:p-4 border border-theme rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex flex-col items-center p-3 lg:p-4 border border-theme rounded-lg bg-hover-theme transition-colors"
               >
                 <TrendingUp className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 mb-2" />
                 <span className="text-xs lg:text-sm font-medium text-theme text-center">View Progress</span>
