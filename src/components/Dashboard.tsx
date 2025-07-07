@@ -186,7 +186,7 @@ export default function Dashboard() {
         <div className="bg-theme rounded-lg shadow-sm border border-theme">
           <div className="p-4 lg:p-6 border-b border-theme">
             <div className="flex items-center justify-between">
-              <h2 className="text-base lg:text-lg font-semibold text-gray-900">Recent Workouts</h2>
+              <h2 className="text-base lg:text-lg font-semibold text-heading-theme">Recent Workouts</h2>
               <Link 
                 to="/workouts"
                 className="text-blue-600 hover:text-blue-700 text-sm font-medium"
@@ -201,7 +201,7 @@ export default function Dashboard() {
                 {stats.recentWorkouts.map((workout) => (
                   <div key={workout.id} className="flex items-center justify-between">
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-gray-900 truncate">{workout.name}</p>
+                      <p className="font-medium text-heading-theme truncate">{workout.name}</p>
                       <p className="text-sm text-gray-500 truncate">
                         {formatDate(workout.date).toLocaleDateString()}
                         {workout.duration_minutes && ` • ${workout.duration_minutes} min`}
@@ -229,7 +229,7 @@ export default function Dashboard() {
         {/* Quick Actions */}
         <div className="bg-theme rounded-lg shadow-sm border border-theme">
           <div className="p-4 lg:p-6 border-b border-theme">
-            <h2 className="text-base lg:text-lg font-semibold text-gray-900">Quick Actions</h2>
+            <h2 className="text-base lg:text-lg font-semibold text-heading-theme">Quick Actions</h2>
           </div>
           <div className="p-4 lg:p-6">
             <div className="grid grid-cols-2 gap-3 lg:gap-4">
@@ -238,28 +238,28 @@ export default function Dashboard() {
                 className="flex flex-col items-center p-3 lg:p-4 border border-theme rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600 mb-2" />
-                <span className="text-xs lg:text-sm font-medium text-gray-900 text-center">Log Weight</span>
+                <span className="text-xs lg:text-sm font-medium text-heading-theme text-center">Log Weight</span>
               </Link>
               <Link
                 to="/measurements"
                 className="flex flex-col items-center p-3 lg:p-4 border border-theme rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <Ruler className="h-6 w-6 lg:h-8 lg:w-8 text-green-600 mb-2" />
-                <span className="text-xs lg:text-sm font-medium text-gray-900 text-center">Measurements</span>
+                <span className="text-xs lg:text-sm font-medium text-heading-theme text-center">Measurements</span>
               </Link>
               <Link
                 to="/workouts"
                 className="flex flex-col items-center p-3 lg:p-4 border border-theme rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <Dumbbell className="h-6 w-6 lg:h-8 lg:w-8 text-purple-600 mb-2" />
-                <span className="text-xs lg:text-sm font-medium text-gray-900 text-center">New Workout</span>
+                <span className="text-xs lg:text-sm font-medium text-heading-theme text-center">New Workout</span>
               </Link>
               <Link
                 to="/progress"
                 className="flex flex-col items-center p-3 lg:p-4 border border-theme rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <TrendingUp className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 mb-2" />
-                <span className="text-xs lg:text-sm font-medium text-gray-900 text-center">View Progress</span>
+                <span className="text-xs lg:text-sm font-medium text-heading-theme text-center">View Progress</span>
               </Link>
             </div>
           </div>
