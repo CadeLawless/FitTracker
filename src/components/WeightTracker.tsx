@@ -390,7 +390,7 @@ export default function WeightTracker() {
                                 required
                                 value={formData.weight}
                                 onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                               />
                             </div>
                             <div>
@@ -402,7 +402,7 @@ export default function WeightTracker() {
                                 required
                                 value={formData.date}
                                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                               />
                             </div>
                           </div>
@@ -424,7 +424,7 @@ export default function WeightTracker() {
                             <button
                               type="button"
                               onClick={() => setEditingEntry(null)}
-                              className="px-3 py-2 border border-gray-300 rounded-lg text-input-label-theme bg-hover-theme transition-colors text-sm"
+                              className="px-3 py-2 border border-gray-300 bg-theme rounded-lg text-input-label-theme bg-hover-theme transition-colors text-sm"
                             >
                               Cancel
                             </button>
