@@ -34,4 +34,7 @@
   .bg-theme {
     @apply bg-white dark:bg-gray-800;
   }
+  .border-theme {
+    @apply border-gray-200 dark:border-gray-600;
+  }
 }
