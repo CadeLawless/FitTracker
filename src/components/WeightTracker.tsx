@@ -304,7 +304,7 @@ export default function WeightTracker() {
                     required
                     value={formData.weight}
                     onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-input-theme bg-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                    className="mt-1 block w-full px-3 py-2 border border-input-theme bg-input-theme text-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                     placeholder="Enter weight"
                   />
                 </div>
@@ -318,7 +318,7 @@ export default function WeightTracker() {
                     required
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-input-theme bg-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                    className="mt-1 block w-full px-3 py-2 border border-input-theme bg-input-theme text-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                   />
                 </div>
               </div>
@@ -331,7 +331,7 @@ export default function WeightTracker() {
                   rows={3}
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border border-input-theme bg-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                  className="mt-1 block w-full px-3 py-2 border border-input-theme bg-input-theme text-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                   placeholder="Any notes about this entry..."
                 />
               </div>
@@ -390,7 +390,7 @@ export default function WeightTracker() {
                                 required
                                 value={formData.weight}
                                 onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                                className="mt-1 block w-full px-3 py-2 border border-input-theme bg-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                className="mt-1 block w-full px-3 py-2 border border-input-theme bg-input-theme text-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                               />
                             </div>
                             <div>
@@ -402,7 +402,7 @@ export default function WeightTracker() {
                                 required
                                 value={formData.date}
                                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                className="mt-1 block w-full px-3 py-2 border border-input-theme bg-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                className="mt-1 block w-full px-3 py-2 border border-input-theme bg-input-theme text-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                               />
                             </div>
                           </div>
@@ -415,7 +415,7 @@ export default function WeightTracker() {
                               rows={2}
                               value={formData.notes}
                               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                              className="mt-1 block w-full px-3 py-2 border border-input-theme bg-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                              className="mt-1 block w-full px-3 py-2 border border-input-theme bg-input-theme text-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                               placeholder="Any notes about this entry..."
                             />
                           </div>
