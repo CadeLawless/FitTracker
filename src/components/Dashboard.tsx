@@ -110,7 +110,7 @@ export default function Dashboard() {
       {/* Header */}
       <div>
         <h1 className="text-2xl lg:text-3xl font-bold text-heading-theme">Dashboard</h1>
-        <p className="mt-2 text-sm lg:text-base text-gray-600">Welcome back! Here's your fitness overview.</p>
+        <p className="mt-2 text-sm lg:text-base text-subheading-theme">Welcome back! Here's your fitness overview.</p>
       </div>
 
       {/* Stats Cards */}
@@ -120,12 +120,12 @@ export default function Dashboard() {
           <div className="flex items-center">
             <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-              <p className="text-xs lg:text-sm font-medium text-gray-600">Latest Weight</p>
+              <p className="text-xs lg:text-sm font-medium text-subheading-theme">Latest Weight</p>
               <p className="text-lg lg:text-2xl font-bold text-heading-theme dark:text-white truncate">
                 {stats.latestWeight ? `${stats.latestWeight.weight} lbs` : 'No data'}
               </p>
               {stats.latestWeight && (
-                <p className="text-xs text-gray-500 truncate">
+                <p className="text-xs text-label-theme truncate">
                   {new Date(stats.latestWeight.date).toLocaleDateString()}
                 </p>
               )}
@@ -138,12 +138,12 @@ export default function Dashboard() {
           <div className="flex items-center">
             <Ruler className="h-6 w-6 lg:h-8 lg:w-8 text-green-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-              <p className="text-xs lg:text-sm font-medium text-gray-600">Body Fat</p>
+              <p className="text-xs lg:text-sm font-medium text-subheading-theme">Body Fat</p>
               <p className="text-lg lg:text-2xl font-bold text-heading-theme truncate">
                 {bodyFatPercentage ? `${bodyFatPercentage}%` : 'No data'}
               </p>
               {stats.latestMeasurement && (
-                <p className="text-xs text-gray-500 truncate">
+                <p className="text-xs text-label-theme truncate">
                   {new Date(stats.latestMeasurement.date).toLocaleDateString()}
                 </p>
               )}
@@ -156,9 +156,9 @@ export default function Dashboard() {
           <div className="flex items-center">
             <Dumbbell className="h-6 w-6 lg:h-8 lg:w-8 text-purple-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-              <p className="text-xs lg:text-sm font-medium text-gray-600">Total Workouts</p>
+              <p className="text-xs lg:text-sm font-medium text-subheading-theme">Total Workouts</p>
               <p className="text-lg lg:text-2xl font-bold text-heading-theme">{stats.totalWorkouts}</p>
-              <p className="text-xs text-gray-500">All time</p>
+              <p className="text-xs text-label-theme">All time</p>
             </div>
           </div>
         </div>
@@ -168,13 +168,13 @@ export default function Dashboard() {
           <div className="flex items-center">
             <TrendingUp className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-              <p className="text-xs lg:text-sm font-medium text-gray-600">This Week</p>
+              <p className="text-xs lg:text-sm font-medium text-subheading-theme">This Week</p>
               <p className="text-lg lg:text-2xl font-bold text-heading-theme">
                 {stats.recentWorkouts.filter(w => 
                   new Date(w.date) >= new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
                 ).length}
               </p>
-              <p className="text-xs text-gray-500">Workouts</p>
+              <p className="text-xs text-label-theme">Workouts</p>
             </div>
           </div>
         </div>
@@ -202,7 +202,7 @@ export default function Dashboard() {
                   <div key={workout.id} className="flex items-center justify-between">
                     <div className="min-w-0 flex-1">
                       <p className="font-medium text-heading-theme truncate">{workout.name}</p>
-                      <p className="text-sm text-gray-500 truncate">
+                      <p className="text-sm text-label-theme truncate">
                         {formatDate(workout.date).toLocaleDateString()}
                         {workout.duration_minutes && ` • ${workout.duration_minutes} min`}
                       </p>
@@ -214,7 +214,7 @@ export default function Dashboard() {
             ) : (
               <div className="text-center py-8">
                 <Dumbbell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 mb-2">No workouts yet</p>
+                <p className="text-label-theme mb-2">No workouts yet</p>
                 <Link
                   to="/workouts"
                   className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
