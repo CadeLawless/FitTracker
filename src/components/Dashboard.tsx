@@ -189,7 +189,7 @@ export default function Dashboard() {
               <h2 className="text-base lg:text-lg font-semibold text-theme">Recent Workouts</h2>
               <Link 
                 to="/workouts"
-                className="text-link-theme hover:text-blue-700 text-sm font-medium"
+                className="text-link-theme text-sm font-medium"
               >
                 View All
               </Link>
