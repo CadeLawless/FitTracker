@@ -204,7 +204,7 @@ export default function WeightTracker() {
               <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
                 <button
                   onClick={handleDeleteCancel}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-hover-theme transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-input-label-theme bg-hover-theme transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -294,7 +294,7 @@ export default function WeightTracker() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="weight" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="weight" className="block text-sm font-medium text-input-label-theme">
                     Weight (lbs)
                   </label>
                   <input
@@ -309,7 +309,7 @@ export default function WeightTracker() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="date" className="block text-sm font-medium text-input-label-theme">
                     Date
                   </label>
                   <input
@@ -323,7 +323,7 @@ export default function WeightTracker() {
                 </div>
               </div>
               <div>
-                <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="notes" className="block text-sm font-medium text-input-label-theme">
                   Notes (optional)
                 </label>
                 <textarea
@@ -339,7 +339,7 @@ export default function WeightTracker() {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-hover-theme transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-input-label-theme bg-hover-theme transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -381,7 +381,7 @@ export default function WeightTracker() {
                           
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-sm font-medium text-gray-700">
+                              <label className="block text-sm font-medium text-input-label-theme">
                                 Weight (lbs)
                               </label>
                               <input
@@ -394,7 +394,7 @@ export default function WeightTracker() {
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700">
+                              <label className="block text-sm font-medium text-input-label-theme">
                                 Date
                               </label>
                               <input
@@ -408,7 +408,7 @@ export default function WeightTracker() {
                           </div>
                           
                           <div>
-                            <label className="block text-sm font-medium text-gray-700">
+                            <label className="block text-sm font-medium text-input-label-theme">
                               Notes (optional)
                             </label>
                             <textarea
@@ -424,7 +424,7 @@ export default function WeightTracker() {
                             <button
                               type="button"
                               onClick={() => setEditingEntry(null)}
-                              className="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 bg-hover-theme transition-colors text-sm"
+                              className="px-3 py-2 border border-gray-300 rounded-lg text-input-label-theme bg-hover-theme transition-colors text-sm"
                             >
                               Cancel
                             </button>
