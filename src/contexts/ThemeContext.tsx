@@ -42,24 +42,34 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   
   useEffect(() => {
     // Apply theme to document
+    if (loading) return;
+
+    // Apply theme to document
     const root = document.documentElement;
     if (theme === 'dark') {
       root.classList.add('dark');
     } else {
       root.classList.remove('dark');
     }
-    
-    // Save to localStorage
-    localStorage.setItem('theme', theme);
   }, [theme, loading]);
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  const toggleTheme = async () => {
+    const newTheme: Theme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
+
+    if (user) {
+      await supabase.auth.updateUser({
+        data: { theme: newTheme }
+      });
+    }
   };
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
+      {!loading && children}
     </ThemeContext.Provider>
   );
 }
