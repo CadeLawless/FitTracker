@@ -652,7 +652,7 @@ export default function MeasurementsTracker() {
                 <h4 className="text-sm font-medium text-theme mb-3">Active Fields (shown in add form)</h4>
                 <div className="space-y-2">
                   {activeFields.map((field) => (
-                    <div key={field.id} className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <div key={field.id} className="flex items-center justify-between p-3 bg-light-green-theme border border-green-200 rounded-lg">
                       <div>
                         <span className="font-medium text-theme">{field.field_name}</span>
                         <span className="text-sm text-subheading-theme ml-2">({field.unit})</span>
