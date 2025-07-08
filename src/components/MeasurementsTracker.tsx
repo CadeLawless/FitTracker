@@ -1156,7 +1156,7 @@ export default function MeasurementsTracker() {
                               <>
                                 {entry.values.map((value) => (                             
                                   <div key={value.id} className="text-center p-3 bg-secondary-theme rounded-lg">
-                                    <p className="text-xs text-gray-500 uppercase tracking-wide truncate">
+                                    <p className="text-xs text-secondary-label-theme uppercase tracking-wide truncate">
                                       {value.field?.field_name}
                                     </p>
                                     <p className="text-sm lg:text-base font-semibold text-theme">
