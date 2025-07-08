@@ -837,7 +837,7 @@ export default function MeasurementsTracker() {
                     <button
                       type="button"
                       onClick={resetBodyFatCalculator}
-                      className="text-sm text-gray-500 hover:text-input-label-theme self-start sm:self-auto"
+                      className="text-sm text-input-label-theme hover:text-label-theme self-start sm:self-auto"
                     >
                       Reset
                     </button>
