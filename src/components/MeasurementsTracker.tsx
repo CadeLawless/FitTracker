@@ -587,7 +587,7 @@ export default function MeasurementsTracker() {
               <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
                 <button
                   onClick={handleDeleteCancel}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-input-label-theme hover:bg-gray-50 transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -682,7 +682,7 @@ export default function MeasurementsTracker() {
                         </div>
                         <button
                           onClick={() => toggleFieldActive(field)}
-                          className="flex items-center px-2 py-1 text-gray-700 hover:bg-gray-100 rounded transition-colors text-sm"
+                          className="flex items-center px-2 py-1 text-input-label-theme hover:bg-gray-100 rounded transition-colors text-sm"
                         >
                           <Eye className="h-4 w-4 mr-1" />
                           Show
@@ -716,7 +716,7 @@ export default function MeasurementsTracker() {
           <div className="flex gap-3">
             <button
               onClick={() => setShowCustomizeFields(true)}
-              className="flex items-center justify-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm lg:text-base"
+              className="flex items-center justify-center px-4 py-2 border border-gray-300 text-input-label-theme rounded-lg hover:bg-gray-50 transition-colors text-sm lg:text-base"
             >
               <Settings className="h-4 w-4 mr-2" />
               Customize Fields
@@ -785,7 +785,7 @@ export default function MeasurementsTracker() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="date" className="block text-sm font-medium text-input-label-theme">
                     Date
                   </label>
                   <input
@@ -802,11 +802,11 @@ export default function MeasurementsTracker() {
               {/* Measurement Fields */}
               {activeFields.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Measurements</h3>
+                  <h3 className="text-sm font-medium text-input-label-theme mb-3">Measurements</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {activeFieldsWithoutBodyFat.map((field) => (
                       <div key={field.id}>
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-input-label-theme">
                           {field.field_name} ({field.unit})
                         </label>
                         <input
@@ -837,7 +837,7 @@ export default function MeasurementsTracker() {
                     <button
                       type="button"
                       onClick={resetBodyFatCalculator}
-                      className="text-sm text-gray-500 hover:text-gray-700 self-start sm:self-auto"
+                      className="text-sm text-gray-500 hover:text-input-label-theme self-start sm:self-auto"
                     >
                       Reset
                     </button>
@@ -851,7 +851,7 @@ export default function MeasurementsTracker() {
                     {/* User Info - Mobile Responsive */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Gender</label>
+                        <label className="block text-sm font-medium text-input-label-theme">Gender</label>
                         <select
                           value={bodyFatData.gender}
                           onChange={(e) => setBodyFatData(prev => ({ ...prev, gender: e.target.value }))}
@@ -863,7 +863,7 @@ export default function MeasurementsTracker() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Age</label>
+                        <label className="block text-sm font-medium text-input-label-theme">Age</label>
                         <input
                           type="number"
                           value={bodyFatData.age}
@@ -880,7 +880,7 @@ export default function MeasurementsTracker() {
                         <h4 className="font-medium text-theme">Male Protocol (3-Site)</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700">Chest (mm)</label>
+                            <label className="block text-sm font-medium text-input-label-theme">Chest (mm)</label>
                             <input
                               type="number"
                               step="0.1"
@@ -891,7 +891,7 @@ export default function MeasurementsTracker() {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700">Abdominal (mm)</label>
+                            <label className="block text-sm font-medium text-input-label-theme">Abdominal (mm)</label>
                             <input
                               type="number"
                               step="0.1"
@@ -902,7 +902,7 @@ export default function MeasurementsTracker() {
                             />
                           </div>
                           <div className="sm:col-span-2 lg:col-span-1">
-                            <label className="block text-sm font-medium text-gray-700">Thigh (mm)</label>
+                            <label className="block text-sm font-medium text-input-label-theme">Thigh (mm)</label>
                             <input
                               type="number"
                               step="0.1"
@@ -919,7 +919,7 @@ export default function MeasurementsTracker() {
                         <h4 className="font-medium text-theme">Female Protocol (3-Site)</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700">Tricep (mm)</label>
+                            <label className="block text-sm font-medium text-input-label-theme">Tricep (mm)</label>
                             <input
                               type="number"
                               step="0.1"
@@ -930,7 +930,7 @@ export default function MeasurementsTracker() {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700">Suprailiac (mm)</label>
+                            <label className="block text-sm font-medium text-input-label-theme">Suprailiac (mm)</label>
                             <input
                               type="number"
                               step="0.1"
@@ -941,7 +941,7 @@ export default function MeasurementsTracker() {
                             />
                           </div>
                           <div className="sm:col-span-2 lg:col-span-1">
-                            <label className="block text-sm font-medium text-gray-700">Thigh (mm)</label>
+                            <label className="block text-sm font-medium text-input-label-theme">Thigh (mm)</label>
                             <input
                               type="number"
                               step="0.1"
@@ -974,7 +974,7 @@ export default function MeasurementsTracker() {
 
               {/* Body Fat Result - Mobile Responsive */}
               <div>
-                <label htmlFor="body_fat_percentage" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="body_fat_percentage" className="block text-sm font-medium text-input-label-theme">
                   Body Fat Percentage (%)
                 </label>
                 <input
@@ -995,7 +995,7 @@ export default function MeasurementsTracker() {
               </div>
   
               <div>
-                <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="notes" className="block text-sm font-medium text-input-label-theme">
                   Notes (optional)
                 </label>
                 <textarea
@@ -1012,7 +1012,7 @@ export default function MeasurementsTracker() {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-input-label-theme hover:bg-gray-50 transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -1055,7 +1055,7 @@ export default function MeasurementsTracker() {
                             
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div>
-                                <label className="block text-sm font-medium text-gray-700">Date</label>
+                                <label className="block text-sm font-medium text-input-label-theme">Date</label>
                                 <input
                                   type="date"
                                   required
@@ -1068,7 +1068,7 @@ export default function MeasurementsTracker() {
   
                             {/* Show all fields that have data or are currently active */}
                             <div>
-                              <h4 className="text-sm font-medium text-gray-700 mb-3">Measurements</h4>
+                              <h4 className="text-sm font-medium text-input-label-theme mb-3">Measurements</h4>
                               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {measurementFields
                                   .filter(field => {
@@ -1076,7 +1076,7 @@ export default function MeasurementsTracker() {
                                   })
                                   .map((field) => (
                                     <div key={field.id}>
-                                      <label className="block text-sm font-medium text-gray-700">
+                                      <label className="block text-sm font-medium text-input-label-theme">
                                         {field.field_name} ({field.unit})
                                         {!field.is_active && (
                                           <span className="text-xs text-gray-500 ml-1">(hidden field)</span>
@@ -1098,7 +1098,7 @@ export default function MeasurementsTracker() {
                             </div>
                             
                             <div>
-                              <label className="block text-sm font-medium text-gray-700">Notes (optional)</label>
+                              <label className="block text-sm font-medium text-input-label-theme">Notes (optional)</label>
                               <textarea
                                 rows={2}
                                 value={formData.notes}
@@ -1111,7 +1111,7 @@ export default function MeasurementsTracker() {
                               <button
                                 type="button"
                                 onClick={() => setEditingEntry(null)}
-                                className="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm"
+                                className="px-3 py-2 border border-gray-300 rounded-lg text-input-label-theme hover:bg-gray-50 transition-colors text-sm"
                               >
                                 Cancel
                               </button>
