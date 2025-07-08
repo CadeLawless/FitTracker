@@ -18,7 +18,28 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     
     return 'light';
   });
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const loadTheme = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
+
+      if (user?.user_metadata?.theme === 'dark' || user?.user_metadata?.theme === 'light') {
+        setTheme(user.user_metadata.theme);
+      } else {
+        // Fallback: system preference
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const defaultTheme: Theme = prefersDark ? 'dark' : 'light';
+        setTheme(defaultTheme);
+      }
+
+      setLoading(false);
+    };
+
+    loadTheme();
+  }, []);
+  
   useEffect(() => {
     // Apply theme to document
     const root = document.documentElement;
@@ -30,7 +51,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     
     // Save to localStorage
     localStorage.setItem('theme', theme);
-  }, [theme]);
+  }, [theme, loading]);
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
