@@ -49,6 +49,9 @@
   .bg-theme {
     @apply bg-white dark:bg-gray-800;
   }
+  .bg-secondary-theme {
+    @apply bg-gray-50 dark:bg-gray-700;
+  }
   .bg-input-theme {
     @apply dark:bg-gray-600;
   }
