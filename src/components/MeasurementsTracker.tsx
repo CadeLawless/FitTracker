@@ -855,7 +855,7 @@ export default function MeasurementsTracker() {
                         <select
                           value={bodyFatData.gender}
                           onChange={(e) => setBodyFatData(prev => ({ ...prev, gender: e.target.value }))}
-                          className="mt-1 block w-full px-3 py-2 border border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                          className="mt-1 block w-full px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                         >
                           <option value="">Select gender</option>
                           <option value="male">Male</option>
