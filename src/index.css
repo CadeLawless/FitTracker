@@ -37,6 +37,9 @@
   .text-label-theme {
     @apply text-gray-500;
   }
+  .text-secondary-label-theme {
+    @apply text-gray-500 dark:text-gray-400;
+  }
   .text-input-label-theme {
     @apply text-gray-700 dark:text-gray-200;
   }
