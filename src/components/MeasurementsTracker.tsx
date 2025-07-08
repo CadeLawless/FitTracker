@@ -515,7 +515,7 @@ export default function MeasurementsTracker() {
       case 'warning':
         return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
       default:
-        return <AlertCircle className="h-5 w-5 text-blue-600" />;
+        return <AlertCircle className="h-5 w-5 text-blue-theme" />;
     }
   };
 
@@ -741,7 +741,7 @@ export default function MeasurementsTracker() {
               return (
                 <div key={field.id} className="bg-theme rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
                   <div className="flex items-center justify-between mb-3">
-                    <Ruler className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600" />
+                    <Ruler className="h-6 w-6 lg:h-8 lg:w-8 text-blue-theme" />
                     {change !== null && (
                       change > 0 ? (
                         <TrendingUp className="h-5 w-5 text-red-500" />
@@ -1185,7 +1185,7 @@ export default function MeasurementsTracker() {
                 <p className="text-gray-500 mb-2 text-sm lg:text-base">No measurements recorded yet</p>
                 <button
                   onClick={handleAddNew}
-                  className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
+                  className="mt-2 text-blue-theme hover:text-blue-700 text-sm font-medium"
                 >
                   Add your first measurement
                 </button>
