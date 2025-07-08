@@ -1040,7 +1040,7 @@ export default function MeasurementsTracker() {
                     <div key={entry.id}>
                       {editingEntry?.id === entry.id ? (
                         /* Inline Edit Form */
-                        <div className="border border-blue-200 rounded-lg p-4 bg-blue-50">
+                        <div className="border border-blue-200 rounded-lg p-4 bg-light-blue-theme">
                           <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="flex items-center justify-between mb-4">
                               <h3 className="text-sm font-medium text-theme">Edit Measurement Entry</h3>
@@ -1169,7 +1169,7 @@ export default function MeasurementsTracker() {
                           </div>
                           
                           {entry.notes && (
-                            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                            <div className="mt-4 p-3 bg-light-blue-theme rounded-lg">
                               <p className="text-sm text-blue-800">{entry.notes}</p>
                             </div>
                           )}
