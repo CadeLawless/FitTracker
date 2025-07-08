@@ -1169,7 +1169,7 @@ export default function MeasurementsTracker() {
                           </div>
                           
                           {entry.notes && (
-                            <div className="mt-4 p-3 bg-light-blue-theme rounded-lg">
+                            <div className="mt-4 p-3 bg-blue-theme rounded-lg">
                               <p className="text-sm text-blue-theme">{entry.notes}</p>
                             </div>
                           )}
