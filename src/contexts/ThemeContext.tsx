@@ -17,7 +17,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const loadTheme = async () => {
       const user = await supabase.auth.getUser();
-      if (!user.data.user) return;
 
       if (user?.user_metadata?.theme === 'dark' || user?.user_metadata?.theme === 'light') {
         setTheme(user.user_metadata.theme);
@@ -52,7 +51,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setTheme(newTheme);
 
     const user = await supabase.auth.getUser();
-    if (!user.data.user) return;
 
     if (user) {
       await supabase.auth.updateUser({
