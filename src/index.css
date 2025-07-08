@@ -73,6 +73,9 @@
   .bg-hover-theme {
     @apply hover:bg-gray-50 dark:hover:bg-gray-900;
   }
+  .bg-hover-light-theme {
+    @apply hover:bg-gray-100 dark:hover:bg-gray-700;
+  }
   .bg-hover-green-theme {
     @apply hover:bg-green-100 dark:hover:bg-green-700/20;
   }
