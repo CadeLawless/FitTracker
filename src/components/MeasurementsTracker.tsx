@@ -659,7 +659,7 @@ export default function MeasurementsTracker() {
                       </div>
                       <button
                         onClick={() => toggleFieldActive(field)}
-                        className="flex items-center px-2 py-1 text-green-700 hover:bg-green-100 rounded transition-colors text-sm"
+                        className="flex items-center px-2 py-1 text-green-theme hover:bg-green-100 rounded transition-colors text-sm"
                       >
                         <EyeOff className="h-4 w-4 mr-1" />
                         Hide
