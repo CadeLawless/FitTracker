@@ -675,7 +675,7 @@ export default function MeasurementsTracker() {
                   <h4 className="text-sm font-medium text-theme mb-3">Hidden Fields</h4>
                   <div className="space-y-2">
                     {inactiveFields.map((field) => (
-                      <div key={field.id} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                      <div key={field.id} className="flex items-center justify-between p-3 bg-gray-50 border border-theme rounded-lg">
                         <div>
                           <span className="font-medium text-theme">{field.field_name}</span>
                           <span className="text-sm text-subheading-theme ml-2">({field.unit})</span>
@@ -693,7 +693,7 @@ export default function MeasurementsTracker() {
                 </div>
               )}
 
-              <div className="flex justify-end pt-6 border-t border-gray-200 mt-6">
+              <div className="flex justify-end pt-6 border-t border-theme mt-6">
                 <button
                   onClick={() => setShowCustomizeFields(false)}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm lg:text-base"
@@ -739,7 +739,7 @@ export default function MeasurementsTracker() {
               const change = getMeasurementChange(field.field_name);
               
               return (
-                <div key={field.id} className="bg-theme rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+                <div key={field.id} className="bg-theme rounded-lg shadow-sm border border-theme p-4 lg:p-6">
                   <div className="flex items-center justify-between mb-3">
                     <Ruler className="h-6 w-6 lg:h-8 lg:w-8 text-blue-theme" />
                     {change !== null && (
@@ -771,7 +771,7 @@ export default function MeasurementsTracker() {
   
         {/* Add Entry Form */}
         {showForm && (
-          <div ref={formRef} className="bg-theme rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+          <div ref={formRef} className="bg-theme rounded-lg shadow-sm border border-theme p-4 lg:p-6">
             <div className="flex items-center justify-between mb-4 lg:mb-6">
               <h2 className="text-base lg:text-lg font-semibold text-theme">Add Measurement Entry</h2>
               <button
@@ -828,7 +828,7 @@ export default function MeasurementsTracker() {
 
               {/* Body Fat Calculator Section - Mobile Responsive */}
               {bodyFatField && (
-                <div className="border-t border-gray-200 pt-6">
+                <div className="border-t border-theme pt-6">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
                     <h3 className="text-sm lg:text-base font-medium text-theme flex items-center">
                       <Calculator className="h-4 w-4 lg:h-5 lg:w-5 mr-2 text-green-600 flex-shrink-0" />
@@ -1008,7 +1008,7 @@ export default function MeasurementsTracker() {
                 />
               </div>
               
-              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-theme">
                 <button
                   type="button"
                   onClick={resetForm}
@@ -1028,8 +1028,8 @@ export default function MeasurementsTracker() {
         )}
   
         {/* Measurement History */}
-        <div className="bg-theme rounded-lg shadow-sm border border-gray-200">
-          <div className="p-4 lg:p-6 border-b border-gray-200">
+        <div className="bg-theme rounded-lg shadow-sm border border-theme">
+          <div className="p-4 lg:p-6 border-b border-theme">
             <h2 className="text-base lg:text-lg font-semibold text-theme">Measurement History</h2>
           </div>
           <div className="p-4 lg:p-6">
@@ -1127,7 +1127,7 @@ export default function MeasurementsTracker() {
                         </div>
                       ) : (
                         /* Regular Entry Display - Restored Original Styling */
-                        <div className="border border-gray-200 rounded-lg p-4 lg:p-6">
+                        <div className="border border-theme rounded-lg p-4 lg:p-6">
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
                             <div className="flex items-center">
                               <Calendar className="h-4 w-4 lg:h-5 lg:w-5 text-gray-400 mr-2 flex-shrink-0" />
