@@ -587,7 +587,7 @@ export default function MeasurementsTracker() {
               <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
                 <button
                   onClick={handleDeleteCancel}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-input-label-theme hover:bg-secondary-theme transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-input-theme rounded-lg text-input-label-theme hover:bg-secondary-theme transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -627,14 +627,14 @@ export default function MeasurementsTracker() {
                     placeholder="Field name (e.g., Forearm)"
                     value={customFieldForm.field_name}
                     onChange={(e) => setCustomFieldForm({ ...customFieldForm, field_name: e.target.value })}
-                    className="px-3 py-2 border bg-input-theme border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    className="px-3 py-2 border bg-input-theme border-input-theme rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                   />
                   <input
                     type="text"
                     placeholder="Unit (e.g., inches, cm)"
                     value={customFieldForm.unit}
                     onChange={(e) => setCustomFieldForm({ ...customFieldForm, unit: e.target.value })}
-                    className="px-3 py-2 border bg-input-theme border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    className="px-3 py-2 border bg-input-theme border-input-theme rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                   />
                   <button
                     onClick={addCustomField}
@@ -716,7 +716,7 @@ export default function MeasurementsTracker() {
           <div className="flex gap-3">
             <button
               onClick={() => setShowCustomizeFields(true)}
-              className="flex items-center justify-center px-4 py-2 border border-gray-300 text-input-label-theme rounded-lg hover:bg-secondary-theme transition-colors text-sm lg:text-base"
+              className="flex items-center justify-center px-4 py-2 border border-input-theme text-input-label-theme rounded-lg hover:bg-secondary-theme transition-colors text-sm lg:text-base"
             >
               <Settings className="h-4 w-4 mr-2" />
               Customize Fields
@@ -794,7 +794,7 @@ export default function MeasurementsTracker() {
                     required
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border bg-input-theme border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                    className="mt-1 block w-full px-3 py-2 border bg-input-theme border-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                   />
                 </div>
               </div>
@@ -817,7 +817,7 @@ export default function MeasurementsTracker() {
                             ...formData, 
                             [getFieldKey(field.field_name)]: e.target.value 
                           })}
-                          className="mt-1 block w-full px-3 py-2 border bg-input-theme border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                          className="mt-1 block w-full px-3 py-2 border bg-input-theme border-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                           placeholder={`Enter ${field.field_name.toLowerCase()}`}
                         />
                       </div>
@@ -855,7 +855,7 @@ export default function MeasurementsTracker() {
                         <select
                           value={bodyFatData.gender}
                           onChange={(e) => setBodyFatData(prev => ({ ...prev, gender: e.target.value }))}
-                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                          className="mt-1 block w-full px-3 py-2 border border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                         >
                           <option value="">Select gender</option>
                           <option value="male">Male</option>
@@ -868,7 +868,7 @@ export default function MeasurementsTracker() {
                           type="number"
                           value={bodyFatData.age}
                           onChange={(e) => setBodyFatData(prev => ({ ...prev, age: e.target.value }))}
-                          className="mt-1 block w-full px-3 py-2 border bg-input-theme border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                          className="mt-1 block w-full px-3 py-2 border bg-input-theme border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                           placeholder="Enter your age"
                         />
                       </div>
@@ -886,7 +886,7 @@ export default function MeasurementsTracker() {
                               step="0.1"
                               value={bodyFatData.chest}
                               onChange={(e) => setBodyFatData(prev => ({ ...prev, chest: e.target.value }))}
-                              className="mt-1 block w-full px-3 py-2 borderc bg-input-theme border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                              className="mt-1 block w-full px-3 py-2 borderc bg-input-theme border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                               placeholder="Chest skinfold"
                             />
                           </div>
@@ -897,7 +897,7 @@ export default function MeasurementsTracker() {
                               step="0.1"
                               value={bodyFatData.abdominal}
                               onChange={(e) => setBodyFatData(prev => ({ ...prev, abdominal: e.target.value }))}
-                              className="mt-1 block w-full px-3 py-2 border bg-input-theme border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                              className="mt-1 block w-full px-3 py-2 border bg-input-theme border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                               placeholder="Abdominal skinfold"
                             />
                           </div>
@@ -908,7 +908,7 @@ export default function MeasurementsTracker() {
                               step="0.1"
                               value={bodyFatData.thigh}
                               onChange={(e) => setBodyFatData(prev => ({ ...prev, thigh: e.target.value }))}
-                              className="mt-1 block w-full px-3 py-2 border bg-input-theme border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                              className="mt-1 block w-full px-3 py-2 border bg-input-theme border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                               placeholder="Thigh skinfold"
                             />
                           </div>
@@ -925,7 +925,7 @@ export default function MeasurementsTracker() {
                               step="0.1"
                               value={bodyFatData.tricep}
                               onChange={(e) => setBodyFatData(prev => ({ ...prev, tricep: e.target.value }))}
-                              className="mt-1 block w-full px-3 py-2 border bg-input-theme border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                              className="mt-1 block w-full px-3 py-2 border bg-input-theme border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                               placeholder="Tricep skinfold"
                             />
                           </div>
@@ -936,7 +936,7 @@ export default function MeasurementsTracker() {
                               step="0.1"
                               value={bodyFatData.suprailiac}
                               onChange={(e) => setBodyFatData(prev => ({ ...prev, suprailiac: e.target.value }))}
-                              className="mt-1 block w-full px-3 py-2 border bg-input-theme border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                              className="mt-1 block w-full px-3 py-2 border bg-input-theme border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                               placeholder="Suprailiac skinfold"
                             />
                           </div>
@@ -947,7 +947,7 @@ export default function MeasurementsTracker() {
                               step="0.1"
                               value={bodyFatData.thigh}
                               onChange={(e) => setBodyFatData(prev => ({ ...prev, thigh: e.target.value }))}
-                              className="mt-1 block w-full px-3 py-2 border bg-input-theme border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                              className="mt-1 block w-full px-3 py-2 border bg-input-theme border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                               placeholder="Thigh skinfold"
                             />
                           </div>
@@ -986,7 +986,7 @@ export default function MeasurementsTracker() {
                     ...prev, 
                     [getFieldKey('Body Fat %')]: e.target.value 
                   }))}
-                  className="mt-1 block w-full px-3 py-2 border bg-input-theme border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                  className="mt-1 block w-full px-3 py-2 border bg-input-theme border-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                   placeholder="Enter or calculate body fat %"
                 />
                 <p className="mt-1 text-xs text-gray-500">
@@ -1003,7 +1003,7 @@ export default function MeasurementsTracker() {
                   rows={3}
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border bg-input-theme border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                  className="mt-1 block w-full px-3 py-2 border bg-input-theme border-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                   placeholder="Any notes about this measurement..."
                 />
               </div>
@@ -1012,7 +1012,7 @@ export default function MeasurementsTracker() {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-input-label-theme hover:bg-secondary-theme transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-input-theme rounded-lg text-input-label-theme hover:bg-secondary-theme transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -1061,7 +1061,7 @@ export default function MeasurementsTracker() {
                                   required
                                   value={formData.date}
                                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                  className="mt-1 block w-full px-3 py-2 border bg-input-theme border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                  className="mt-1 block w-full px-3 py-2 border bg-input-theme border-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                                 />
                               </div>
                             </div>
@@ -1090,7 +1090,7 @@ export default function MeasurementsTracker() {
                                           ...formData, 
                                           [getFieldKey(field.field_name)]: e.target.value 
                                         })}
-                                        className="mt-1 block w-full px-3 py-2 border bg-input-theme border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                        className="mt-1 block w-full px-3 py-2 border bg-input-theme border-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                                       />
                                     </div>
                                   ))}
@@ -1103,7 +1103,7 @@ export default function MeasurementsTracker() {
                                 rows={2}
                                 value={formData.notes}
                                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                                className="mt-1 block w-full px-3 py-2 border bg-input-theme border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                className="mt-1 block w-full px-3 py-2 border bg-input-theme border-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                               />
                             </div>
                             
@@ -1111,7 +1111,7 @@ export default function MeasurementsTracker() {
                               <button
                                 type="button"
                                 onClick={() => setEditingEntry(null)}
-                                className="px-3 py-2 border border-gray-300 rounded-lg text-input-label-theme hover:bg-secondary-theme transition-colors text-sm"
+                                className="px-3 py-2 border border-input-theme rounded-lg text-input-label-theme hover:bg-secondary-theme transition-colors text-sm"
                               >
                                 Cancel
                               </button>
