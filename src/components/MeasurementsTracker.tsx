@@ -574,7 +574,7 @@ export default function MeasurementsTracker() {
                   <AlertTriangle className="h-6 w-6 text-red-600" />
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-gray-900">Delete Measurement Entry</h3>
+                  <h3 className="text-lg font-medium text-theme">Delete Measurement Entry</h3>
                 </div>
               </div>
               <div className="mb-6">
@@ -609,7 +609,7 @@ export default function MeasurementsTracker() {
           <div className="bg-theme rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-medium text-gray-900">Customize Measurement Fields</h3>
+                <h3 className="text-lg font-medium text-theme">Customize Measurement Fields</h3>
                 <button
                   onClick={() => setShowCustomizeFields(false)}
                   className="text-gray-400 hover:text-gray-600 p-1"
@@ -620,7 +620,7 @@ export default function MeasurementsTracker() {
 
               {/* Add Custom Field */}
               <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                <h4 className="text-sm font-medium text-gray-900 mb-3">Add Custom Field</h4>
+                <h4 className="text-sm font-medium text-theme mb-3">Add Custom Field</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <input
                     type="text"
@@ -649,12 +649,12 @@ export default function MeasurementsTracker() {
 
               {/* Active Fields */}
               <div className="mb-6">
-                <h4 className="text-sm font-medium text-gray-900 mb-3">Active Fields (shown in add form)</h4>
+                <h4 className="text-sm font-medium text-theme mb-3">Active Fields (shown in add form)</h4>
                 <div className="space-y-2">
                   {activeFields.map((field) => (
                     <div key={field.id} className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
                       <div>
-                        <span className="font-medium text-gray-900">{field.field_name}</span>
+                        <span className="font-medium text-theme">{field.field_name}</span>
                         <span className="text-sm text-gray-600 ml-2">({field.unit})</span>
                       </div>
                       <button
@@ -672,12 +672,12 @@ export default function MeasurementsTracker() {
               {/* Inactive Fields */}
               {inactiveFields.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-3">Hidden Fields</h4>
+                  <h4 className="text-sm font-medium text-theme mb-3">Hidden Fields</h4>
                   <div className="space-y-2">
                     {inactiveFields.map((field) => (
                       <div key={field.id} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg">
                         <div>
-                          <span className="font-medium text-gray-900">{field.field_name}</span>
+                          <span className="font-medium text-theme">{field.field_name}</span>
                           <span className="text-sm text-gray-600 ml-2">({field.unit})</span>
                         </div>
                         <button
@@ -710,7 +710,7 @@ export default function MeasurementsTracker() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Body Measurements</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold text-theme">Body Measurements</h1>
             <p className="mt-2 text-sm lg:text-base text-gray-600">Track your body measurements and progress over time.</p>
           </div>
           <div className="flex gap-3">
@@ -754,7 +754,7 @@ export default function MeasurementsTracker() {
                   </div>
                   <div>
                     <p className="text-xs lg:text-sm font-medium text-gray-600">{field.field_name}</p>
-                    <p className="text-lg lg:text-2xl font-bold text-gray-900">
+                    <p className="text-lg lg:text-2xl font-bold text-theme">
                       {latest !== null ? `${latest} ${field.unit}` : 'No data'}
                     </p>
                     {change !== null && (
@@ -773,7 +773,7 @@ export default function MeasurementsTracker() {
         {showForm && (
           <div ref={formRef} className="bg-theme rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
             <div className="flex items-center justify-between mb-4 lg:mb-6">
-              <h2 className="text-base lg:text-lg font-semibold text-gray-900">Add Measurement Entry</h2>
+              <h2 className="text-base lg:text-lg font-semibold text-theme">Add Measurement Entry</h2>
               <button
                 onClick={resetForm}
                 className="text-gray-400 hover:text-gray-600 p-1"
@@ -830,7 +830,7 @@ export default function MeasurementsTracker() {
               {bodyFatField && (
                 <div className="border-t border-gray-200 pt-6">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-                    <h3 className="text-sm lg:text-base font-medium text-gray-900 flex items-center">
+                    <h3 className="text-sm lg:text-base font-medium text-theme flex items-center">
                       <Calculator className="h-4 w-4 lg:h-5 lg:w-5 mr-2 text-green-600 flex-shrink-0" />
                       Body Fat Calculator
                     </h3>
@@ -877,7 +877,7 @@ export default function MeasurementsTracker() {
                     {/* Skinfold Measurements - Mobile Responsive */}
                     {bodyFatData.gender === 'male' ? (
                       <div className="space-y-4">
-                        <h4 className="font-medium text-gray-900">Male Protocol (3-Site)</h4>
+                        <h4 className="font-medium text-theme">Male Protocol (3-Site)</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                           <div>
                             <label className="block text-sm font-medium text-gray-700">Chest (mm)</label>
@@ -916,7 +916,7 @@ export default function MeasurementsTracker() {
                       </div>
                     ) : bodyFatData.gender === 'female' ? (
                       <div className="space-y-4">
-                        <h4 className="font-medium text-gray-900">Female Protocol (3-Site)</h4>
+                        <h4 className="font-medium text-theme">Female Protocol (3-Site)</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                           <div>
                             <label className="block text-sm font-medium text-gray-700">Tricep (mm)</label>
@@ -1030,7 +1030,7 @@ export default function MeasurementsTracker() {
         {/* Measurement History */}
         <div className="bg-theme rounded-lg shadow-sm border border-gray-200">
           <div className="p-4 lg:p-6 border-b border-gray-200">
-            <h2 className="text-base lg:text-lg font-semibold text-gray-900">Measurement History</h2>
+            <h2 className="text-base lg:text-lg font-semibold text-theme">Measurement History</h2>
           </div>
           <div className="p-4 lg:p-6">
             {entries.length > 0 ? (
@@ -1043,7 +1043,7 @@ export default function MeasurementsTracker() {
                         <div className="border border-blue-200 rounded-lg p-4 bg-blue-50">
                           <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="flex items-center justify-between mb-4">
-                              <h3 className="text-sm font-medium text-gray-900">Edit Measurement Entry</h3>
+                              <h3 className="text-sm font-medium text-theme">Edit Measurement Entry</h3>
                               <button
                                 type="button"
                                 onClick={() => setEditingEntry(null)}
@@ -1131,7 +1131,7 @@ export default function MeasurementsTracker() {
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
                             <div className="flex items-center">
                               <Calendar className="h-4 w-4 lg:h-5 lg:w-5 text-gray-400 mr-2 flex-shrink-0" />
-                              <span className="font-medium text-gray-900 text-sm lg:text-base">
+                              <span className="font-medium text-theme text-sm lg:text-base">
                                 {formatDate(entry.date).toLocaleDateString()}
                               </span>
                             </div>
@@ -1159,7 +1159,7 @@ export default function MeasurementsTracker() {
                                     <p className="text-xs text-gray-500 uppercase tracking-wide truncate">
                                       {value.field?.field_name}
                                     </p>
-                                    <p className="text-sm lg:text-base font-semibold text-gray-900">
+                                    <p className="text-sm lg:text-base font-semibold text-theme">
                                       {value.value} {value.field?.unit}
                                     </p>
                                   </div>
