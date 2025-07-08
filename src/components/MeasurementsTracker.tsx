@@ -567,7 +567,7 @@ export default function MeasurementsTracker() {
       {/* Delete Confirmation Modal */}
       {deleteConfirmation.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-theme rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
@@ -606,7 +606,7 @@ export default function MeasurementsTracker() {
       {/* Customize Fields Modal */}
       {showCustomizeFields && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-theme rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-medium text-gray-900">Customize Measurement Fields</h3>
@@ -739,7 +739,7 @@ export default function MeasurementsTracker() {
               const change = getMeasurementChange(field.field_name);
               
               return (
-                <div key={field.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+                <div key={field.id} className="bg-theme rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
                   <div className="flex items-center justify-between mb-3">
                     <Ruler className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600" />
                     {change !== null && (
@@ -771,7 +771,7 @@ export default function MeasurementsTracker() {
   
         {/* Add Entry Form */}
         {showForm && (
-          <div ref={formRef} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+          <div ref={formRef} className="bg-theme rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
             <div className="flex items-center justify-between mb-4 lg:mb-6">
               <h2 className="text-base lg:text-lg font-semibold text-gray-900">Add Measurement Entry</h2>
               <button
@@ -1028,7 +1028,7 @@ export default function MeasurementsTracker() {
         )}
   
         {/* Measurement History */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-theme rounded-lg shadow-sm border border-gray-200">
           <div className="p-4 lg:p-6 border-b border-gray-200">
             <h2 className="text-base lg:text-lg font-semibold text-gray-900">Measurement History</h2>
           </div>
