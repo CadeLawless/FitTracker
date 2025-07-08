@@ -886,7 +886,7 @@ export default function MeasurementsTracker() {
                               step="0.1"
                               value={bodyFatData.chest}
                               onChange={(e) => setBodyFatData(prev => ({ ...prev, chest: e.target.value }))}
-                              className="mt-1 block w-full px-3 py-2 borderc bg-input-theme text-theme border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
+                              className="mt-1 block w-full px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                               placeholder="Chest skinfold"
                             />
                           </div>
