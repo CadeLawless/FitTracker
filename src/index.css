@@ -59,7 +59,7 @@
     @apply dark:bg-gray-600;
   }
   .bg-blue-theme {
-    @apply bg-blue-50 dark:bg-blue-900/10;
+    @apply bg-blue-50 dark:bg-blue-900/30;
   }
   .bg-light-blue-theme {
     @apply bg-blue-50 dark:bg-blue-900/10;
