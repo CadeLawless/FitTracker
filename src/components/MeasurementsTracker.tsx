@@ -553,7 +553,7 @@ export default function MeasurementsTracker() {
                 <div className="ml-4 flex-shrink-0 flex">
                   <button
                     onClick={() => removeNotification(notification.id)}
-                    className="inline-flex text-gray-400 hover:text-gray-600 focus:outline-none"
+                    className="inline-flex text-gray-400 hover:text-subheading-theme focus:outline-none"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -578,7 +578,7 @@ export default function MeasurementsTracker() {
                 </div>
               </div>
               <div className="mb-6">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-subheading-theme">
                   Are you sure you want to delete the measurement entry from{' '}
                   <span className="font-medium">{deleteConfirmation.entryDate}</span>?
                   This action cannot be undone.
@@ -612,7 +612,7 @@ export default function MeasurementsTracker() {
                 <h3 className="text-lg font-medium text-theme">Customize Measurement Fields</h3>
                 <button
                   onClick={() => setShowCustomizeFields(false)}
-                  className="text-gray-400 hover:text-gray-600 p-1"
+                  className="text-gray-400 hover:text-subheading-theme p-1"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -655,7 +655,7 @@ export default function MeasurementsTracker() {
                     <div key={field.id} className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
                       <div>
                         <span className="font-medium text-theme">{field.field_name}</span>
-                        <span className="text-sm text-gray-600 ml-2">({field.unit})</span>
+                        <span className="text-sm text-subheading-theme ml-2">({field.unit})</span>
                       </div>
                       <button
                         onClick={() => toggleFieldActive(field)}
@@ -678,7 +678,7 @@ export default function MeasurementsTracker() {
                       <div key={field.id} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg">
                         <div>
                           <span className="font-medium text-theme">{field.field_name}</span>
-                          <span className="text-sm text-gray-600 ml-2">({field.unit})</span>
+                          <span className="text-sm text-subheading-theme ml-2">({field.unit})</span>
                         </div>
                         <button
                           onClick={() => toggleFieldActive(field)}
@@ -711,7 +711,7 @@ export default function MeasurementsTracker() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl lg:text-3xl font-bold text-theme">Body Measurements</h1>
-            <p className="mt-2 text-sm lg:text-base text-gray-600">Track your body measurements and progress over time.</p>
+            <p className="mt-2 text-sm lg:text-base text-subheading-theme">Track your body measurements and progress over time.</p>
           </div>
           <div className="flex gap-3">
             <button
@@ -753,7 +753,7 @@ export default function MeasurementsTracker() {
                     )}
                   </div>
                   <div>
-                    <p className="text-xs lg:text-sm font-medium text-gray-600">{field.field_name}</p>
+                    <p className="text-xs lg:text-sm font-medium text-subheading-theme">{field.field_name}</p>
                     <p className="text-lg lg:text-2xl font-bold text-theme">
                       {latest !== null ? `${latest} ${field.unit}` : 'No data'}
                     </p>
@@ -776,7 +776,7 @@ export default function MeasurementsTracker() {
               <h2 className="text-base lg:text-lg font-semibold text-theme">Add Measurement Entry</h2>
               <button
                 onClick={resetForm}
-                className="text-gray-400 hover:text-gray-600 p-1"
+                className="text-gray-400 hover:text-subheading-theme p-1"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -844,7 +844,7 @@ export default function MeasurementsTracker() {
                   </div>
                   
                   <div className="bg-gray-50 rounded-lg p-4 space-y-4">
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-subheading-theme">
                       Use skinfold calipers to measure at the specified sites. Measurements should be in millimeters.
                     </p>
                     
@@ -1047,7 +1047,7 @@ export default function MeasurementsTracker() {
                               <button
                                 type="button"
                                 onClick={() => setEditingEntry(null)}
-                                className="text-gray-400 hover:text-gray-600 p-1"
+                                className="text-gray-400 hover:text-subheading-theme p-1"
                               >
                                 <X className="h-4 w-4" />
                               </button>
