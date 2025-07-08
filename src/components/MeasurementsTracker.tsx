@@ -587,7 +587,7 @@ export default function MeasurementsTracker() {
               <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
                 <button
                   onClick={handleDeleteCancel}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-input-label-theme hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-input-label-theme hover:bg-secondary-theme transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -619,7 +619,7 @@ export default function MeasurementsTracker() {
               </div>
 
               {/* Add Custom Field */}
-              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+              <div className="mb-6 p-4 bg-secondary-theme rounded-lg">
                 <h4 className="text-sm font-medium text-theme mb-3">Add Custom Field</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <input
@@ -675,7 +675,7 @@ export default function MeasurementsTracker() {
                   <h4 className="text-sm font-medium text-theme mb-3">Hidden Fields</h4>
                   <div className="space-y-2">
                     {inactiveFields.map((field) => (
-                      <div key={field.id} className="flex items-center justify-between p-3 bg-gray-50 border border-theme rounded-lg">
+                      <div key={field.id} className="flex items-center justify-between p-3 bg-secondary-theme border border-theme rounded-lg">
                         <div>
                           <span className="font-medium text-theme">{field.field_name}</span>
                           <span className="text-sm text-subheading-theme ml-2">({field.unit})</span>
@@ -716,7 +716,7 @@ export default function MeasurementsTracker() {
           <div className="flex gap-3">
             <button
               onClick={() => setShowCustomizeFields(true)}
-              className="flex items-center justify-center px-4 py-2 border border-gray-300 text-input-label-theme rounded-lg hover:bg-gray-50 transition-colors text-sm lg:text-base"
+              className="flex items-center justify-center px-4 py-2 border border-gray-300 text-input-label-theme rounded-lg hover:bg-secondary-theme transition-colors text-sm lg:text-base"
             >
               <Settings className="h-4 w-4 mr-2" />
               Customize Fields
@@ -843,7 +843,7 @@ export default function MeasurementsTracker() {
                     </button>
                   </div>
                   
-                  <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+                  <div className="bg-secondary-theme rounded-lg p-4 space-y-4">
                     <p className="text-sm text-subheading-theme">
                       Use skinfold calipers to measure at the specified sites. Measurements should be in millimeters.
                     </p>
@@ -1012,7 +1012,7 @@ export default function MeasurementsTracker() {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-input-label-theme hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-input-label-theme hover:bg-secondary-theme transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -1111,7 +1111,7 @@ export default function MeasurementsTracker() {
                               <button
                                 type="button"
                                 onClick={() => setEditingEntry(null)}
-                                className="px-3 py-2 border border-gray-300 rounded-lg text-input-label-theme hover:bg-gray-50 transition-colors text-sm"
+                                className="px-3 py-2 border border-gray-300 rounded-lg text-input-label-theme hover:bg-secondary-theme transition-colors text-sm"
                               >
                                 Cancel
                               </button>
@@ -1155,7 +1155,7 @@ export default function MeasurementsTracker() {
                             {entry.values.length > 0 && (
                               <>
                                 {entry.values.map((value) => (                             
-                                  <div key={value.id} className="text-center p-3 bg-gray-50 rounded-lg">
+                                  <div key={value.id} className="text-center p-3 bg-secondary-theme rounded-lg">
                                     <p className="text-xs text-gray-500 uppercase tracking-wide truncate">
                                       {value.field?.field_name}
                                     </p>
