@@ -682,7 +682,7 @@ export default function MeasurementsTracker() {
                         </div>
                         <button
                           onClick={() => toggleFieldActive(field)}
-                          className="flex items-center px-2 py-1 text-input-label-theme hover:bg-gray-100 rounded transition-colors text-sm"
+                          className="flex items-center px-2 py-1 text-input-label-theme bg-hover-theme rounded transition-colors text-sm"
                         >
                           <Eye className="h-4 w-4 mr-1" />
                           Show
