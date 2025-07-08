@@ -49,6 +49,9 @@
   .text-blue-theme {
     @apply text-blue-600 dark:text-blue-400;
   }
+  .text-blue-theme {
+    @apply text-green-700 dark:text-green-400;
+  }
   .bg-theme {
     @apply bg-white dark:bg-gray-800;
   }
