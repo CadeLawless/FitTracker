@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase';
 
 type Theme = 'light' | 'dark';
 
@@ -22,8 +23,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const loadTheme = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      const user = session?.user;
+      const user = await supabase.auth.getUser();
+      if (!user.data.user) return;
 
       if (user?.user_metadata?.theme === 'dark' || user?.user_metadata?.theme === 'light') {
         setTheme(user.user_metadata.theme);
@@ -57,8 +58,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const newTheme: Theme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
 
-    const { data: { session } } = await supabase.auth.getSession();
-    const user = session?.user;
+    const user = await supabase.auth.getUser();
+    if (!user.data.user) return;
 
     if (user) {
       await supabase.auth.updateUser({
