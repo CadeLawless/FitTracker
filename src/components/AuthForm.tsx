@@ -39,9 +39,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
           formData.birth_date,
           formData.gender as 'male' | 'female' | 'other'
         );
-        if(error){
-          console.error("Signup error:", error);
-        }
+        if (error) throw error;
       }
       onAuthSuccess();
     } catch (err: any) {
