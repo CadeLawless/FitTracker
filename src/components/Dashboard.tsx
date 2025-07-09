@@ -22,10 +22,13 @@ export default function Dashboard() {
   }, []);
 
   const loadDashboardData = async () => {
+    console.log('loading dashboard data...');
     try {
+      console.log('getting user...');
       const user = await supabase.auth.getUser();
       if (!user.data.user) return;
-
+      console.log('user found!', user);
+      
       // Load latest weight
       const { data: weightData } = await supabase
         .from('weight_entries')
