@@ -33,11 +33,18 @@ function App() {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setUser(session?.user || null);
-        
-        if (session?.user && event === 'SIGNED_IN') {
-          // Check if user needs goal setup
-          await checkGoalSetup(session.user.id);
+        try {
+          // Optionally delay to avoid race condition
+          setTimeout(() => {
+            setUser(session?.user || null);
+          
+            if (session?.user && event === 'SIGNED_IN') {
+              // Check if user needs goal setup
+              await checkGoalSetup(session.user.id);
+            }
+          }, 100);
+        } catch (e) {
+          console.error(`[${event} error]`, e);
         }
         
         setLoading(false);
