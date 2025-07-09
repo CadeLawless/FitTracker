@@ -32,13 +32,17 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
         const { error } = await auth.signIn(formData.email, formData.password);
         if (error) throw error;
       } else {
-        const { error } = await auth.signUp(
+        const { data, error } = await auth.signUp(
           formData.email, 
           formData.password, 
           formData.name,
           formData.birth_date,
           formData.gender as 'male' | 'female' | 'other'
         );
+
+        console.log('signUp data:', data);
+        console.log('signUp error:', error);
+        
         if (error) throw error;
       }
       onAuthSuccess();
