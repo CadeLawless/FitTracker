@@ -17,81 +17,17 @@ import {
 } from 'lucide-react';
 import { supabase, auth } from '../lib/supabase';
 import ThemeToggle from './ThemeToggle';
-import type { User as UserInfo } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
 interface LayoutProps {
   children: React.ReactNode; // This allows us to wrap other components
 }
 
 export default function Layout({ children }: LayoutProps) {
+  const { user, authLoading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [user, setUser] = useState<UserInfo | null>(null);
-  const [loadingUser, setLoadingUser] = useState(true);
-
-  useEffect(() => {
-    loadUser();
-
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-    console.log('[Auth State Changed]', event);
-    if (event === 'USER_UPDATED') {
-      try {
-        // Optionally delay to avoid race condition
-        setTimeout(() => {
-          loadUser().catch(e => console.error('[USER_UPDATED loadUser error]', e));
-        }, 100);
-      } catch (e) {
-        console.error('[USER_UPDATED error]', e);
-      }
-    } else if (session?.user) {
-      try {
-        await loadUser();
-      } catch (e) {
-        console.error('[Other auth change error]', e);
-      }
-    } else {
-      setUser(null);
-    }
-  });
-
-    // Listen for profile updates
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'profile-updated') {
-        loadUser();
-        localStorage.removeItem('profile-updated'); // Clean up
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    // Also listen for custom events within the same tab
-    const handleProfileUpdate = () => {
-      loadUser();
-    };
-
-    window.addEventListener('profile-updated', handleProfileUpdate);
-
-    return () => {
-      subscription.unsubscribe();
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('profile-updated', handleProfileUpdate);
-    };
-  }, []);
-
-  const loadUser = async () => {
-    try {
-      const { data, error } = await supabase.auth.getUser();
-      if (error) throw error;
-      if (!data.user) return;
-      setUser(data.user);
-    } catch (error) {
-      console.error('Error loading user data:', error);
-    } finally {
-      setLoadingUser(false);
-    }
-  };
   
   const handleSignOut = async () => {
     await auth.signOut();
@@ -183,7 +119,7 @@ export default function Layout({ children }: LayoutProps) {
             <div className="flex items-center">
               <User className="h-8 w-8 text-gray-400 dark:text-gray-500 flex-shrink-0" />
               <div className="ml-3 flex-1 min-w-0">
-                {!loadingUser ? (
+                {!authLoading ? (
                   <>
                     <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                       {user?.user_metadata?.name || user?.email || "User"}
