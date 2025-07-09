@@ -6,6 +6,7 @@ import { formatDate } from '../lib/date';
 import type { WorkoutSession, WorkoutRoutine, Exercise } from '../types';
 import { useCustomExercises } from '../hooks/useCustomExercises';
 import { CustomExerciseForm } from '../components/CustomExerciseForm';
+import { useAuth } from '../contexts/AuthContext';
 
 interface DeleteConfirmation {
   isOpen: boolean;
@@ -16,6 +17,7 @@ interface DeleteConfirmation {
 }
 
 export default function WorkoutsPage() {
+  const { user, authLoading } = useAuth();
   const navigate = useNavigate();
   const [sessions, setSessions] = useState<WorkoutSession[]>([]);
   const [routines, setRoutines] = useState<WorkoutRoutine[]>([]);
@@ -47,13 +49,15 @@ export default function WorkoutsPage() {
   });
 
   useEffect(() => {
+    if(authLoading) return;
+    if(!user) return;
+
     loadData();
-  }, []);
+  }, [authLoading, user]);
 
   const loadData = async () => {
     try {
-      const user = await supabase.auth.getUser();
-      if (!user.data.user) return;
+      if (!user) return;
 
       // Load workout sessions with routine info, ordered by status and date
       const { data: sessionsData, error: sessionsError } = await supabase
@@ -62,7 +66,7 @@ export default function WorkoutsPage() {
           *,
           routine:workout_routines(name)
         `)
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .order('status', { ascending: true }) // active first
         .order('date', { ascending: false });
 
@@ -72,7 +76,7 @@ export default function WorkoutsPage() {
       const { data: routinesData, error: routinesError } = await supabase
         .from('workout_routines')
         .select('*')
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .order('name');
 
       if (routinesError) throw routinesError;
@@ -81,7 +85,7 @@ export default function WorkoutsPage() {
       const { data: exercisesData, error: exercisesError } = await supabase
         .from('exercises')
         .select('*')
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .order('name');
   
       if (exercisesError) throw exercisesError;

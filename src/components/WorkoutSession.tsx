@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { scrollToElement } from '../lib/htmlElement';
 import type { WorkoutRoutine, RoutineExercise, ExerciseSet, WorkoutSession as WorkoutSessionType } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
 interface WorkoutState {
   session: WorkoutSessionType | null;
@@ -21,6 +22,7 @@ interface PopupConfirmation {
 }
 
 export default function WorkoutSession() {
+  const { user, authLoading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const routineId = searchParams.get('routine');
@@ -53,7 +55,6 @@ export default function WorkoutSession() {
 
   const restTimerDiv = useRef<HTMLDivElement>(null);
   const hasScrolledToRestTimer = useRef(false);
-  const navbarHeight = 80;
 
   useEffect(() => {
     const condition = workoutState.isResting && restTimerDiv.current && !hasScrolledToRestTimer.current;
@@ -64,6 +65,9 @@ export default function WorkoutSession() {
   }, [workoutState]);
   
   useEffect(() => {
+    if(authLoading) return;
+    if(!user) return;
+
     console.log('WorkoutSession mounted');
     console.log(workoutComplete);
     if (hasCreatedSessionRef.current || workoutComplete) {
@@ -81,7 +85,7 @@ export default function WorkoutSession() {
       console.log('No routineId or resumeSessionId -> starting custom workout');
       startCustomWorkout();
     }
-  }, [routineId, resumeSessionId]);
+  }, [routineId, resumeSessionId, authLoading, user]);
 
   useEffect(() => {
     return () => {
@@ -93,8 +97,7 @@ export default function WorkoutSession() {
 
   const resumeExistingSession = async () => {
     try {
-      const user = await supabase.auth.getUser();
-      if (!user.data.user) return;
+      if (!user) return;
 
       // Load existing session
       const { data: sessionData, error: sessionError } = await supabase
@@ -104,7 +107,7 @@ export default function WorkoutSession() {
           routine:workout_routines(*)
         `)
         .eq('id', resumeSessionId)
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .eq('status', 'active')
         .single();
 
@@ -267,13 +270,13 @@ export default function WorkoutSession() {
     console.log('Checking for existing active session');
     try {
       const user = await supabase.auth.getUser();
-      if (!user.data.user) return;
+      if (!user) return;
 
       // Check if there's already an active session for today
       const { data: existingSession, error: checkError } = await supabase
         .from('workout_sessions')
         .select('*')
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .eq('status', 'active')
         .eq('date', getLocalDateString())
         .maybeSingle();
@@ -300,7 +303,7 @@ export default function WorkoutSession() {
       const { data, error } = await supabase
         .from('workout_sessions')
         .insert([{
-          user_id: user.data.user.id,
+          user_id: user.id,
           routine_id: routineId || null,
           name,
           date: getLocalDateString(),

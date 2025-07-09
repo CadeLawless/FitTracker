@@ -4,12 +4,14 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
 import type { WorkoutSession, ExerciseSet, Exercise } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
 interface WorkoutSessionWithSets extends WorkoutSession {
   sets: (ExerciseSet & { exercise: Exercise })[];
 }
 
 export default function WorkoutSessionDetails() {
+  const { user, authLoading } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
   const [session, setSession] = useState<WorkoutSessionWithSets | null>(null);
@@ -22,15 +24,17 @@ export default function WorkoutSessionDetails() {
   });
 
   useEffect(() => {
+    if(authLoading) return;
+    if(!user) return;
+
     if (id) {
       loadWorkoutSession();
     }
-  }, [id]);
+  }, [id, authLoading, user]);
 
   const loadWorkoutSession = async () => {
     try {
-      const user = await supabase.auth.getUser();
-      if (!user.data.user) return;
+      if (!user) return;
 
       // Load workout session
       const { data: sessionData, error: sessionError } = await supabase
@@ -40,7 +44,7 @@ export default function WorkoutSessionDetails() {
           routine:workout_routines(name)
         `)
         .eq('id', id)
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .single();
 
       if (sessionError) throw sessionError;

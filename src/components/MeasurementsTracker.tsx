@@ -4,6 +4,7 @@ import { supabase, bodyFatCalculations } from '../lib/supabase';
 import { formatDate } from '../lib/date';
 import { scrollToElement } from '../lib/htmlElement';
 import type { BodyMeasurement, BodyMeasurementEntry, BodyMeasurementValue, MeasurementField, UserProfile } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
 interface DeleteConfirmation {
   isOpen: boolean;
@@ -34,10 +35,10 @@ interface Notification {
 }
 
 export default function MeasurementsTracker() {
+  const { user, authLoading } = useAuth();
   const [entries, setEntries] = useState<BodyMeasurement[]>([]);
   const [measurementFields, setMeasurementFields] = useState<MeasurementField[]>([]);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [userAuth, setUserAuth] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [showCustomizeFields, setShowCustomizeFields] = useState(false);
@@ -69,8 +70,11 @@ export default function MeasurementsTracker() {
   const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if(authLoading) return;
+    if(!user) return;
+
     loadData();
-  }, []);
+  }, [authLoading, user]);
 
   useEffect(() => {
     scrollToElement(formRef, showForm && formRef.current);
@@ -94,10 +98,7 @@ export default function MeasurementsTracker() {
 
   const loadData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
-      setUserAuth(user);
 
       // Load user profile and gender for body fat calculation
       const { data: profileData, error: profileError } = await supabase
@@ -241,12 +242,12 @@ export default function MeasurementsTracker() {
 
   const resetBodyFatCalculator = () => {
     // Reset to profile defaults
-    const age = userAuth?.user_metadata?.birth_date || userProfile?.birth_date 
-      ? calculateAge(userAuth?.user_metadata?.birth_date || userProfile?.birth_date) 
+    const age = user?.user_metadata?.birth_date || userProfile?.birth_date 
+      ? calculateAge(user?.user_metadata?.birth_date || userProfile?.birth_date) 
       : 0;
     
     setBodyFatData({
-      gender: userAuth?.user_metadata?.gender || userProfile?.gender || '',
+      gender: user?.user_metadata?.gender || userProfile?.gender || '',
       age: age > 0 ? age.toString() : '',
       chest: '',
       abdominal: '',

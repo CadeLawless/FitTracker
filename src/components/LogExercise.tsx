@@ -3,8 +3,10 @@ import { ArrowLeft, Save, Calendar, Clock, FileText, Dumbbell } from 'lucide-rea
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Exercise } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function LogExercise() {
+  const { user, authLoading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const exerciseId = searchParams.get('exercise');
@@ -23,8 +25,11 @@ export default function LogExercise() {
   });
 
   useEffect(() => {
+    if(authLoading) return;
+    if(!user) return;
+
     loadExercises();
-  }, []);
+  }, [authLoading, user]);
 
   useEffect(() => {
     if (exerciseId && allExercises.length > 0) {
