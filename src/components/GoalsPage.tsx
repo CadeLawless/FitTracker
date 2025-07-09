@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
 import { scrollToElement } from '../lib/htmlElement';
 import type { UserGoal, WeightEntry, MeasurementField, BodyMeasurement, UserProfile } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
 interface DeleteConfirmation {
   isOpen: boolean;
@@ -24,6 +25,7 @@ interface ConflictConfirmation {
 }
 
 export default function GoalsPage() {
+  const { user, authLoading } = useAuth();
   const [goals, setGoals] = useState<UserGoal[]>([]);
   const [activeGoals, setActiveGoals] = useState<UserGoal[]>([]);
   const [inactiveGoals, setInactiveGoals] = useState<UserGoal[]>([]);
@@ -76,8 +78,11 @@ export default function GoalsPage() {
   const editFormRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
+    if(authLoading) return;
+    if(!user) return;
+
     loadGoalsData();
-  }, []);
+  }, [authLoading, user]);
 
   useEffect(() => {
     scrollToElement(formRef, showForm && formRef.current);
@@ -98,14 +103,13 @@ export default function GoalsPage() {
 
   const loadGoalsData = async () => {
     try {
-      const user = await supabase.auth.getUser();
-      if (!user.data.user) return;
+      if (!user) return;
 
       // Load user profile for fitness phase
       const { data: profileData, error: profileError } = await supabase
         .from('user_profiles')
         .select('*')
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .maybeSingle();
 
       if (profileError && profileError.code !== 'PGRST116') throw profileError;
@@ -119,7 +123,7 @@ export default function GoalsPage() {
           *,
           measurement_field:measurement_fields(*)
         `)
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (goalsError) throw goalsError;
@@ -128,7 +132,7 @@ export default function GoalsPage() {
       const { data: fieldsData, error: fieldsError } = await supabase
         .from('measurement_fields')
         .select('*')
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .eq('is_active', true)
         .order('field_name');
 
@@ -138,7 +142,7 @@ export default function GoalsPage() {
       const { data: weightData, error: weightError } = await supabase
         .from('weight_entries')
         .select('*')
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .order('date', { ascending: false })
         .limit(1);
 
@@ -154,7 +158,7 @@ export default function GoalsPage() {
             field:measurement_fields(*)
           )
         `)
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .order('date', { ascending: false })
         .limit(1);
 
@@ -179,12 +183,12 @@ export default function GoalsPage() {
     setUpdatingPhase(true);
     try {
       const user = await supabase.auth.getUser();
-      if (!user.data.user) return;
+      if (!user) return;
 
       const { error } = await supabase
         .from('user_profiles')
         .update({ fitness_phase: newPhase, updated_at: new Date().toISOString() })
-        .eq('user_id', user.data.user.id);
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
@@ -258,10 +262,10 @@ export default function GoalsPage() {
 
     try {
       const user = await supabase.auth.getUser();
-      if (!user.data.user) return;
+      if (!user) return;
 
       let goalData: any = {
-        user_id: user.data.user.id,
+        user_id: user.id,
         goal_category: formData.goal_category,
         target_date: formData.target_date || null,
         weekly_goal: formData.weekly_goal ? parseFloat(formData.weekly_goal) : null,

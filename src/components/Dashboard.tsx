@@ -7,8 +7,10 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
 import type { WeightEntry, BodyMeasurement, WorkoutSession } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Dashboard() {
+  const { user, authLoading } = useAuth();
   const [stats, setStats] = useState({
     latestWeight: null as WeightEntry | null,
     latestMeasurement: null as BodyMeasurement | null,
@@ -18,19 +20,19 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if(authLoading) return;
+    if(!user) return;
+
     loadDashboardData();
-  }, []);
+  }, [authLoading, user]);
 
   const loadDashboardData = async () => {
-    try {
-      const user = await supabase.auth.getUser();
-      if (!user.data.user) return;
-      
+    try {   
       // Load latest weight
       const { data: weightData } = await supabase
         .from('weight_entries')
         .select('*')
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .order('date', { ascending: false })
         .limit(1);
 
@@ -44,7 +46,7 @@ export default function Dashboard() {
             field:measurement_fields(*)
           )
         `)
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .order('date', { ascending: false })
         .limit(1);
 
@@ -61,7 +63,7 @@ export default function Dashboard() {
       const { data: workoutData } = await supabase
         .from('workout_sessions')
         .select('*')
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .order('date', { ascending: false })
         .limit(5);
 
@@ -69,7 +71,7 @@ export default function Dashboard() {
       const { count } = await supabase
         .from('workout_sessions')
         .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.data.user.id);
+        .eq('user_id', user.id);
 
       setStats({
         latestWeight: weightData?.[0] || null,
