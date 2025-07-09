@@ -50,14 +50,15 @@ function App() {
   const checkUser = async () => {
     console.log('checking user...');
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const result = await supabase.auth.getUser();
+      console.log('getUser result:', result);
+      const user = result.data?.user;
       setUser(user);
-      console.log('done');
       if (user) {
         await checkGoalSetup(user.id);
       }
     } catch (error) {
-      console.error('Error checking user:', error);
+      console.error('Error during getUser:', error);
     } finally {
       setLoading(false);
     }
