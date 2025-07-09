@@ -15,15 +15,27 @@ export const auth = {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: {
-          name,
-          birth_date,
-          gender,
-        },
-      },
     });
-    return { data, error };
+    if(error) return { data, error };
+
+    const user = data.user;
+
+    if (!user) {
+      return { data, error: new Error('User not returned after sign up') };
+    }
+
+    // Step 2: Insert profile into `users` table
+    const { error: profileError } = await supabase.from('users').insert([
+      {
+        id: user.id, // must match auth.uid()
+        name,
+        birth_date,
+        gender,
+      },
+    ]);
+
+    // Optionally return both errors
+    return { data, error: profileError || null };
   },
 
   signIn: async (email: string, password: string) => {
