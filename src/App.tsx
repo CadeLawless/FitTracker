@@ -40,7 +40,7 @@ function App() {
           
             if (session?.user && event === 'SIGNED_IN') {
               // Check if user needs goal setup
-              await checkGoalSetup(session.user.id);
+              checkGoalSetup(session.user.id);
             }
           }, 100);
         } catch (e) {
