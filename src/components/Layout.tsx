@@ -46,7 +46,7 @@ export default function Layout({ children }: LayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-[100dvh] bg-gray-50">
       {/* Mobile menu button */}
       <div id="navbar" className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
         <div className="flex items-center justify-between">
@@ -146,7 +146,7 @@ export default function Layout({ children }: LayoutProps) {
       <div className="lg:pl-64">
         {/* Mobile top spacing */}
         <div className="lg:hidden h-16"></div>
-        <main className="py-4 lg:py-8 min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+        <main className="py-4 lg:py-8 min-h-[100dvh] bg-gray-50 dark:bg-gray-900 transition-colors">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {children}
           </div>
