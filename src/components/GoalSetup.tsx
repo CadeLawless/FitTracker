@@ -132,7 +132,7 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
   ];
 
   return (
-    <div className="min-h-[100dvh] flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 sm:px-6 lg:px-8">
+    <div className="h-dvh flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl w-full space-y-6 lg:space-y-8 p-6 lg:p-8 bg-white rounded-xl shadow-lg">
         {/* Header */}
         <div className="text-center">
