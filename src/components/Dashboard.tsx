@@ -1,8 +1,8 @@
 // Dashboard component - the main overview page
 // This shows a summary of recent activity and key metrics
 
-import React, { useState, useEffect } from 'react';
-import { Scale, Ruler, Dumbbell, TrendingUp, Plus } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Scale, Ruler, Dumbbell, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
@@ -28,6 +28,7 @@ export default function Dashboard() {
 
   const loadDashboardData = async () => {
     try {   
+      if(!user) return;
       // Load latest weight
       const { data: weightData } = await supabase
         .from('weight_entries')

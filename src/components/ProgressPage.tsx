@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, Scale, Ruler, Dumbbell, Calendar, Target, Award } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';

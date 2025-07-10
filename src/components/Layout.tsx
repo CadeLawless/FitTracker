@@ -1,7 +1,7 @@
 // Layout component - this wraps around all our pages
 // React Router handles navigation between different pages
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Home, 
@@ -10,12 +10,12 @@ import {
   Dumbbell, 
   TrendingUp, 
   LogOut,
-  User,
+  User as UserIcon,
   Menu,
   X,
   Target
 } from 'lucide-react';
-import { supabase, auth } from '../lib/supabase';
+import { auth } from '../lib/supabase';
 import ThemeToggle from './ThemeToggle';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -42,7 +42,7 @@ export default function Layout({ children }: LayoutProps) {
     { path: '/workouts', icon: Dumbbell, label: 'Workouts' },
     { path: '/goals', icon: Target, label: 'Goals' },
     { path: '/progress', icon: TrendingUp, label: 'Progress' },
-    { path: '/profile', icon: User, label: 'Profile' },
+    { path: '/profile', icon: UserIcon, label: 'Profile' },
   ];
 
   return (
@@ -117,12 +117,12 @@ export default function Layout({ children }: LayoutProps) {
           {/* User Profile & Sign Out */}
           <div className="border-t border-gray-200 dark:border-gray-700 p-4">
             <div className="flex items-center">
-              <User className="h-8 w-8 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+              <UserIcon className="h-8 w-8 text-gray-400 dark:text-gray-500 flex-shrink-0" />
               <div className="ml-3 flex-1 min-w-0">
                 {!authLoading ? (
                   <>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                      {user?.user_metadata?.name || user?.email || "User"}
+                    <p className="text-sm font-medium max-w-[8rem] text-gray-900 dark:text-white truncate">
+                      {user?.name || user?.email || "User"}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 truncate">Fitness Enthusiast</p>
                   </>

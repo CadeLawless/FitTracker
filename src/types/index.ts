@@ -111,9 +111,9 @@ export interface RoutineExercise {
   exercise_id: string;
   order_index: number;
   target_sets: number;
-  require_reps?: boolean;
+  requires_reps?: boolean;
   target_reps?: number;
-  require_weight?: boolean;
+  requires_weight?: boolean;
   target_weight?: number;
   rest_seconds?: number;
   notes?: string;

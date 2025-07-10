@@ -1,9 +1,10 @@
 // Main App component - this is the root of our application
 // React Router handles navigation between different pages
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { supabase } from './lib/supabase';
+import { supabase, auth } from './lib/supabase';
+import { User } from './types';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout';
@@ -23,7 +24,7 @@ import Profile from './components/Profile';
 import ResetSessionButton from './components/ResetSessionButton';
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [needsGoalSetup, setNeedsGoalSetup] = useState(false);
 
@@ -37,7 +38,16 @@ function App() {
         try {
           // Optionally delay to avoid race condition
           setTimeout(() => {
-            setUser(session?.user || null);
+            if(session?.user){
+              setUser({
+                id: session.user.id,
+                email: session.user.email || '',
+                name: session.user?.user_metadata.name,
+                created_at: session.user?.created_at,
+              });
+            }else{
+              setUser(null);
+            }
           
             if (session?.user && event === 'SIGNED_IN') {
               // Check if user needs goal setup
@@ -58,12 +68,18 @@ function App() {
   const checkUser = async () => {
     console.log('checking user...');
     try {
-      const result = await supabase.auth.getUser();
-      console.log('getUser result:', result);
-      const user = result.data?.user;
-      setUser(user);
-      if (user) {
+      const user = await auth.getCurrentUser();
+      if(user){
+        setUser({
+          id: user.id,
+          email: user.email || '',
+          name: user?.user_metadata.name,
+          created_at: user?.created_at,
+        });
+
         await checkGoalSetup(user.id);
+      }else{
+        setUser(null);
       }
     } catch (error) {
       console.error('Error during getUser:', error);
@@ -77,7 +93,7 @@ function App() {
       // Check if user has completed goal setup by looking for profile
       const { data: profile, error } = await supabase
         .from('user_profiles')
-        .select('id')
+        .select('activity_level')
         .eq('user_id', userId)
         .maybeSingle();
 
@@ -85,7 +101,8 @@ function App() {
         console.error('Error checking profile:', error);
       }
 
-      setNeedsGoalSetup(!profile);
+      const needsSetup = profile?.activity_level === null;
+      setNeedsGoalSetup(needsSetup);
     } catch (error) {
       console.error('Error in checkGoalSetup:', error);
       // If there's an error, assume user needs setup

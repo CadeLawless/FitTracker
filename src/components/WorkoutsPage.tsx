@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Dumbbell, Clock, Calendar, Play, Edit2, Trash2, X, AlertTriangle, ChevronRight, RotateCcw, Square, Search } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';

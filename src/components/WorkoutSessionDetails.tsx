@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Clock, Scale, Calendar, Dumbbell, Target, TrendingUp, Edit2, Trash2, Save, X, RotateCcw, Timer } from 'lucide-react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -387,7 +387,7 @@ export default function WorkoutSessionDetails() {
 
       {/* Exercise Details */}
       <div className="space-y-6">
-        {exerciseGroups.map((group, index) => (
+        {exerciseGroups.map((group) => (
           <div key={group.exercise.id} className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="p-4 lg:p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
@@ -414,7 +414,7 @@ export default function WorkoutSessionDetails() {
             
             <div className="p-4 lg:p-6">
               <div className="space-y-3">
-                {group.sets.map((set, setIndex) => (
+                {group.sets.map((set) => (
                   <div key={set.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center gap-4">
                       <span className="text-sm font-medium text-gray-600 w-12">
