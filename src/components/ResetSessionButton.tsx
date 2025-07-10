@@ -1,5 +1,3 @@
-import React from 'react';
-
 const ResetSessionButton = () => {
   if (!import.meta.env.DEV) return null; // show only in dev
 

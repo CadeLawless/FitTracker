@@ -61,8 +61,7 @@ export default function LogExercise() {
     setSuccess('');
 
     try {
-      const user = await supabase.auth.getUser();
-      if (!user.data.user) throw new Error('No authenticated user');
+      if (!user) throw new Error('No authenticated user');
 
       const selectedExercise = allExercises.find(ex => ex.id === formData.exercise_id);
       if (!selectedExercise) throw new Error('Please select an exercise');
@@ -71,7 +70,7 @@ export default function LogExercise() {
       const { data: sessionData, error: sessionError } = await supabase
         .from('workout_sessions')
         .insert([{
-          user_id: user.data.user.id,
+          user_id: user.id,
           name: `${selectedExercise.name} - Single Exercise`,
           date: formData.date,
           duration_minutes: formData.duration_minutes ? parseInt(formData.duration_minutes) : null,

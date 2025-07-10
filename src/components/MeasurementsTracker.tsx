@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Ruler, TrendingUp, TrendingDown, X, Edit2, Trash2, Calendar, AlertTriangle, Save, Settings, Check, Eye, EyeOff, Calculator, CheckCircle, AlertCircle } from 'lucide-react';
-import { supabase, bodyFatCalculations } from '../lib/supabase';
+import { Plus, Ruler, TrendingUp, TrendingDown, X, Edit2, Trash2, Calendar, AlertTriangle, Save, Settings, Eye, EyeOff, Calculator, CheckCircle, AlertCircle } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
 import { scrollToElement } from '../lib/htmlElement';
-import type { BodyMeasurement, BodyMeasurementEntry, BodyMeasurementValue, MeasurementField, UserProfile } from '../types';
+import type { BodyMeasurement, BodyMeasurementValue, MeasurementField, UserProfile } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 
 interface DeleteConfirmation {
@@ -77,7 +77,8 @@ export default function MeasurementsTracker() {
   }, [authLoading, user]);
 
   useEffect(() => {
-    scrollToElement(formRef, showForm && formRef.current);
+      const isRefPresent = !!formRef.current;
+    scrollToElement(formRef, showForm && isRefPresent);
   }, [showForm]);
 
   // Notification system
@@ -108,8 +109,6 @@ export default function MeasurementsTracker() {
         .maybeSingle();
 
       if (profileError && profileError.code !== 'PGRST116') throw profileError;
-
-      const gender = user.user_metadata?.gender as 'male' | 'female';
 
       // Load measurement fields
       const { data: fieldsData, error: fieldsError } = await supabase
@@ -155,10 +154,10 @@ export default function MeasurementsTracker() {
 
       setUserProfile(profileData);
       // Set default values for body fat calculator from profile and auth data
-      const age = calculateAge(user.user_metadata?.birth_date || data?.birth_date);
+      const age = calculateAge(user?.birth_date || '');
       setBodyFatData(prev => ({
         ...prev,
-        gender: user.user_metadata?.gender || data?.gender || '',
+        gender: user?.gender || '',
         age: age > 0 ? age.toString() : '',
       }));
       setMeasurementFields(fieldsData || []);
@@ -242,12 +241,12 @@ export default function MeasurementsTracker() {
 
   const resetBodyFatCalculator = () => {
     // Reset to profile defaults
-    const age = user?.user_metadata?.birth_date || userProfile?.birth_date 
-      ? calculateAge(user?.user_metadata?.birth_date || userProfile?.birth_date) 
+    const age = user?.birth_date || userProfile?.birth_date 
+      ? calculateAge(user?.birth_date || userProfile?.birth_date || '') 
       : 0;
     
     setBodyFatData({
-      gender: user?.user_metadata?.gender || userProfile?.gender || '',
+      gender: user?.gender || userProfile?.gender || '',
       age: age > 0 ? age.toString() : '',
       chest: '',
       abdominal: '',

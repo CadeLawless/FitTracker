@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, GripVertical, Save, X, Search, Dumbbell, Edit2, Timer } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import type { WorkoutRoutine, Exercise, RoutineExercise } from '../types';
+import type { Exercise, RoutineExercise } from '../types';
 import { useCustomExercises } from '../hooks/useCustomExercises';
 import { CustomExerciseForm } from '../components/CustomExerciseForm';
 import { useAuth } from '../contexts/AuthContext';
@@ -12,7 +12,6 @@ export default function RoutineBuilder() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = !!id;
-  const [routine, setRoutine] = useState<WorkoutRoutine | null>(null);
   const [routineExercises, setRoutineExercises] = useState<RoutineExercise[]>([]);
   const [availableExercises, setAvailableExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
@@ -90,7 +89,6 @@ export default function RoutineBuilder() {
           .single();
 
         if (routineError) throw routineError;
-        setRoutine(routineData);
         setFormData({
           name: routineData.name,
           description: routineData.description || '',

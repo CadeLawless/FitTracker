@@ -25,7 +25,7 @@ export default function Profile() {
     activity_level: '',
   });
 
-  const formRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     if(authLoading) return;
@@ -35,7 +35,21 @@ export default function Profile() {
   }, [authLoading, user]);
 
   useEffect(() => {
-    scrollToElement(formRef, editing && formRef.current);
+    if (!user) return;
+
+    // Possibly keep height/activity from profile state or reset to defaults
+    setFormData(form => ({
+      ...form,
+      name: user.name || '',
+      email: user.email || '',
+      birth_date: user.birth_date || '',
+      gender: user.gender || '',
+    }));
+  }, [user]);
+
+  useEffect(() => {
+    const isRefPresent = !!formRef.current;
+    scrollToElement(formRef, editing && isRefPresent);
   }, [editing]);
   
   const loadProfile = async () => {
@@ -59,15 +73,12 @@ export default function Profile() {
       const heightFeet = profileData?.height_inches ? Math.floor(profileData.height_inches / 12) : '';
       const heightInches = profileData?.height_inches ? profileData.height_inches % 12 : '';
 
-      setFormData({
-        name: user.user_metadata?.name || '',
-        email: user.email || '',
-        birth_date: user.user_metadata?.birth_date || '',
-        gender: user.user_metadata?.gender || '',
+      setFormData(form => ({
+        ...form,
         height_feet: heightFeet.toString(),
         height_inches: heightInches.toString(),
         activity_level: profileData?.activity_level || '',
-      });
+      }));
     } catch (error) {
       console.error('Error loading profile:', error);
       setError('Failed to load profile information');
@@ -83,7 +94,6 @@ export default function Profile() {
     setSuccess('');
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No authenticated user');
 
       // Calculate total height in inches
@@ -131,13 +141,6 @@ export default function Profile() {
       setSuccess('Profile updated successfully!');
       setEditing(false);
       await loadProfile(); // Reload to get updated data
-
-      // Notify other components that the profile was updated
-      // This will trigger the Layout component to refresh the user name
-      window.dispatchEvent(new CustomEvent('profile-updated'));
-      
-      // Also set localStorage for cross-tab communication
-      localStorage.setItem('profile-updated', Date.now().toString());
     } catch (error: any) {
       console.error('Error updating profile:', error);
       setError(error.message || 'Failed to update profile');
@@ -433,7 +436,7 @@ export default function Profile() {
                           <>
                             {formatDate(formData.birth_date).toLocaleDateString()} 
                             <span className="text-gray-500 ml-2">
-                              (Age {calculateAge(formatDate(formData.birth_date))})
+                              (Age {calculateAge(formData.birth_date)})
                             </span>
                           </>
                         ) : (

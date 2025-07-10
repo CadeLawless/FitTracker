@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Play, Pause, Square, Plus, Check, Timer, RotateCcw, X, ArrowLeft, ArrowRight, Dumbbell, CheckCircle, AlertTriangle, Clock } from 'lucide-react';
+import { Check, Timer, ArrowLeft, ArrowRight, Dumbbell, CheckCircle, AlertTriangle, Clock } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { scrollToElement } from '../lib/htmlElement';
@@ -57,7 +57,9 @@ export default function WorkoutSession() {
   const hasScrolledToRestTimer = useRef(false);
 
   useEffect(() => {
-    const condition = workoutState.isResting && restTimerDiv.current && !hasScrolledToRestTimer.current;
+    const isRestTimerDivRefPresent = !!restTimerDiv.current;
+    const ishasScrolledRefPresent = !!hasScrolledToRestTimer.current;
+    const condition = workoutState.isResting && isRestTimerDivRefPresent && !ishasScrolledRefPresent;
     scrollToElement(restTimerDiv, condition);
     if (condition) {      
       hasScrolledToRestTimer.current = true;
@@ -190,7 +192,7 @@ export default function WorkoutSession() {
     }
   };
 
-  const loadRoutineExercises = async (routineId: string) => {
+  const loadRoutineExercises = async (routineId: string | null) => {
     const { data: exercisesData, error: exercisesError } = await supabase
       .from('routine_exercises')
       .select(`
@@ -266,10 +268,9 @@ export default function WorkoutSession() {
     return `${year}-${month}-${day}`;
   };
   
-  const createWorkoutSession = async (name: string, routineId?: string) => {
+  const createWorkoutSession = async (name: string, routineId?: string | null) => {
     console.log('Checking for existing active session');
     try {
-      const user = await supabase.auth.getUser();
       if (!user) return;
 
       // Check if there's already an active session for today
@@ -630,7 +631,7 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
                       <p className="font-bold text-yellow-900">Sets still need finished for the following exercises:</p>
                       <ul className="list-disc list-inside text-yellow-800">
                         {unfinishedExercises.map(ex => (
-                          <li key={ex.exercise_id}>{ex.exercise.name} ({(workoutState.sets.filter(s => s.exercise_id === ex.exercise_id).length)} of {ex.target_sets} sets)</li>
+                          <li key={ex.exercise_id}>{ex.exercise?.name} ({(workoutState.sets.filter(s => s.exercise_id === ex.exercise_id).length)} of {ex.target_sets} sets)</li>
                         ))}
                       </ul>
                     </div>                    
@@ -756,7 +757,7 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
                 <div className="space-y-2">
                   {workoutState.sets
                     .filter(set => set.exercise_id === currentExercise.exercise_id)
-                    .map((set, index) => (
+                    .map((set) => (
                       <div key={set.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                         <span className="text-sm text-gray-600">Set {set.set_number}</span>
                         <span className="text-sm font-medium">

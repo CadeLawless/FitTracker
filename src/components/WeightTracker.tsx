@@ -46,7 +46,8 @@ export default function WeightTracker() {
 
   // Auto-scroll to form when it becomes visible
   useEffect(() => {
-    scrollToElement(formRef, showForm && formRef.current);
+    const isRefPresent = !!formRef.current;
+    scrollToElement(formRef, showForm && isRefPresent);
   }, [showForm]);
 
   const loadWeightEntries = async () => {
@@ -72,7 +73,6 @@ export default function WeightTracker() {
     e.preventDefault();
     
     try {
-      const user = await supabase.auth.getUser();
       if (!user) return;
 
       const entryData = {
@@ -447,7 +447,7 @@ export default function WeightTracker() {
                       <div className="flex items-center justify-between p-3 lg:p-4 border border-theme rounded-lg bg-hover-theme transition-colors">
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <p className="font-medium text-theme text-sm lg:text-base">{entry.weight} lbs</p>
+                            <p className="font-medium text-theme text-sm lg:text-base">{Number(entry.weight).toFixed(1)} lbs</p>
                             <div className="flex items-center text-xs lg:text-sm text-label-theme">
                               <Calendar className="h-3 w-3 lg:h-4 lg:w-4 mr-1" />
                               {formatDate(entry.date).toLocaleDateString()}

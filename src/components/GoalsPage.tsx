@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Target, TrendingUp, TrendingDown, Minus, Save, Edit2, Plus, Calendar, Scale, CheckCircle, AlertCircle, Ruler, X, Trash2, Check, AlertTriangle } from 'lucide-react';
+import { Target, TrendingUp, TrendingDown, Minus, Save, Edit2, Plus, Scale, CheckCircle, AlertCircle, Ruler, X, Trash2, Check, AlertTriangle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
 import { scrollToElement } from '../lib/htmlElement';
-import type { UserGoal, WeightEntry, MeasurementField, BodyMeasurement, UserProfile } from '../types';
+import type { UserGoal, WeightEntry, MeasurementField, BodyMeasurement } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 
 interface DeleteConfirmation {
@@ -32,7 +32,6 @@ export default function GoalsPage() {
   const [measurementFields, setMeasurementFields] = useState<MeasurementField[]>([]);
   const [latestWeight, setLatestWeight] = useState<WeightEntry | null>(null);
   const [latestMeasurements, setLatestMeasurements] = useState<BodyMeasurement | null>(null);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -71,7 +70,7 @@ export default function GoalsPage() {
   const [updatingPhase, setUpdatingPhase] = useState(false);
 
   // Ref for timeout on fitness phase success messages
-  const fitnessPhaseTimeoutRef = useRef(null);
+  const fitnessPhaseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   // Ref for the form section to enable auto-scrolling
   const formRef = useRef<HTMLDivElement>(null);
@@ -85,11 +84,13 @@ export default function GoalsPage() {
   }, [authLoading, user]);
 
   useEffect(() => {
-    scrollToElement(formRef, showForm && formRef.current);
+    const isFormRefPresent = !!formRef.current;
+    scrollToElement(formRef, showForm && isFormRefPresent);
   }, [showForm]);
 
   useEffect(() => {
-    scrollToElement(editFormRef, editingGoal !== null && editFormRef.current);
+    const isEditFormRefPresent = !!editFormRef.current;
+    scrollToElement(editFormRef, editingGoal !== null && isEditFormRefPresent);
   }, [editingGoal]);
 
   useEffect(() => {
@@ -113,7 +114,6 @@ export default function GoalsPage() {
         .maybeSingle();
 
       if (profileError && profileError.code !== 'PGRST116') throw profileError;
-      setUserProfile(profileData);
       setFitnessPhase(profileData?.fitness_phase || 'none');
 
       // Load goals with measurement field info
@@ -182,7 +182,6 @@ export default function GoalsPage() {
   const updateFitnessPhase = async (newPhase: 'cutting' | 'bulking' | 'maintaining' | 'none') => {
     setUpdatingPhase(true);
     try {
-      const user = await supabase.auth.getUser();
       if (!user) return;
 
       const { error } = await supabase
@@ -261,7 +260,6 @@ export default function GoalsPage() {
     setSuccess('');
 
     try {
-      const user = await supabase.auth.getUser();
       if (!user) return;
 
       let goalData: any = {
@@ -540,9 +538,9 @@ export default function GoalsPage() {
         return change > 0 ? 'text-green-600' : 'text-red-600';
       } */
 
-      changeNeeded = goal.target_value - goal.starting_value;
+      changeNeeded = (goal.target_value || 0) - (goal.starting_value || 0);
     }else{
-      changeNeeded = goal.target_weight - goal.starting_weight;
+      changeNeeded = (goal.target_weight || 0) - (goal.starting_weight || 0);
     }
     
     if(changeNeeded > 0){
@@ -564,7 +562,7 @@ export default function GoalsPage() {
     } */
   };
 
-  const getProgressIcon = (goal: UserGoal, change: number) => {
+  const getProgressIcon = (change: number) => {
     if (change === 0) return Minus;
     return change > 0 ? TrendingUp : TrendingDown;
   };
@@ -627,7 +625,7 @@ export default function GoalsPage() {
                   <AlertTriangle className="h-6 w-6 text-red-600" />
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-gray-900 text-gray-900">Delete Goal</h3>
+                  <h3 className="text-lg font-medium text-gray-900">Delete Goal</h3>
                 </div>
               </div>
               <div className="mb-6">
@@ -666,7 +664,7 @@ export default function GoalsPage() {
                   <CheckCircle className="h-6 w-6 text-green-600" />
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-gray-900 text-gray-900">Mark Goal as Complete</h3>
+                  <h3 className="text-lg font-medium text-gray-900">Mark Goal as Complete</h3>
                 </div>
               </div>
               <div className="mb-6">
@@ -1255,7 +1253,7 @@ export default function GoalsPage() {
                           <p className="text-gray-600">Progress</p>
                           <div className="flex items-center">
                             {(() => {
-                              const ProgressIcon = getProgressIcon(goal, progress.currentChange);
+                              const ProgressIcon = getProgressIcon(progress.currentChange);
                               const progressColor = getProgressColor(goal, progress.currentChange);
                               return (
                                 <>
@@ -1300,7 +1298,7 @@ export default function GoalsPage() {
                 {inactiveGoals.map((goal) => {
                   const progress = getGoalProgress(goal);
                   const unit = getGoalUnit(goal);
-                  const ProgressIcon = progress ? getProgressIcon(goal, progress.currentChange) : Minus;
+                  const ProgressIcon = progress ? getProgressIcon(progress.currentChange) : Minus;
                   const progressColor = progress ? getProgressColor(goal, progress.currentChange) : 'text-gray-600';
 
                   // Check if this goal is being edited

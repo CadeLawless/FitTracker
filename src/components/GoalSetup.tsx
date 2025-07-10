@@ -3,15 +3,13 @@
 
 import React, { useState } from 'react';
 import { Target, Scale, TrendingUp, TrendingDown, Minus, ArrowRight } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import { useAuth } from '../contexts/AuthContext';
+import { supabase, auth } from '../lib/supabase';
 
 interface GoalSetupProps {
   onComplete: () => void;
 }
 
 export default function GoalSetup({ onComplete }: GoalSetupProps) {
-  const { user, authLoading } = useAuth();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -31,6 +29,7 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
     setError('');
 
     try {
+      const user = await auth.getCurrentUser();
       if (!user) {
         throw new Error('No authenticated user found');
       }
@@ -41,17 +40,15 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
       // Create user profile
       const { error: profileError } = await supabase
         .from('user_profiles')
-        .insert([
-          {
-            user_id: user.id,
-            height_inches: totalHeightInches,
-            activity_level: formData.activity_level,
-          },
-        ]);
+        .update({
+          height_inches: totalHeightInches,
+          activity_level: formData.activity_level,
+        })
+        .eq('user_id', user.id);
 
       if (profileError) {
         console.error('Profile error:', profileError);
-        throw new Error(`Failed to create profile: ${profileError.message}`);
+        throw new Error(`Failed to update profile: ${profileError.message}`);
       }
 
       // Create initial weight entry
@@ -133,14 +130,6 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
       color: 'text-blue-600 bg-blue-50 border-blue-200',
     },
   ];
-
-  if (authLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 sm:px-6 lg:px-8">
