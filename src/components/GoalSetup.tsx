@@ -4,12 +4,14 @@
 import React, { useState } from 'react';
 import { Target, Scale, TrendingUp, TrendingDown, Minus, ArrowRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 
 interface GoalSetupProps {
   onComplete: () => void;
 }
 
 export default function GoalSetup({ onComplete }: GoalSetupProps) {
+  const { user, authLoading } = useAuth();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -29,7 +31,6 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
     setError('');
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         throw new Error('No authenticated user found');
       }
@@ -132,6 +133,14 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
       color: 'text-blue-600 bg-blue-50 border-blue-200',
     },
   ];
+
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 sm:px-6 lg:px-8">

@@ -3,6 +3,7 @@ import { TrendingUp, TrendingDown, Scale, Ruler, Dumbbell, Calendar, Target, Awa
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
 import type { WeightEntry, BodyMeasurement, WorkoutSession, UserGoal } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
 interface ProgressStats {
   weightEntries: WeightEntry[];
@@ -12,6 +13,7 @@ interface ProgressStats {
 }
 
 export default function ProgressPage() {
+  const { user, authLoading } = useAuth();
   const [stats, setStats] = useState<ProgressStats>({
     weightEntries: [],
     measurements: [],
@@ -22,19 +24,21 @@ export default function ProgressPage() {
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
 
   useEffect(() => {
+    if(authLoading) return;
+    if(!user) return;
+
     loadProgressData();
-  }, []);
+  }, [authLoading, user]);
 
   const loadProgressData = async () => {
     try {
-      const user = await supabase.auth.getUser();
-      if (!user.data.user) return;
+      if (!user) return;
 
       // Load weight entries
       const { data: weightData } = await supabase
         .from('weight_entries')
         .select('*')
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .order('date', { ascending: false })
         .limit(50);
 
@@ -48,7 +52,7 @@ export default function ProgressPage() {
             field:measurement_fields(*)
           )
         `)
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .order('date', { ascending: false })
         .limit(50);
 
@@ -74,7 +78,7 @@ export default function ProgressPage() {
       const { data: workoutData } = await supabase
         .from('workout_sessions')
         .select('*')
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .eq('status', 'completed') // Only count completed workouts
         .order('date', { ascending: false })
         .limit(100);
@@ -83,7 +87,7 @@ export default function ProgressPage() {
       const { data: goalData } = await supabase
         .from('user_goals')
         .select('*')
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       setStats({

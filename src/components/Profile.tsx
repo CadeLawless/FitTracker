@@ -4,10 +4,11 @@ import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
 import { scrollToElement } from '../lib/htmlElement';
 import type { UserProfile } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Profile() {
+  const { user, authLoading } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [userAuth, setUserAuth] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -27,8 +28,11 @@ export default function Profile() {
   const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if(authLoading) return;
+    if(!user) return;
+
     loadProfile();
-  }, []);
+  }, [authLoading, user]);
 
   useEffect(() => {
     scrollToElement(formRef, editing && formRef.current);
@@ -36,10 +40,7 @@ export default function Profile() {
   
   const loadProfile = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
-      setUserAuth(user);
 
       // Load user profile
       const { data: profileData, error: profileError } = await supabase
@@ -495,7 +496,7 @@ export default function Profile() {
                 <div>
                   <label className="block text-sm font-medium text-gray-500">Member Since</label>
                   <p className="mt-1 text-sm lg:text-base text-gray-900">
-                    {userAuth?.created_at ? new Date(userAuth.created_at).toLocaleDateString() : 'Unknown'}
+                    {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}
                   </p>
                 </div>
                 <div>

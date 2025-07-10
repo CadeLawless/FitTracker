@@ -5,12 +5,13 @@ import { supabase } from '../lib/supabase';
 import type { WorkoutRoutine, Exercise, RoutineExercise } from '../types';
 import { useCustomExercises } from '../hooks/useCustomExercises';
 import { CustomExerciseForm } from '../components/CustomExerciseForm';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function RoutineBuilder() {
+  const { user, authLoading } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = !!id;
-
   const [routine, setRoutine] = useState<WorkoutRoutine | null>(null);
   const [routineExercises, setRoutineExercises] = useState<RoutineExercise[]>([]);
   const [availableExercises, setAvailableExercises] = useState<Exercise[]>([]);
@@ -63,8 +64,11 @@ export default function RoutineBuilder() {
  
 
   useEffect(() => {
+    if(authLoading) return;
+    if(!user) return;
+
     loadData();
-  }, [id]);
+  }, [id, authLoading, user]);
 
   const loadData = async () => {
     try {
@@ -117,8 +121,7 @@ export default function RoutineBuilder() {
 
     setSaving(true);
     try {
-      const user = await supabase.auth.getUser();
-      if (!user.data.user) return;
+      if (!user) return;
 
       let routineId = id;
 
@@ -138,7 +141,7 @@ export default function RoutineBuilder() {
         const { data, error } = await supabase
           .from('workout_routines')
           .insert([{
-            user_id: user.data.user.id,
+            user_id: user.id,
             name: formData.name,
             description: formData.description || null,
           }])

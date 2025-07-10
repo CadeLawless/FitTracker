@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
 import { scrollToElement } from '../lib/htmlElement';
 import type { WeightEntry } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
 interface DeleteConfirmation {
   isOpen: boolean;
@@ -16,6 +17,7 @@ interface DeleteConfirmation {
 }
 
 export default function WeightTracker() {
+  const { user, authLoading } = useAuth();
   const [entries, setEntries] = useState<WeightEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -36,8 +38,11 @@ export default function WeightTracker() {
   const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if(authLoading) return;
+    if(!user) return;
+
     loadWeightEntries();
-  }, []);
+  }, [authLoading, user]);
 
   // Auto-scroll to form when it becomes visible
   useEffect(() => {
@@ -46,13 +51,12 @@ export default function WeightTracker() {
 
   const loadWeightEntries = async () => {
     try {
-      const user = await supabase.auth.getUser();
-      if (!user.data.user) return;
+      if (!user) return;
 
       const { data, error } = await supabase
         .from('weight_entries')
         .select('*')
-        .eq('user_id', user.data.user.id)
+        .eq('user_id', user.id)
         .order('date', { ascending: false });
 
       if (error) throw error;
@@ -69,10 +73,10 @@ export default function WeightTracker() {
     
     try {
       const user = await supabase.auth.getUser();
-      if (!user.data.user) return;
+      if (!user) return;
 
       const entryData = {
-        user_id: user.data.user.id,
+        user_id: user.id,
         weight: parseFloat(formData.weight),
         date: formData.date,
         notes: formData.notes || null,
