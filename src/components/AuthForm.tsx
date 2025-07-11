@@ -58,7 +58,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
   };
 
   return (
-    <div className="h-[100dvh] flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4 sm:px-6 lg:px-8 transition-colors">
+    <div className="min-h-[100dvh] flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4 sm:px-6 lg:px-8 transition-colors">
       <div className="max-w-md w-full my-3 space-y-6 lg:space-y-8 p-6 lg:p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
         {/* Header */}
         <div className="text-center">
