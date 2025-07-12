@@ -8,6 +8,7 @@ import { formatDate } from '../lib/date';
 import { scrollToElement } from '../lib/htmlElement';
 import type { WeightEntry } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import FormInput from './ui/FormInput';
 
 interface DeleteConfirmation {
   isOpen: boolean;
@@ -301,14 +302,14 @@ export default function WeightTracker() {
                   <label htmlFor="weight" className="block text-sm font-medium text-input-label-theme">
                     Weight (lbs)
                   </label>
-                  <input
+                  <FormInput
+                    inputMode='decimal'
                     type="number"
                     id="weight"
                     step="0.1"
                     required
                     value={formData.weight}
                     onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-input-theme bg-input-theme text-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                     placeholder="Enter weight"
                   />
                 </div>
@@ -316,13 +317,12 @@ export default function WeightTracker() {
                   <label htmlFor="date" className="block text-sm font-medium text-input-label-theme">
                     Date
                   </label>
-                  <input
+                  <FormInput
                     type="date"
                     id="date"
                     required
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-input-theme bg-input-theme text-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                   />
                 </div>
               </div>
@@ -330,12 +330,12 @@ export default function WeightTracker() {
                 <label htmlFor="notes" className="block text-sm font-medium text-input-label-theme">
                   Notes (optional)
                 </label>
-                <textarea
+                <FormInput
+                  inputType='textarea'
                   id="notes"
                   rows={3}
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border border-input-theme bg-input-theme text-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                   placeholder="Any notes about this entry..."
                 />
               </div>
@@ -388,25 +388,24 @@ export default function WeightTracker() {
                               <label className="block text-sm font-medium text-input-label-theme">
                                 Weight (lbs)
                               </label>
-                              <input
+                              <FormInput
+                                inputMode='decimal'
                                 type="number"
                                 step="0.1"
                                 required
                                 value={formData.weight}
                                 onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                                className="mt-1 block w-full px-3 py-2 border border-input-theme bg-input-theme text-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                               />
                             </div>
                             <div>
                               <label className="block text-sm font-medium text-input-label-theme">
                                 Date
                               </label>
-                              <input
+                              <FormInput
                                 type="date"
                                 required
                                 value={formData.date}
                                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                className="mt-1 block w-full px-3 py-2 border border-input-theme bg-input-theme text-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                               />
                             </div>
                           </div>
@@ -415,11 +414,11 @@ export default function WeightTracker() {
                             <label className="block text-sm font-medium text-input-label-theme">
                               Notes (optional)
                             </label>
-                            <textarea
+                            <FormInput
+                              inputType='textarea'
                               rows={2}
                               value={formData.notes}
                               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                              className="mt-1 block w-full px-3 py-2 border border-input-theme bg-input-theme text-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                               placeholder="Any notes about this entry..."
                             />
                           </div>

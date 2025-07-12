@@ -5,6 +5,7 @@ import { formatDate } from '../lib/date';
 import { scrollToElement } from '../lib/htmlElement';
 import type { BodyMeasurement, BodyMeasurementValue, MeasurementField, UserProfile } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import FormInput from './ui/FormInput';
 
 interface DeleteConfirmation {
   isOpen: boolean;
@@ -622,19 +623,17 @@ export default function MeasurementsTracker() {
               <div className="mb-6 p-4 bg-secondary-theme rounded-lg">
                 <h4 className="text-sm font-medium text-theme mb-3">Add Custom Field</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <input
+                  <FormInput
                     type="text"
                     placeholder="Field name (e.g., Forearm)"
                     value={customFieldForm.field_name}
                     onChange={(e) => setCustomFieldForm({ ...customFieldForm, field_name: e.target.value })}
-                    className="px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                   />
-                  <input
+                  <FormInput
                     type="text"
                     placeholder="Unit (e.g., inches, cm)"
                     value={customFieldForm.unit}
                     onChange={(e) => setCustomFieldForm({ ...customFieldForm, unit: e.target.value })}
-                    className="px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                   />
                   <button
                     onClick={addCustomField}
@@ -788,13 +787,12 @@ export default function MeasurementsTracker() {
                   <label htmlFor="date" className="block text-sm font-medium text-input-label-theme">
                     Date
                   </label>
-                  <input
+                  <FormInput
                     type="date"
                     id="date"
                     required
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                   />
                 </div>
               </div>
@@ -809,7 +807,8 @@ export default function MeasurementsTracker() {
                         <label className="block text-sm font-medium text-input-label-theme">
                           {field.field_name} ({field.unit})
                         </label>
-                        <input
+                        <FormInput
+                        inputMode='decimal'
                           type="number"
                           step="0.1"
                           value={formData[getFieldKey(field.field_name)] || ''}
@@ -817,7 +816,6 @@ export default function MeasurementsTracker() {
                             ...formData, 
                             [getFieldKey(field.field_name)]: e.target.value 
                           })}
-                          className="mt-1 block w-full px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                           placeholder={`Enter ${field.field_name.toLowerCase()}`}
                         />
                       </div>
@@ -852,23 +850,25 @@ export default function MeasurementsTracker() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-input-label-theme">Gender</label>
-                        <select
+                        <FormInput
+                          inputType='select'
                           value={bodyFatData.gender}
                           onChange={(e) => setBodyFatData(prev => ({ ...prev, gender: e.target.value }))}
-                          className="mt-1 block w-full px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                         >
-                          <option value="">Select gender</option>
-                          <option value="male">Male</option>
-                          <option value="female">Female</option>
-                        </select>
+                          <>
+                            <option value="">Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                          </>
+                        </FormInput>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-input-label-theme">Age</label>
-                        <input
+                        <FormInput
+                          inputMode='decimal'
                           type="number"
                           value={bodyFatData.age}
                           onChange={(e) => setBodyFatData(prev => ({ ...prev, age: e.target.value }))}
-                          className="mt-1 block w-full px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                           placeholder="Enter your age"
                         />
                       </div>
@@ -881,34 +881,34 @@ export default function MeasurementsTracker() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                           <div>
                             <label className="block text-sm font-medium text-input-label-theme">Chest (mm)</label>
-                            <input
+                            <FormInput
+                              inputMode='decimal'
                               type="number"
                               step="0.1"
                               value={bodyFatData.chest}
                               onChange={(e) => setBodyFatData(prev => ({ ...prev, chest: e.target.value }))}
-                              className="mt-1 block w-full px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                               placeholder="Chest skinfold"
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-input-label-theme">Abdominal (mm)</label>
-                            <input
+                            <FormInput
+                              inputMode='decimal'
                               type="number"
                               step="0.1"
                               value={bodyFatData.abdominal}
                               onChange={(e) => setBodyFatData(prev => ({ ...prev, abdominal: e.target.value }))}
-                              className="mt-1 block w-full px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                               placeholder="Abdominal skinfold"
                             />
                           </div>
                           <div className="sm:col-span-2 lg:col-span-1">
                             <label className="block text-sm font-medium text-input-label-theme">Thigh (mm)</label>
-                            <input
+                            <FormInput
+                              inputMode='decimal'
                               type="number"
                               step="0.1"
                               value={bodyFatData.thigh}
                               onChange={(e) => setBodyFatData(prev => ({ ...prev, thigh: e.target.value }))}
-                              className="mt-1 block w-full px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                               placeholder="Thigh skinfold"
                             />
                           </div>
@@ -920,34 +920,34 @@ export default function MeasurementsTracker() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                           <div>
                             <label className="block text-sm font-medium text-input-label-theme">Tricep (mm)</label>
-                            <input
+                            <FormInput
+                              inputMode='decimal'
                               type="number"
                               step="0.1"
                               value={bodyFatData.tricep}
                               onChange={(e) => setBodyFatData(prev => ({ ...prev, tricep: e.target.value }))}
-                              className="mt-1 block w-full px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                               placeholder="Tricep skinfold"
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-input-label-theme">Suprailiac (mm)</label>
-                            <input
+                            <FormInput
+                              inputMode='decimal'
                               type="number"
                               step="0.1"
                               value={bodyFatData.suprailiac}
                               onChange={(e) => setBodyFatData(prev => ({ ...prev, suprailiac: e.target.value }))}
-                              className="mt-1 block w-full px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                               placeholder="Suprailiac skinfold"
                             />
                           </div>
                           <div className="sm:col-span-2 lg:col-span-1">
                             <label className="block text-sm font-medium text-input-label-theme">Thigh (mm)</label>
-                            <input
+                            <FormInput
+                              inputMode='decimal'
                               type="number"
                               step="0.1"
                               value={bodyFatData.thigh}
                               onChange={(e) => setBodyFatData(prev => ({ ...prev, thigh: e.target.value }))}
-                              className="mt-1 block w-full px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                               placeholder="Thigh skinfold"
                             />
                           </div>
@@ -977,7 +977,8 @@ export default function MeasurementsTracker() {
                 <label htmlFor="body_fat_percentage" className="block text-sm font-medium text-input-label-theme">
                   Body Fat Percentage (%)
                 </label>
-                <input
+                <FormInput
+                  inputMode='decimal'
                   type="number"
                   id="body_fat_percentage"
                   step="0.1"
@@ -986,7 +987,6 @@ export default function MeasurementsTracker() {
                     ...prev, 
                     [getFieldKey('Body Fat %')]: e.target.value 
                   }))}
-                  className="mt-1 block w-full px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                   placeholder="Enter or calculate body fat %"
                 />
                 <p className="mt-1 text-xs text-gray-500">
@@ -998,12 +998,12 @@ export default function MeasurementsTracker() {
                 <label htmlFor="notes" className="block text-sm font-medium text-input-label-theme">
                   Notes (optional)
                 </label>
-                <textarea
+                <FormInput
+                  inputType='textarea'
                   id="notes"
                   rows={3}
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                   placeholder="Any notes about this measurement..."
                 />
               </div>
@@ -1056,12 +1056,11 @@ export default function MeasurementsTracker() {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div>
                                 <label className="block text-sm font-medium text-input-label-theme">Date</label>
-                                <input
+                                <FormInput
                                   type="date"
                                   required
                                   value={formData.date}
                                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                  className="mt-1 block w-full px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                                 />
                               </div>
                             </div>
@@ -1082,7 +1081,8 @@ export default function MeasurementsTracker() {
                                           <span className="text-xs text-gray-500 ml-1">(hidden field)</span>
                                         )}
                                       </label>
-                                      <input
+                                      <FormInput
+                                        inputMode='decimal'
                                         type="number"
                                         step="0.1"
                                         value={formData[getFieldKey(field.field_name)] || ''}
@@ -1090,7 +1090,6 @@ export default function MeasurementsTracker() {
                                           ...formData, 
                                           [getFieldKey(field.field_name)]: e.target.value 
                                         })}
-                                        className="mt-1 block w-full px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                                       />
                                     </div>
                                   ))}
@@ -1099,11 +1098,11 @@ export default function MeasurementsTracker() {
                             
                             <div>
                               <label className="block text-sm font-medium text-input-label-theme">Notes (optional)</label>
-                              <textarea
+                              <FormInput
+                                inputType='textarea'
                                 rows={2}
                                 value={formData.notes}
                                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                                className="mt-1 block w-full px-3 py-2 border bg-input-theme text-theme border-input-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                               />
                             </div>
                             

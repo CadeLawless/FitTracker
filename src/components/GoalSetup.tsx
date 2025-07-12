@@ -4,6 +4,7 @@
 import React, { useState } from 'react';
 import { Target, Scale, TrendingUp, TrendingDown, Minus, ArrowRight } from 'lucide-react';
 import { supabase, auth } from '../lib/supabase';
+import FormInput from './ui/FormInput';
 
 interface GoalSetupProps {
   onComplete: () => void;
@@ -173,7 +174,8 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
                     Current Weight (lbs)
                   </label>
                   <div className="mt-1 relative">
-                    <input
+                    <FormInput
+                      inputMode='decimal'
                       id="starting_weight"
                       name="starting_weight"
                       type="number"
@@ -181,7 +183,6 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
                       required
                       value={formData.starting_weight}
                       onChange={handleInputChange}
-                      className="block w-full px-3 py-2 pl-10 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                       placeholder="Enter your weight"
                     />
                     <Scale className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
@@ -194,32 +195,36 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
                   </label>
                   <div className="mt-1 grid grid-cols-2 gap-2">
                     <div>
-                      <select
+                      <FormInput
+                        inputType='select'
                         name="height_feet"
                         required
                         value={formData.height_feet}
                         onChange={handleInputChange}
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                       >
-                        <option value="">Feet</option>
-                        {[4, 5, 6, 7].map(ft => (
-                          <option key={ft} value={ft}>{ft} ft</option>
-                        ))}
-                      </select>
+                        <>
+                          <option value="">Feet</option>
+                          {[4, 5, 6, 7].map(ft => (
+                            <option key={ft} value={ft}>{ft} ft</option>
+                          ))}
+                        </>
+                      </FormInput>
                     </div>
                     <div>
-                      <select
+                      <FormInput
+                        inputType='select'
                         name="height_inches"
                         required
                         value={formData.height_inches}
                         onChange={handleInputChange}
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                       >
-                        <option value="">Inches</option>
-                        {Array.from({ length: 12 }, (_, i) => (
-                          <option key={i} value={i}>{i} in</option>
-                        ))}
-                      </select>
+                        <>
+                          <option value="">Inches</option>
+                          {Array.from({ length: 12 }, (_, i) => (
+                            <option key={i} value={i}>{i} in</option>
+                          ))}
+                        </>
+                      </FormInput>
                     </div>
                   </div>
                 </div>
@@ -229,21 +234,23 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
                 <label htmlFor="activity_level" className="block text-sm font-medium text-gray-700">
                   Activity Level
                 </label>
-                <select
+                <FormInput
+                  inputType='select'
                   id="activity_level"
                   name="activity_level"
                   required
                   value={formData.activity_level}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                 >
-                  <option value="">Select activity level</option>
-                  <option value="sedentary">Sedentary (little/no exercise)</option>
-                  <option value="lightly_active">Lightly Active (light exercise 1-3 days/week)</option>
-                  <option value="moderately_active">Moderately Active (moderate exercise 3-5 days/week)</option>
-                  <option value="very_active">Very Active (hard exercise 6-7 days/week)</option>
-                  <option value="extremely_active">Extremely Active (very hard exercise, physical job)</option>
-                </select>
+                  <>
+                    <option value="">Select activity level</option>
+                    <option value="sedentary">Sedentary (little/no exercise)</option>
+                    <option value="lightly_active">Lightly Active (light exercise 1-3 days/week)</option>
+                    <option value="moderately_active">Moderately Active (moderate exercise 3-5 days/week)</option>
+                    <option value="very_active">Very Active (hard exercise 6-7 days/week)</option>
+                    <option value="extremely_active">Extremely Active (very hard exercise, physical job)</option>
+                  </>
+                </FormInput>
               </div>
             </div>
           )}
@@ -297,7 +304,8 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
                   <label htmlFor="target_weight" className="block text-sm font-medium text-gray-700">
                     Target Weight (lbs)
                   </label>
-                  <input
+                  <FormInput
+                    inputMode='decimal'
                     id="target_weight"
                     name="target_weight"
                     type="number"
@@ -305,7 +313,6 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
                     required
                     value={formData.target_weight}
                     onChange={handleInputChange}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                     placeholder="Enter target weight"
                   />
                 </div>
@@ -314,14 +321,13 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
                   <label htmlFor="target_date" className="block text-sm font-medium text-gray-700">
                     Target Date (optional)
                   </label>
-                  <input
+                  <FormInput
                     id="target_date"
                     name="target_date"
                     type="date"
                     value={formData.target_date}
                     onChange={handleInputChange}
                     min={new Date().toISOString().split('T')[0]}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                   />
                 </div>
               </div>
