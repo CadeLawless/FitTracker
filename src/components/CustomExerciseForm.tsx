@@ -1,4 +1,5 @@
 import { Plus, Edit2, X } from 'lucide-react';
+import FormInput from './ui/FormInput';
 
 export const CustomExerciseForm = ({
   customExerciseData,
@@ -36,56 +37,56 @@ export const CustomExerciseForm = ({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Exercise Name *</label>
-              <input
+              <FormInput
                 type="text"
                 required
                 value={customExerciseData.name}
                 onChange={(e) =>
                   setCustomExerciseData({ ...customExerciseData, name: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 placeholder="e.g., Bulgarian Split Squats"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Muscle Group *</label>
-              <select
+              <FormInput
+                inputType='select'
                 required
                 value={customExerciseData.muscle_group}
                 onChange={(e) =>
                   setCustomExerciseData({ ...customExerciseData, muscle_group: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               >
-                <option value="">Select muscle group</option>
-                {muscleGroups.map((group) => (
-                  <option key={group} value={group}>
-                    {group}
-                  </option>
-                ))}
-              </select>
+                <>
+                  <option value="">Select muscle group</option>
+                  {muscleGroups.map((group) => (
+                    <option key={group} value={group}>
+                      {group}
+                    </option>
+                  ))}
+                </>
+              </FormInput>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Equipment</label>
-              <input
+              <FormInput
                 type="text"
                 value={customExerciseData.equipment}
                 onChange={(e) =>
                   setCustomExerciseData({ ...customExerciseData, equipment: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 placeholder="e.g., Dumbbells, Barbell, Bodyweight"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Instructions</label>
-              <textarea
+              <FormInput
+                inputType='textarea'
                 rows={3}
                 value={customExerciseData.instructions}
                 onChange={(e) =>
                   setCustomExerciseData({ ...customExerciseData, instructions: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               />
             </div>
           </div>
