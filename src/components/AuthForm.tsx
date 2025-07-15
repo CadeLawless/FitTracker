@@ -1,15 +1,23 @@
 // Authentication form component
 // This handles user login and registration with enhanced profile fields
 
-import React, { useState } from 'react';
-import { Dumbbell, Eye, EyeOff, Calendar, User } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Dumbbell, Eye, EyeOff, Calendar, User, Moon, Sun } from 'lucide-react';
 import { auth } from '../lib/supabase';
+import FormInput from './ui/FormInput';
+
+type Theme = 'light' | 'dark';
 
 interface AuthFormProps {
   onAuthSuccess: () => void;
 }
 
 export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
+  const [theme, setTheme] = useState(() => {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const defaultTheme: Theme = prefersDark ? 'dark' : 'light';
+    return defaultTheme;
+  });
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -21,6 +29,21 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
     gender: '',
   });
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    // Apply theme to document
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [theme]);
+
+  const toggleTheme = async () => {
+    const newTheme: Theme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,6 +84,19 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
     <div className="min-h-[100dvh] flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4 sm:px-6 lg:px-8 transition-colors">
       <div className="max-w-md w-full my-3 space-y-6 lg:space-y-8 p-6 lg:p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
         {/* Header */}
+        <div className='text-right'>
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          >
+            {theme === 'light' ? (
+              <Moon className="h-5 w-5" />
+            ) : (
+              <Sun className="h-5 w-5" />
+            )}
+          </button>
+        </div>
         <div className="text-center">
           <div className="flex justify-center">
             <Dumbbell className="h-10 w-10 lg:h-12 lg:w-12 text-blue-600 dark:text-blue-400" />
@@ -87,17 +123,17 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
                     Full Name
                   </label>
                   <div className="mt-1 relative">
-                    <input
+                    <FormInput
                       id="name"
                       name="name"
                       type="text"
                       required={!isLogin}
                       value={formData.name}
                       onChange={handleInputChange}
-                      className="block w-full px-3 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="pl-10"
                       placeholder="Enter your full name"
                     />
-                    <User className="absolute left-3 top-2.5 h-4 w-4 text-gray-400 dark:text-gray-500" />
+                    <User className="absolute left-3 top-[50%] translate-y-[-50%] h-4 w-4 text-gray-400 dark:text-gray-500" />
                   </div>
                 </div>
 
@@ -106,16 +142,16 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
                     Birth Date
                   </label>
                   <div className="mt-1 relative">
-                    <input
+                    <FormInput
                       id="birth_date"
                       name="birth_date"
                       type="date"
                       required={!isLogin}
                       value={formData.birth_date}
                       onChange={handleInputChange}
-                      className="block w-full px-3 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="pl-10"
                     />
-                    <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-gray-400 dark:text-gray-500" />
+                    <Calendar className="absolute left-3 top-[50%] translate-y-[-50%] h-4 w-4 text-gray-400 dark:text-gray-500" />
                   </div>
                 </div>
 
@@ -123,19 +159,21 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
                   <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Gender
                   </label>
-                  <select
+                  <FormInput
+                    inputType='select'
                     id="gender"
                     name="gender"
                     required={!isLogin}
                     value={formData.gender}
                     onChange={handleInputChange}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
-                    <option value="">Select gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                  </select>
+                    <>
+                      <option value="">Select gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                    </>
+                  </FormInput>
                 </div>
               </>
             )}
@@ -144,14 +182,13 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Email Address
               </label>
-              <input
+              <FormInput
                 id="email"
                 name="email"
                 type="email"
                 required
                 value={formData.email}
                 onChange={handleInputChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="Enter your email"
               />
             </div>
@@ -161,20 +198,20 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
                 Password
               </label>
               <div className="mt-1 relative">
-                <input
+                <FormInput
                   id="password"
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="block w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="pr-10"
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute top-[50%] translate-y-[-50%] right-0 pr-3 flex items-center"
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4 text-gray-400 dark:text-gray-500" />
