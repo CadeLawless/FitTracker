@@ -323,7 +323,6 @@ export default function WeightTracker() {
                     required
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="appearance-none"
                   />
                 </div>
               </div>

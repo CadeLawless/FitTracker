@@ -79,9 +79,11 @@ const FormInput: React.FC<FormInputProps> = ({
       }
     : {};
 
+  const newCombinedClasses = isDateType ? combinedClasses + " appearance-none" : combinedClasses;
+
   return (
     <input
-      className={combinedClasses}
+      className={newCombinedClasses}
       {...(props as InputHTMLAttributes<HTMLInputElement>)}
       {...dateProps}
     />
