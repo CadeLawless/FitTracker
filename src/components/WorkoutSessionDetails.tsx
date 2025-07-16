@@ -42,7 +42,11 @@ export default function WorkoutSessionDetails() {
         .from('workout_sessions')
         .select(`
           *,
-          routine:workout_routines(name)
+          routine:workout_routines(
+            name,
+            description,
+            created_at as routine_created_at
+          )
         `)
         .eq('id', id)
         .eq('user_id', user.id)
@@ -64,6 +68,14 @@ export default function WorkoutSessionDetails() {
 
       setSession({
         ...sessionData,
+        name: sessionData.name,
+        routine: {
+          id: sessionData.routine_id,
+          user_id: user.id,
+          name: sessionData.name,
+          description: sessionData.description,
+          created_at: sessionData.routine_created_at,
+        },
         sets: setsData || [],
       });
     } catch (error) {
