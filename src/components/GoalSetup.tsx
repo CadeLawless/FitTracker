@@ -175,7 +175,6 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
                   </label>
                   <div className="mt-1 relative">
                     <FormInput
-                      inputMode='decimal'
                       id="starting_weight"
                       name="starting_weight"
                       type="number"
@@ -305,7 +304,6 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
                     Target Weight (lbs)
                   </label>
                   <FormInput
-                    inputMode='decimal'
                     id="target_weight"
                     name="target_weight"
                     type="number"

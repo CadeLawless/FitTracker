@@ -7,6 +7,7 @@ import type { WorkoutSession, WorkoutRoutine, Exercise } from '../types';
 import { useCustomExercises } from '../hooks/useCustomExercises';
 import { CustomExerciseForm } from '../components/CustomExerciseForm';
 import { useAuth } from '../contexts/AuthContext';
+import FormInput from './ui/FormInput';
 
 interface DeleteConfirmation {
   isOpen: boolean;
@@ -356,12 +357,12 @@ export default function WorkoutsPage() {
                   {/* Exercise Search */}
                   <div className="relative mb-4">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
+                    <FormInput
                       type="text"
                       placeholder="Search exercises..."
                       value={exerciseSearchTerm}
                       onChange={(e) => setExerciseSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                      className="pl-10 pr-4 text-sm"
                     />
                   </div>
 
@@ -631,7 +632,7 @@ export default function WorkoutsPage() {
                             e.stopPropagation();
                             handleDeleteClick('session', session);
                           }}
-                          className="p-2 text-gray-400 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                          className="p-2 text-gray-400 hover:text-red-600 transition-colors"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -806,12 +807,12 @@ function LogExerciseTab({ allExercises }: { allExercises: Exercise[] }) {
         {/* Search */}
         <div className="relative mb-6">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <input
+          <FormInput
             type="text"
             placeholder="Search exercises..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="pl-10 pr-4"
           />
         </div>
 

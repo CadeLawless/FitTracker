@@ -5,6 +5,7 @@ import { formatDate } from '../lib/date';
 import { scrollToElement } from '../lib/htmlElement';
 import type { UserGoal, WeightEntry, MeasurementField, BodyMeasurement } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import FormInput from './ui/FormInput';
 
 interface DeleteConfirmation {
   isOpen: boolean;
@@ -878,20 +879,22 @@ export default function GoalsPage() {
                   <label htmlFor="measurement_field_id" className="block text-sm font-medium text-gray-700">
                     Measurement Field
                   </label>
-                  <select
+                  <FormInput
+                    inputType="select"
                     id="measurement_field_id"
                     required
                     value={formData.measurement_field_id}
                     onChange={(e) => setFormData({ ...formData, measurement_field_id: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                   >
-                    <option value="">Select measurement field</option>
-                    {measurementFields.map((field) => (
-                      <option key={field.id} value={field.id}>
-                        {field.field_name} ({field.unit})
-                      </option>
-                    ))}
-                  </select>
+                    <>
+                      <option value="">Select measurement field</option>
+                      {measurementFields.map((field) => (
+                        <option key={field.id} value={field.id}>
+                          {field.field_name} ({field.unit})
+                        </option>
+                      ))}
+                    </>
+                  </FormInput>
                 </div>
               )}
 
@@ -906,7 +909,7 @@ export default function GoalsPage() {
                       </span>
                     )}
                   </label>
-                  <input
+                  <FormInput
                     type="number"
                     id={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'}
                     step="0.1"
@@ -916,7 +919,6 @@ export default function GoalsPage() {
                       ...formData, 
                       [formData.goal_category === 'weight' ? 'target_weight' : 'target_value']: e.target.value 
                     })}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                     placeholder={`Enter target ${formData.goal_category === 'weight' ? 'weight' : 'value'}`}
                   />
                 </div>
@@ -925,13 +927,12 @@ export default function GoalsPage() {
                   <label htmlFor="target_date" className="block text-sm font-medium text-gray-700">
                     Target Date (optional)
                   </label>
-                  <input
+                  <FormInput
                     type="date"
                     id="target_date"
                     value={formData.target_date}
                     onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
                     min={new Date().toISOString().split('T')[0]}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                   />
                 </div>
               </div>
@@ -940,13 +941,12 @@ export default function GoalsPage() {
                 <label htmlFor="weekly_goal" className="block text-sm font-medium text-gray-700">
                   Weekly Goal (optional)
                 </label>
-                <input
+                <FormInput
                   type="number"
                   id="weekly_goal"
                   step="0.1"
                   value={formData.weekly_goal}
                   onChange={(e) => setFormData({ ...formData, weekly_goal: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                   placeholder={`Units per week (${formData.goal_category === 'weight' ? 'lbs' : 'measurement units'})`}
                 />
               </div>
@@ -1097,20 +1097,22 @@ export default function GoalsPage() {
                           <label htmlFor="measurement_field_id" className="block text-sm font-medium text-gray-700">
                             Measurement Field
                           </label>
-                          <select
+                          <FormInput
+                            inputType="select"
                             id="measurement_field_id"
                             required
                             value={formData.measurement_field_id}
                             onChange={(e) => setFormData({ ...formData, measurement_field_id: e.target.value })}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                           >
-                            <option value="">Select measurement field</option>
-                            {measurementFields.map((field) => (
-                              <option key={field.id} value={field.id}>
-                                {field.field_name} ({field.unit})
-                              </option>
-                            ))}
-                          </select>
+                            <>
+                              <option value="">Select measurement field</option>
+                              {measurementFields.map((field) => (
+                                <option key={field.id} value={field.id}>
+                                  {field.field_name} ({field.unit})
+                                </option>
+                              ))}
+                            </>
+                          </FormInput>
                         </div>
                       )}
 
@@ -1125,7 +1127,7 @@ export default function GoalsPage() {
                               </span>
                             )}
                           </label>
-                          <input
+                          <FormInput
                             type="number"
                             id={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'}
                             step="0.1"
@@ -1135,7 +1137,6 @@ export default function GoalsPage() {
                               ...formData, 
                               [formData.goal_category === 'weight' ? 'target_weight' : 'target_value']: e.target.value 
                             })}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                             placeholder={`Enter target ${formData.goal_category === 'weight' ? 'weight' : 'value'}`}
                           />
                         </div>
@@ -1144,13 +1145,12 @@ export default function GoalsPage() {
                           <label htmlFor="target_date" className="block text-sm font-medium text-gray-700">
                             Target Date (optional)
                           </label>
-                          <input
+                          <FormInput
                             type="date"
                             id="target_date"
                             value={formData.target_date}
                             onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
                             min={new Date().toISOString().split('T')[0]}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                           />
                         </div>
                       </div>
@@ -1159,13 +1159,12 @@ export default function GoalsPage() {
                         <label htmlFor="weekly_goal" className="block text-sm font-medium text-gray-700">
                           Weekly Goal (optional)
                         </label>
-                        <input
+                        <FormInput
                           type="number"
                           id="weekly_goal"
                           step="0.1"
                           value={formData.weekly_goal}
                           onChange={(e) => setFormData({ ...formData, weekly_goal: e.target.value })}
-                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                           placeholder={`Units per week (${formData.goal_category === 'weight' ? 'lbs' : 'measurement units'})`}
                         />
                       </div>
@@ -1374,20 +1373,22 @@ export default function GoalsPage() {
                               <label htmlFor="measurement_field_id" className="block text-sm font-medium text-gray-700">
                                 Measurement Field
                               </label>
-                              <select
+                              <FormInput
+                                inputType="select"
                                 id="measurement_field_id"
                                 required
                                 value={formData.measurement_field_id}
                                 onChange={(e) => setFormData({ ...formData, measurement_field_id: e.target.value })}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                               >
-                                <option value="">Select measurement field</option>
-                                {measurementFields.map((field) => (
-                                  <option key={field.id} value={field.id}>
-                                    {field.field_name} ({field.unit})
-                                  </option>
-                                ))}
-                              </select>
+                                <>
+                                  <option value="">Select measurement field</option>
+                                  {measurementFields.map((field) => (
+                                    <option key={field.id} value={field.id}>
+                                      {field.field_name} ({field.unit})
+                                    </option>
+                                  ))}
+                                </>
+                              </FormInput>
                             </div>
                           )}
 
@@ -1402,7 +1403,7 @@ export default function GoalsPage() {
                                   </span>
                                 )}
                               </label>
-                              <input
+                              <FormInput
                                 type="number"
                                 id={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'}
                                 step="0.1"
@@ -1412,7 +1413,6 @@ export default function GoalsPage() {
                                   ...formData, 
                                   [formData.goal_category === 'weight' ? 'target_weight' : 'target_value']: e.target.value 
                                 })}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                                 placeholder={`Enter target ${formData.goal_category === 'weight' ? 'weight' : 'value'}`}
                               />
                             </div>
@@ -1421,13 +1421,12 @@ export default function GoalsPage() {
                               <label htmlFor="target_date" className="block text-sm font-medium text-gray-700">
                                 Target Date (optional)
                               </label>
-                              <input
+                              <FormInput
                                 type="date"
                                 id="target_date"
                                 value={formData.target_date}
                                 onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
                                 min={new Date().toISOString().split('T')[0]}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                               />
                             </div>
                           </div>
@@ -1436,13 +1435,12 @@ export default function GoalsPage() {
                             <label htmlFor="weekly_goal" className="block text-sm font-medium text-gray-700">
                               Weekly Goal (optional)
                             </label>
-                            <input
+                            <FormInput
                               type="number"
                               id="weekly_goal"
                               step="0.1"
                               value={formData.weekly_goal}
                               onChange={(e) => setFormData({ ...formData, weekly_goal: e.target.value })}
-                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                               placeholder={`Units per week (${formData.goal_category === 'weight' ? 'lbs' : 'measurement units'})`}
                             />
                           </div>

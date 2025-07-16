@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
 import type { WorkoutSession, ExerciseSet, Exercise } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import FormInput from './ui/FormInput';
 
 interface WorkoutSessionWithSets extends WorkoutSession {
   sets: (ExerciseSet & { exercise: Exercise })[];
@@ -425,7 +426,7 @@ export default function WorkoutSessionDetails() {
                         <div className="flex items-center gap-2 flex-wrap">
                           {/* Weight Input */}
                           <div className="flex items-center gap-1">
-                            <input
+                            <FormInput
                               type="number"
                               step="0.5"
                               value={editFormData.weight}
@@ -438,7 +439,8 @@ export default function WorkoutSessionDetails() {
                           
                           {/* Reps Input */}
                           <div className="flex items-center gap-1">
-                            <input
+                            <FormInput
+                              inputMode="numeric"
                               type="number"
                               value={editFormData.reps}
                               onChange={(e) => setEditFormData({ ...editFormData, reps: e.target.value })}
@@ -451,7 +453,7 @@ export default function WorkoutSessionDetails() {
                           {/* Duration Input */}
                           <div className="flex items-center gap-1">
                             <Timer className="h-3 w-3 text-gray-400" />
-                            <input
+                            <FormInput
                               type="number"
                               step="0.5"
                               value={editFormData.durationMinutes}

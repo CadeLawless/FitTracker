@@ -303,7 +303,6 @@ export default function WeightTracker() {
                     Weight (lbs)
                   </label>
                   <FormInput
-                    inputMode='decimal'
                     type="number"
                     id="weight"
                     step="0.1"
@@ -389,7 +388,6 @@ export default function WeightTracker() {
                                 Weight (lbs)
                               </label>
                               <FormInput
-                                inputMode='decimal'
                                 type="number"
                                 step="0.1"
                                 required

@@ -38,7 +38,7 @@ const FormInput: React.FC<FormInputProps> = ({
   ...props
 }) => {
   const baseClasses =
-    "mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-400 dark:bg-gray-600 text-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm";
+    "mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-400 dark:bg-gray-600 text-theme rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base";
   const combinedClasses = `${baseClasses} ${className}`;
 
   if (inputType === "textarea") {
@@ -72,10 +72,18 @@ const FormInput: React.FC<FormInputProps> = ({
   const inputProps = props as InputHTMLAttributes<HTMLInputElement>;
 
   const isDateType = inputProps.type === "date";
+  const isNumberType = inputProps.type === "number";
 
   const dateProps = isDateType
     ? {
         max: inputProps.max ?? '9999-12-31',
+        placeholder: inputProps.placeholder ?? "mm/dd/yyyy",
+      }
+    : {};
+
+  const numberProps = isNumberType
+    ? {
+        inputMode: inputProps.inputMode ?? 'decimal',
       }
     : {};
 
@@ -86,6 +94,7 @@ const FormInput: React.FC<FormInputProps> = ({
       className={newCombinedClasses}
       {...(props as InputHTMLAttributes<HTMLInputElement>)}
       {...dateProps}
+      {...numberProps}
     />
   );
 };

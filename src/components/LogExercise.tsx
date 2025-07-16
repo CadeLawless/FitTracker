@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Exercise } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import FormInput from './ui/FormInput';
 
 export default function LogExercise() {
   const { user, authLoading } = useAuth();
@@ -175,13 +176,13 @@ export default function LogExercise() {
             <label htmlFor="exercise_id" className="block text-sm font-medium text-gray-700 mb-2">
               Exercise *
             </label>
-            <select
+            <FormInput
+              inputType="select"
               id="exercise_id"
               name="exercise_id"
               required
               value={formData.exercise_id}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
             >
               <option value="">Select an exercise</option>
               {allExercises.map((exercise) => (
@@ -190,7 +191,7 @@ export default function LogExercise() {
                   {exercise.is_custom ? ' (Custom)' : ''}
                 </option>
               ))}
-            </select>
+            </FormInput>
             {selectedExercise && (
               <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="flex items-center gap-2 mb-1">
@@ -218,14 +219,13 @@ export default function LogExercise() {
               <Calendar className="h-4 w-4 inline mr-1" />
               Date *
             </label>
-            <input
+            <FormInput
               type="date"
               id="date"
               name="date"
               required
               value={formData.date}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
             />
           </div>
 
@@ -235,7 +235,8 @@ export default function LogExercise() {
               <Clock className="h-4 w-4 inline mr-1" />
               Duration (minutes)
             </label>
-            <input
+            <FormInput
+              inputMode="numeric"
               type="number"
               id="duration_minutes"
               name="duration_minutes"
@@ -243,7 +244,6 @@ export default function LogExercise() {
               step="1"
               value={formData.duration_minutes}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
               placeholder="e.g., 30"
             />
             <p className="mt-1 text-xs text-gray-500">
@@ -257,13 +257,13 @@ export default function LogExercise() {
               <FileText className="h-4 w-4 inline mr-1" />
               Notes / Description
             </label>
-            <textarea
+            <FormInput
+              inputType="textarea"
               id="notes"
               name="notes"
               rows={4}
               value={formData.notes}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
               placeholder="e.g., I ran for 3 miles, I did 3 sets at 100 lbs, felt great today..."
             />
             <p className="mt-1 text-xs text-gray-500">

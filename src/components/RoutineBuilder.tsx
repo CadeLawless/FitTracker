@@ -6,6 +6,7 @@ import type { Exercise, RoutineExercise } from '../types';
 import { useCustomExercises } from '../hooks/useCustomExercises';
 import { CustomExerciseForm } from '../components/CustomExerciseForm';
 import { useAuth } from '../contexts/AuthContext';
+import FormInput from './ui/FormInput';
 
 export default function RoutineBuilder() {
   const { user, authLoading } = useAuth();
@@ -294,12 +295,12 @@ export default function RoutineBuilder() {
               <div className="space-y-3">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <input
+                  <FormInput
                     type="text"
                     placeholder="Search exercises..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="pl-10 pr-4"
                   />
                 </div>
                 <button
@@ -431,13 +432,12 @@ export default function RoutineBuilder() {
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Routine Name
               </label>
-              <input
+              <FormInput
                 type="text"
                 id="name"
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                 placeholder="e.g., Push Day, Leg Day, Upper Body"
               />
             </div>
@@ -445,12 +445,11 @@ export default function RoutineBuilder() {
               <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                 Description (optional)
               </label>
-              <input
+              <FormInput
                 type="text"
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                 placeholder="Brief description of this routine"
               />
             </div>
@@ -545,23 +544,23 @@ export default function RoutineBuilder() {
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                           <div>
                             <label className="block text-xs font-medium text-gray-700 mb-1">Sets</label>
-                            <input
+                            <FormInput
+                              inputMode="numeric"
                               type="number"
                               min="1"
                               value={routineExercise.target_sets}
                               onChange={(e) => updateExercise(index, 'target_sets', parseInt(e.target.value))}
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                             />
                           </div>
                           {routineExercise.requires_reps && (
                             <div>
                               <label className="block text-xs font-medium text-gray-700 mb-1">Reps</label>
-                              <input
+                              <FormInput
+                                inputMode="numeric"
                                 type="number"
                                 min="1"
                                 value={routineExercise.target_reps || ''}
                                 onChange={(e) => updateExercise(index, 'target_reps', e.target.value ? parseInt(e.target.value) : null)}
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                                 placeholder="10"
                               />
                             </div>
@@ -569,13 +568,12 @@ export default function RoutineBuilder() {
                           {routineExercise.requires_weight && (
                             <div>
                               <label className="block text-xs font-medium text-gray-700 mb-1">Weight (lbs)</label>
-                              <input
+                              <FormInput
                                 type="number"
                                 step="0.5"
                                 min="0"
                                 value={routineExercise.target_weight || ''}
                                 onChange={(e) => updateExercise(index, 'target_weight', e.target.value ? parseFloat(e.target.value) : null)}
-                                className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                                 placeholder="135"
                               />
                             </div>
@@ -590,7 +588,8 @@ export default function RoutineBuilder() {
                           </label>
                           <div className="flex items-center gap-2">
                             <div className="flex items-center gap-1">
-                              <input
+                              <FormInput
+                                inputMode="numeric"
                                 type="number"
                                 min="0"
                                 max="59"
@@ -600,13 +599,14 @@ export default function RoutineBuilder() {
                                   parseInt(e.target.value) || 0, 
                                   getRestSecondsRemainder(routineExercise.rest_seconds)
                                 )}
-                                className="w-16 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                className="w-16 px-2 py-1"
                                 placeholder="2"
                               />
                               <span className="text-xs text-gray-500">min</span>
                             </div>
                             <div className="flex items-center gap-1">
-                              <input
+                              <FormInput
+                                inputMode="numeric"
                                 type="number"
                                 min="0"
                                 max="59"
@@ -616,7 +616,7 @@ export default function RoutineBuilder() {
                                   getRestMinutes(routineExercise.rest_seconds), 
                                   parseInt(e.target.value) || 0
                                 )}
-                                className="w-16 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                className="w-16 px-2 py-1"
                                 placeholder="0"
                               />
                               <span className="text-xs text-gray-500">sec</span>
@@ -631,11 +631,10 @@ export default function RoutineBuilder() {
                         
                         <div className="mt-3">
                           <label className="block text-xs font-medium text-gray-700 mb-1">Notes (optional)</label>
-                          <input
+                          <FormInput
                             type="text"
                             value={routineExercise.notes || ''}
                             onChange={(e) => updateExercise(index, 'notes', e.target.value)}
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                             placeholder="Form cues, variations, etc."
                           />
                         </div>

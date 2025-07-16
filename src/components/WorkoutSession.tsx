@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 import { scrollToElement } from '../lib/htmlElement';
 import type { WorkoutRoutine, RoutineExercise, ExerciseSet, WorkoutSession as WorkoutSessionType } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import FormInput from './ui/FormInput';
 
 interface WorkoutState {
   session: WorkoutSessionType | null;
@@ -787,7 +788,8 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
                 ) : (
                   <div className="flex items-center gap-2 flex-wrap">
                     <div className="flex items-center gap-1">
-                      <input
+                      <FormInput
+                        inputMode="numeric"
                         type="number"
                         value={customRestMinutes}
                         onChange={(e) => setCustomRestMinutes(parseInt(e.target.value) || 0)}
@@ -798,7 +800,8 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
                       <span className="text-sm text-gray-600">min</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <input
+                      <FormInput
+                        inputMode="numeric"
                         type="number"
                         value={customRestSeconds}
                         onChange={(e) => setCustomRestSeconds(parseInt(e.target.value) || 0)}
@@ -919,12 +922,11 @@ function SetLogger({ targetWeight, targetReps, requiresWeight = true, requiresRe
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Weight (lbs)
             </label>
-            <input
+            <FormInput
               type="number"
               step="0.5"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="135"
               required
             />
@@ -936,12 +938,12 @@ function SetLogger({ targetWeight, targetReps, requiresWeight = true, requiresRe
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Reps
             </label>
-            <input
+            <FormInput
+              inputMode="numeric"
               type="number"
               min="1"
               value={reps}
               onChange={(e) => setReps(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="10"
               required
             />
@@ -952,13 +954,12 @@ function SetLogger({ targetWeight, targetReps, requiresWeight = true, requiresRe
               <Clock className="h-4 w-4 inline mr-1" />
               Duration (minutes)
             </label>
-            <input
+            <FormInput
               type="number"
               step="0.5"
               min="0"
               value={durationMinutes}
               onChange={(e) => setDurationMinutes(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="30"
             />
           </div>
