@@ -55,11 +55,11 @@ export default function WorkoutSessionDetails() {
         .from('exercise_sets')
         .select(`
           *,
-          routine_exercises(index_order),
+          routine_exercises(order_index),
           exercise:exercises(*)
         `)
         .eq('workout_session_id', id)
-        .order('routine_exercises.index_order, exercise_id, set_number');
+        .order('routine_exercises.order_index, exercise_id, set_number');
 
       if (setsError) throw setsError;
 
