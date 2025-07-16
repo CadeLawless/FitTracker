@@ -59,9 +59,13 @@ export default function WorkoutSessionDetails() {
           exercise:exercises(*)
         `)
         .eq('workout_session_id', id)
-        .order('routine_exercises.order_index, exercise_id, set_number');
+        .order('exercise_id, set_number');
 
       if (setsError) throw setsError;
+
+      setsData.sort((a, b) => {
+        return a.routine_exercises.order_index - b.routine_exercises.order_index;
+      });
 
       setSession({
         ...sessionData,
