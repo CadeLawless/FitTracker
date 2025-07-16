@@ -44,8 +44,7 @@ export default function WorkoutSessionDetails() {
           *,
           routine:workout_routines(
             name,
-            description,
-            created_at as routine_created_at
+            description
           )
         `)
         .eq('id', id)
@@ -74,7 +73,6 @@ export default function WorkoutSessionDetails() {
           user_id: user.id,
           name: sessionData.name,
           description: sessionData.description,
-          created_at: sessionData.routine_created_at,
         },
         sets: setsData || [],
       });
