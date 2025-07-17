@@ -5,6 +5,7 @@ import { formatDate } from '../lib/date';
 import { scrollToElement } from '../lib/htmlElement';
 import type { UserProfile } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import FormInput from './ui/FormInput';
 
 export default function Profile() {
   const { user, authLoading } = useAuth();
@@ -255,13 +256,12 @@ export default function Profile() {
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                     Full Name
                   </label>
-                  <input
+                  <FormInput
                     type="text"
                     id="name"
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                     placeholder="Enter your full name"
                   />
                 </div>
@@ -270,13 +270,12 @@ export default function Profile() {
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                     Email Address
                   </label>
-                  <input
+                  <FormInput
                     type="email"
                     id="email"
                     name="email"
                     value={formData.email}
                     disabled
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-gray-50 text-gray-500 cursor-not-allowed text-sm lg:text-base"
                   />
                   <p className="mt-1 text-xs text-gray-500">Email cannot be changed here</p>
                 </div>
@@ -285,13 +284,12 @@ export default function Profile() {
                   <label htmlFor="birth_date" className="block text-sm font-medium text-gray-700">
                     Birth Date
                   </label>
-                  <input
+                  <FormInput
                     type="date"
                     id="birth_date"
                     name="birth_date"
                     value={formData.birth_date}
                     onChange={handleInputChange}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                   />
                 </div>
 
@@ -299,18 +297,19 @@ export default function Profile() {
                   <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
                     Gender
                   </label>
-                  <select
+                  <FormInput
+                    inputType="select"
                     id="gender"
                     name="gender"
                     value={formData.gender}
                     onChange={handleInputChange}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                   >
-                    <option value="">Select gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                  </select>
+                    <>
+                      <option value="">Select gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                    </>
+                  </FormInput>
                 </div>
               </div>
 
@@ -324,30 +323,34 @@ export default function Profile() {
                   </label>
                   <div className="mt-1 grid grid-cols-2 gap-2">
                     <div>
-                      <select
+                      <FormInput
+                        inputType="select"
                         name="height_feet"
                         value={formData.height_feet}
                         onChange={handleInputChange}
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                       >
-                        <option value="">Feet</option>
-                        {[4, 5, 6, 7].map(ft => (
-                          <option key={ft} value={ft}>{ft} ft</option>
-                        ))}
-                      </select>
+                        <>
+                          <option value="">Feet</option>
+                          {[4, 5, 6, 7].map(ft => (
+                            <option key={ft} value={ft}>{ft} ft</option>
+                          ))}
+                        </>
+                      </FormInput>
                     </div>
                     <div>
-                      <select
+                      <FormInput
+                        inputType="select"
                         name="height_inches"
                         value={formData.height_inches}
                         onChange={handleInputChange}
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                       >
-                        <option value="">Inches</option>
-                        {Array.from({ length: 12 }, (_, i) => (
-                          <option key={i} value={i}>{i} in</option>
-                        ))}
-                      </select>
+                        <>
+                          <option value="">Inches</option>
+                          {Array.from({ length: 12 }, (_, i) => (
+                            <option key={i} value={i}>{i} in</option>
+                          ))}
+                        </>
+                      </FormInput>
                     </div>
                   </div>
                 </div>
@@ -356,20 +359,22 @@ export default function Profile() {
                   <label htmlFor="activity_level" className="block text-sm font-medium text-gray-700">
                     Activity Level
                   </label>
-                  <select
+                  <FormInput
+                    inputType="select"
                     id="activity_level"
                     name="activity_level"
                     value={formData.activity_level}
                     onChange={handleInputChange}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base"
                   >
-                    <option value="">Select activity level</option>
-                    <option value="sedentary">Sedentary (little/no exercise)</option>
-                    <option value="lightly_active">Lightly Active (light exercise 1-3 days/week)</option>
-                    <option value="moderately_active">Moderately Active (moderate exercise 3-5 days/week)</option>
-                    <option value="very_active">Very Active (hard exercise 6-7 days/week)</option>
-                    <option value="extremely_active">Extremely Active (very hard exercise, physical job)</option>
-                  </select>
+                    <>
+                      <option value="">Select activity level</option>
+                      <option value="sedentary">Sedentary (little/no exercise)</option>
+                      <option value="lightly_active">Lightly Active (light exercise 1-3 days/week)</option>
+                      <option value="moderately_active">Moderately Active (moderate exercise 3-5 days/week)</option>
+                      <option value="very_active">Very Active (hard exercise 6-7 days/week)</option>
+                      <option value="extremely_active">Extremely Active (very hard exercise, physical job)</option>
+                    </>
+                  </FormInput>
                 </div>
               </div>
             </div>

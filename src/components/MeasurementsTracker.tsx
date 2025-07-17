@@ -808,7 +808,6 @@ export default function MeasurementsTracker() {
                           {field.field_name} ({field.unit})
                         </label>
                         <FormInput
-                        inputMode='decimal'
                           type="number"
                           step="0.1"
                           value={formData[getFieldKey(field.field_name)] || ''}
@@ -865,7 +864,6 @@ export default function MeasurementsTracker() {
                       <div>
                         <label className="block text-sm font-medium text-input-label-theme">Age</label>
                         <FormInput
-                          inputMode='decimal'
                           type="number"
                           value={bodyFatData.age}
                           onChange={(e) => setBodyFatData(prev => ({ ...prev, age: e.target.value }))}
@@ -882,7 +880,6 @@ export default function MeasurementsTracker() {
                           <div>
                             <label className="block text-sm font-medium text-input-label-theme">Chest (mm)</label>
                             <FormInput
-                              inputMode='decimal'
                               type="number"
                               step="0.1"
                               value={bodyFatData.chest}
@@ -893,7 +890,6 @@ export default function MeasurementsTracker() {
                           <div>
                             <label className="block text-sm font-medium text-input-label-theme">Abdominal (mm)</label>
                             <FormInput
-                              inputMode='decimal'
                               type="number"
                               step="0.1"
                               value={bodyFatData.abdominal}
@@ -904,7 +900,6 @@ export default function MeasurementsTracker() {
                           <div className="sm:col-span-2 lg:col-span-1">
                             <label className="block text-sm font-medium text-input-label-theme">Thigh (mm)</label>
                             <FormInput
-                              inputMode='decimal'
                               type="number"
                               step="0.1"
                               value={bodyFatData.thigh}
@@ -921,7 +916,6 @@ export default function MeasurementsTracker() {
                           <div>
                             <label className="block text-sm font-medium text-input-label-theme">Tricep (mm)</label>
                             <FormInput
-                              inputMode='decimal'
                               type="number"
                               step="0.1"
                               value={bodyFatData.tricep}
@@ -932,7 +926,6 @@ export default function MeasurementsTracker() {
                           <div>
                             <label className="block text-sm font-medium text-input-label-theme">Suprailiac (mm)</label>
                             <FormInput
-                              inputMode='decimal'
                               type="number"
                               step="0.1"
                               value={bodyFatData.suprailiac}
@@ -943,7 +936,6 @@ export default function MeasurementsTracker() {
                           <div className="sm:col-span-2 lg:col-span-1">
                             <label className="block text-sm font-medium text-input-label-theme">Thigh (mm)</label>
                             <FormInput
-                              inputMode='decimal'
                               type="number"
                               step="0.1"
                               value={bodyFatData.thigh}
@@ -978,7 +970,6 @@ export default function MeasurementsTracker() {
                   Body Fat Percentage (%)
                 </label>
                 <FormInput
-                  inputMode='decimal'
                   type="number"
                   id="body_fat_percentage"
                   step="0.1"
@@ -1082,7 +1073,6 @@ export default function MeasurementsTracker() {
                                         )}
                                       </label>
                                       <FormInput
-                                        inputMode='decimal'
                                         type="number"
                                         step="0.1"
                                         value={formData[getFieldKey(field.field_name)] || ''}

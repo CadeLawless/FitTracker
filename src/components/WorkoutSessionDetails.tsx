@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
 import type { WorkoutSession, ExerciseSet, Exercise } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import FormInput from './ui/FormInput';
 
 interface WorkoutSessionWithSets extends WorkoutSession {
   sets: (ExerciseSet & { exercise: Exercise })[];
@@ -41,7 +42,10 @@ export default function WorkoutSessionDetails() {
         .from('workout_sessions')
         .select(`
           *,
-          routine:workout_routines(name)
+          routine:workout_routines(
+            name,
+            description
+          )
         `)
         .eq('id', id)
         .eq('user_id', user.id)
@@ -63,6 +67,13 @@ export default function WorkoutSessionDetails() {
 
       setSession({
         ...sessionData,
+        name: sessionData.name,
+        routine: {
+          id: sessionData.routine_id,
+          user_id: user.id,
+          name: sessionData.name,
+          description: sessionData.description,
+        },
         sets: setsData || [],
       });
     } catch (error) {
@@ -425,7 +436,7 @@ export default function WorkoutSessionDetails() {
                         <div className="flex items-center gap-2 flex-wrap">
                           {/* Weight Input */}
                           <div className="flex items-center gap-1">
-                            <input
+                            <FormInput
                               type="number"
                               step="0.5"
                               value={editFormData.weight}
@@ -438,7 +449,8 @@ export default function WorkoutSessionDetails() {
                           
                           {/* Reps Input */}
                           <div className="flex items-center gap-1">
-                            <input
+                            <FormInput
+                              inputMode="numeric"
                               type="number"
                               value={editFormData.reps}
                               onChange={(e) => setEditFormData({ ...editFormData, reps: e.target.value })}
@@ -451,7 +463,7 @@ export default function WorkoutSessionDetails() {
                           {/* Duration Input */}
                           <div className="flex items-center gap-1">
                             <Timer className="h-3 w-3 text-gray-400" />
-                            <input
+                            <FormInput
                               type="number"
                               step="0.5"
                               value={editFormData.durationMinutes}
