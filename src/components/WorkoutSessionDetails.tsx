@@ -42,10 +42,7 @@ export default function WorkoutSessionDetails() {
         .from('workout_sessions')
         .select(`
           *,
-          routine:workout_routines(
-            name,
-            description
-          )
+          routine:workout_routines(name)
         `)
         .eq('id', id)
         .eq('user_id', user.id)
@@ -61,7 +58,7 @@ export default function WorkoutSessionDetails() {
           exercise:exercises(*)
         `)
         .eq('workout_session_id', id)
-        .order('exercise_id, set_number');
+        .order('order_index, exercise_id, set_number');
 
       if (setsError) throw setsError;
 
@@ -321,7 +318,7 @@ export default function WorkoutSessionDetails() {
             {session.routine && (
               <div className="flex items-center">
                 <Target className="h-4 w-4 mr-1" />
-                {session.routine.name}
+                {session.routine.name || session.name}
               </div>
             )}
           </div>
