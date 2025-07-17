@@ -337,6 +337,7 @@ export default function WorkoutSession() {
         workout_session_id: workoutState.session.id,
         exercise_id: currentExercise.exercise_id,
         set_number: workoutState.currentSet,
+        order_index: workoutState.currentExerciseIndex,
       };
 
       // Only include weight if required

@@ -140,6 +140,7 @@ export interface ExerciseSet {
   workout_session_id: string;
   exercise_id: string;
   set_number: number;
+  order_index: number;
   weight?: number;
   reps?: number;
   duration_seconds?: number;
