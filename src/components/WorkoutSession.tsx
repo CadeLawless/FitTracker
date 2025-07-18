@@ -6,6 +6,7 @@ import { scrollToElement } from '../lib/htmlElement';
 import type { WorkoutRoutine, RoutineExercise, ExerciseSet, WorkoutSession as WorkoutSessionType } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import FormInput from './ui/FormInput';
+import { formatMinutes } from '../lib/formatMinutes';
 
 interface WorkoutState {
   session: WorkoutSessionType | null;
@@ -581,17 +582,17 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
   if (workoutComplete) {
     return (
       <div className="max-w-2xl mx-auto text-center py-12">
-        <div className="bg-green-50 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
+        <div className="bg-green-50 dark:bg-green-200/10 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
           <Check className="h-12 w-12 text-green-600" />
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Workout Complete!</h1>
-        <p className="text-gray-600 mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">Workout Complete!</h1>
+        <p className="text-gray-600 dark:text-gray-400 mb-8">
           Great job! You've completed {routine?.name || 'your workout'}.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
             onClick={() => navigate('/workouts')}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-6 py-3 border border-gray-300 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors"
           >
             Back to Workouts
           </button>
@@ -605,7 +606,7 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
       {/* Popup Confirmation Modal */}
       {popupConfirmation.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
@@ -616,7 +617,7 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
                   )}
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-gray-900">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                     {popupConfirmation.type === 'complete' ? (
                       <span>Finish Workout</span>
                     ) : (
@@ -626,7 +627,7 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
                 </div>
               </div>
               <div className="mb-6">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-gray-600 dark:text-gray-400">
                   Are you sure you want to {popupConfirmation.type === 'complete' ? 'finish' : 'cancel'} this workout?
                   {popupConfirmation.type === 'complete' && unfinishedExercises.length > 0 && (
                     <div className="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-200 rounded">
@@ -646,7 +647,7 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
               <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
                 <button
                   onClick={handlePopupCancel}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
                 >
                   {popupConfirmation.type === 'complete' ? 'Cancel' : 'Continue Workout'}
                 </button>
@@ -663,25 +664,25 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
       )}
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-xl lg:text-2xl font-bold text-gray-900">
+                <h1 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {routine?.name || 'Custom Workout'}
                 </h1>
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-400/20 text-green-800 dark:text-green-200">
                   Active Session
                 </span>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Exercise {workoutState.currentExerciseIndex + 1} of {routineExercises.length}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-gray-600">Duration</p>
-              <p className="text-lg font-semibold text-gray-900">
-                {Math.round((new Date().getTime() - workoutState.sessionStartTime.getTime()) / 60000)}m
+              <p className="text-sm text-gray-600 dark:text-gray-400">Duration</p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                {formatMinutes(Math.round((new Date().getTime() - workoutState.sessionStartTime.getTime()) / 60000))}
               </p>
             </div>
           </div>
@@ -715,14 +716,14 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
   
         {/* Current Exercise */}
         {currentExercise && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
             <div className="mb-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-2">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                 {currentExercise.exercise?.name}
               </h2>
-              <p className="text-gray-600">{currentExercise.exercise?.muscle_group}</p>
+              <p className="text-gray-600 dark:text-gray-400">{currentExercise.exercise?.muscle_group}</p>
               {currentExercise.exercise?.instructions && (
-                <p className="text-sm text-gray-600 mt-2">{currentExercise.exercise.instructions}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{currentExercise.exercise.instructions}</p>
               )}
             </div>
   
@@ -731,7 +732,7 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
               <div>
                 {workoutState.currentSet <= currentExercise.target_sets ? (
                   <>
-                    <h3 className="font-medium text-gray-900 mb-4">
+                    <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">
                       Set {workoutState.currentSet} of {currentExercise.target_sets}
                     </h3>
                     
@@ -755,13 +756,13 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
   
               {/* Previous Sets */}
               <div>
-                <h3 className="font-medium text-gray-900 mb-4">Previous Sets</h3>
+                <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Previous Sets</h3>
                 <div className="space-y-2">
                   {workoutState.sets
                     .filter(set => set.exercise_id === currentExercise.exercise_id)
                     .map((set) => (
                       <div key={set.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                        <span className="text-sm text-gray-600">Set {set.set_number}</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Set {set.set_number}</span>
                         <span className="text-sm font-medium">
                           {set.weight && `${set.weight}lbs`}
                           {set.weight && set.reps && ' × '}
@@ -776,12 +777,12 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
             </div>
   
             {/* Exercise Actions */}
-            <div className="mt-6 pt-6 border-t border-gray-200">
+            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
               <div className="flex flex-col sm:flex-row gap-3">
                 {!showCustomTimer ? (
                   <button
                     onClick={() => setShowCustomTimer(true)}
-                    className="flex items-center justify-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center justify-center px-4 py-2 border border-gray-300 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors"
                   >
                     <Timer className="h-4 w-4 mr-2" />
                     Custom Rest Timer
@@ -798,7 +799,7 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
                         min="0"
                         max="59"
                       />
-                      <span className="text-sm text-gray-600">min</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">min</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <FormInput
@@ -810,7 +811,7 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
                         min="0"
                         max="59"
                       />
-                      <span className="text-sm text-gray-600">sec</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">sec</span>
                     </div>
                     <button
                       onClick={startCustomRestTimer}
@@ -820,7 +821,7 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
                     </button>
                     <button
                       onClick={() => setShowCustomTimer(false)}
-                      className="px-3 py-1 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50"
+                      className="px-3 py-1 border border-gray-300 text-gray-700 dark:text-gray-200 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-900/50"
                     >
                       Cancel
                     </button>
@@ -852,11 +853,11 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
         )}
   
         {/* Workout Actions */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
           <div className="flex flex-col sm:flex-row gap-3 justify-end">
             <button
               onClick={() => handlePopupClick('cancel')}
-              className="px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors"
+              className="px-4 py-2 border border-red-300 dark:border-red-200 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-800/10 transition-colors"
             >
               Cancel Workout
             </button>
@@ -920,7 +921,7 @@ function SetLogger({ targetWeight, targetReps, requiresWeight = true, requiresRe
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {requiresWeight && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               Weight (lbs)
             </label>
             <FormInput
@@ -936,7 +937,7 @@ function SetLogger({ targetWeight, targetReps, requiresWeight = true, requiresRe
         
         {requiresReps ? (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               Reps
             </label>
             <FormInput
@@ -951,7 +952,7 @@ function SetLogger({ targetWeight, targetReps, requiresWeight = true, requiresRe
           </div>
         ) : (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               <Clock className="h-4 w-4 inline mr-1" />
               Duration (minutes)
             </label>

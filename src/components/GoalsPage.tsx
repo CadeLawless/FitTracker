@@ -520,7 +520,7 @@ export default function GoalsPage() {
   };
 
   const getProgressColor = (goal: UserGoal, change: number) => {
-    if (change === 0) return 'text-gray-600';
+    if (change === 0) return 'text-gray-600 dark:text-gray-400';
     
     // For measurement goals, determine if increase/decrease is good based on the field
     let changeNeeded;
@@ -559,7 +559,7 @@ export default function GoalsPage() {
       case 'maintaining':
         return Math.abs(change) <= 2 ? 'text-green-600' : 'text-orange-600';
       default:
-        return 'text-gray-600';
+        return 'text-gray-600 dark:text-gray-400';
     } */
   };
 
@@ -581,28 +581,28 @@ export default function GoalsPage() {
       name: 'Cutting',
       description: 'Losing weight while maintaining muscle',
       icon: TrendingDown,
-      color: 'text-red-600 bg-red-50 border-red-200',
+      color: 'text-red-600 bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-400/40',
     },
     {
       id: 'bulking',
       name: 'Bulking',
       description: 'Gaining weight to build muscle',
       icon: TrendingUp,
-      color: 'text-green-600 bg-green-50 border-green-200',
+      color: 'text-green-600 bg-green-50 dark:bg-green-200/10 border-green-200 dark:border-green-400/40',
     },
     {
       id: 'maintaining',
       name: 'Maintaining',
       description: 'Maintaining current weight/composition',
       icon: Minus,
-      color: 'text-blue-600 bg-blue-50 border-blue-200',
+      color: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border-blue-200',
     },
     {
       id: 'none',
       name: 'None',
       description: 'Not following a specific phase',
       icon: Target,
-      color: 'text-gray-600 bg-gray-50 border-gray-200',
+      color: 'text-gray-600 dark:text-gray-400 bg-gray-50 border-gray-200 dark:border-gray-600',
     },
   ];
 
@@ -619,18 +619,18 @@ export default function GoalsPage() {
       {/* Delete Confirmation Modal */}
       {deleteConfirmation.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
                   <AlertTriangle className="h-6 w-6 text-red-600" />
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-gray-900">Delete Goal</h3>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Delete Goal</h3>
                 </div>
               </div>
               <div className="mb-6">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   Are you sure you want to delete{' '}
                   <span className="font-medium">"{deleteConfirmation.goalName}"</span>?
                   This action cannot be undone.
@@ -639,7 +639,7 @@ export default function GoalsPage() {
               <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
                 <button
                   onClick={() => setDeleteConfirmation({ isOpen: false, goalId: null, goalName: '' })}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -658,18 +658,18 @@ export default function GoalsPage() {
       {/* Complete Confirmation Modal */}
       {completeConfirmation.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
                   <CheckCircle className="h-6 w-6 text-green-600" />
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-gray-900">Mark Goal as Complete</h3>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Mark Goal as Complete</h3>
                 </div>
               </div>
               <div className="mb-6">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   Congratulations! Are you ready to mark{' '}
                   <span className="font-medium">"{completeConfirmation.goalName}"</span>{' '}
                   as complete? This will deactivate the goal and move it to your history.
@@ -678,7 +678,7 @@ export default function GoalsPage() {
               <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
                 <button
                   onClick={() => setCompleteConfirmation({ isOpen: false, goalId: null, goalName: '' })}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -697,18 +697,18 @@ export default function GoalsPage() {
       {/* Conflict Confirmation Modal */}
       {conflictConfirmation.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
                   <AlertTriangle className="h-6 w-6 text-orange-600" />
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">Active Goal Conflict</h3>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 dark:text-white">Active Goal Conflict</h3>
                 </div>
               </div>
               <div className="mb-6">
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                   You already have an active goal for this {conflictConfirmation.newGoalData?.goal_category === 'weight' ? 'weight' : 'measurement'}:
                 </p>
                 {conflictConfirmation.conflictingGoal && (
@@ -723,14 +723,14 @@ export default function GoalsPage() {
                     </p>
                   </div>
                 )}
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   Would you like to replace it with your new goal? The current goal will be moved to your history.
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
                 <button
                   onClick={() => setConflictConfirmation({ isOpen: false, conflictingGoal: null, newGoalData: null })}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -750,8 +750,8 @@ export default function GoalsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">Goals</h1>
-            <p className="mt-2 text-sm lg:text-base text-gray-600">Set and track goals for weight and body measurements.</p>
+            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 dark:text-white">Goals</h1>
+            <p className="mt-2 text-sm lg:text-base text-gray-600 dark:text-gray-400">Set and track goals for weight and body measurements.</p>
           </div>
           <button
             onClick={() => setShowForm(true)}
@@ -764,23 +764,23 @@ export default function GoalsPage() {
 
         {/* Success/Error Messages */}
         {success && (
-          <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg flex items-center">
+          <div className="bg-green-50 dark:bg-green-200/10 border border-green-200 dark:border-green-400/40 text-green-600 px-4 py-3 rounded-lg flex items-center">
             <CheckCircle className="h-5 w-5 mr-2 flex-shrink-0" />
             <span className="text-sm lg:text-base">{success}</span>
           </div>
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg flex items-center">
+          <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-400/40 text-red-600 px-4 py-3 rounded-lg flex items-center">
             <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
             <span className="text-sm lg:text-base">{error}</span>
           </div>
         )}
 
         {/* Fitness Phase Selection */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
-          <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-white mb-4">Current Fitness Phase</h2>
-          <p className="text-sm text-gray-600 mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
+          <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white mb-4">Current Fitness Phase</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             This affects how progress indicators are colored when you don't have specific goals set.
           </p>
           
@@ -795,7 +795,7 @@ export default function GoalsPage() {
                   className={`relative flex flex-col items-center p-4 border rounded-lg transition-colors disabled:opacity-50 ${
                     fitnessPhase === phase.id
                       ? phase.color
-                      : 'border-gray-300 bg-white hover:bg-gray-50'
+                      : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
                   }`}
                 >
                   <Icon className="h-6 w-6 mb-2" />
@@ -809,12 +809,12 @@ export default function GoalsPage() {
 
         {/* Add Goal Form */}
         {showForm && (
-          <div ref={formRef} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+          <div ref={formRef} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-white">Create New Goal</h2>
+              <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white">Create New Goal</h2>
               <button
                 onClick={resetForm}
-                className="text-gray-400 hover:text-gray-600 p-1"
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-400 p-1"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -823,14 +823,14 @@ export default function GoalsPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Goal Category Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
                   Goal Category
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
                     formData.goal_category === 'weight'
                       ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-300 bg-white hover:bg-gray-50'
+                      : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
                   }`}>
                     <input
                       type="radio"
@@ -852,7 +852,7 @@ export default function GoalsPage() {
                   <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
                     formData.goal_category === 'measurement'
                       ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-300 bg-white hover:bg-gray-50'
+                      : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
                   }`}>
                     <input
                       type="radio"
@@ -876,7 +876,7 @@ export default function GoalsPage() {
               {/* Measurement Field Selection (only for measurement goals) */}
               {formData.goal_category === 'measurement' && (
                 <div>
-                  <label htmlFor="measurement_field_id" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="measurement_field_id" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Measurement Field
                   </label>
                   <FormInput
@@ -901,7 +901,7 @@ export default function GoalsPage() {
               {/* Target Value */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'} className="block text-sm font-medium text-gray-700">
+                  <label htmlFor={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'} className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Target {formData.goal_category === 'weight' ? 'Weight (lbs)' : 'Value'}
                     {formData.goal_category === 'measurement' && formData.measurement_field_id && (
                       <span className="text-gray-500">
@@ -924,7 +924,7 @@ export default function GoalsPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="target_date" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="target_date" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Target Date (optional)
                   </label>
                   <FormInput
@@ -938,7 +938,7 @@ export default function GoalsPage() {
               </div>
 
               <div>
-                <label htmlFor="weekly_goal" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="weekly_goal" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Weekly Goal (optional)
                 </label>
                 <FormInput
@@ -972,18 +972,18 @@ export default function GoalsPage() {
 
                 if (currentValue) {
                   return (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-4">
                       <div className="flex items-center">
                         {formData.goal_category === 'weight' ? (
-                          <Scale className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0" />
+                          <Scale className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2 flex-shrink-0" />
                         ) : (
-                          <Ruler className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0" />
+                          <Ruler className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2 flex-shrink-0" />
                         )}
                         <div>
-                          <p className="text-sm font-medium text-blue-900">
+                          <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
                             Starting from current value: {currentValue} {unit}
                           </p>
-                          <p className="text-xs text-blue-700">
+                          <p className="text-xs text-blue-700 dark:text-blue-300">
                             Logged on {source}
                           </p>
                         </div>
@@ -994,11 +994,11 @@ export default function GoalsPage() {
                 return null;
               })()}
 
-              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-600">
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -1018,7 +1018,7 @@ export default function GoalsPage() {
         {/* Active Goals */}
         {activeGoals.length > 0 && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Active Goals</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white">Active Goals</h2>
             {activeGoals.map((goal) => {
               const progress = getGoalProgress(goal);
               const unit = getGoalUnit(goal);
@@ -1027,12 +1027,12 @@ export default function GoalsPage() {
               // Check if this goal is being edited
               if (editingGoal?.id === goal.id) {
                 return (
-                  <div ref={editFormRef} key={goal.id} className="bg-blue-50 border border-blue-200 rounded-lg p-4 lg:p-6">
+                  <div ref={editFormRef} key={goal.id} className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-4 lg:p-6">
                     <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-white">Edit Goal</h3>
+                      <h3 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white">Edit Goal</h3>
                       <button
                         onClick={() => setEditingGoal(null)}
-                        className="text-gray-400 hover:text-gray-600 p-1"
+                        className="text-gray-400 hover:text-gray-600 dark:text-gray-400 p-1"
                       >
                         <X className="h-5 w-5" />
                       </button>
@@ -1041,14 +1041,14 @@ export default function GoalsPage() {
                     <form onSubmit={handleSubmit} className="space-y-6">
                       {/* Goal Category Selection */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
                           Goal Category
                         </label>
                         <div className="grid grid-cols-2 gap-3">
                           <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
                             formData.goal_category === 'weight'
                               ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-300 bg-white hover:bg-gray-50'
+                              : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
                           }`}>
                             <input
                               type="radio"
@@ -1070,7 +1070,7 @@ export default function GoalsPage() {
                           <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
                             formData.goal_category === 'measurement'
                               ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-300 bg-white hover:bg-gray-50'
+                              : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
                           }`}>
                             <input
                               type="radio"
@@ -1094,7 +1094,7 @@ export default function GoalsPage() {
                       {/* Measurement Field Selection (only for measurement goals) */}
                       {formData.goal_category === 'measurement' && (
                         <div>
-                          <label htmlFor="measurement_field_id" className="block text-sm font-medium text-gray-700">
+                          <label htmlFor="measurement_field_id" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                             Measurement Field
                           </label>
                           <FormInput
@@ -1119,7 +1119,7 @@ export default function GoalsPage() {
                       {/* Target Value */}
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div>
-                          <label htmlFor={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'} className="block text-sm font-medium text-gray-700">
+                          <label htmlFor={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'} className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                             Target {formData.goal_category === 'weight' ? 'Weight (lbs)' : 'Value'}
                             {formData.goal_category === 'measurement' && formData.measurement_field_id && (
                               <span className="text-gray-500">
@@ -1142,7 +1142,7 @@ export default function GoalsPage() {
                         </div>
 
                         <div>
-                          <label htmlFor="target_date" className="block text-sm font-medium text-gray-700">
+                          <label htmlFor="target_date" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                             Target Date (optional)
                           </label>
                           <FormInput
@@ -1156,7 +1156,7 @@ export default function GoalsPage() {
                       </div>
 
                       <div>
-                        <label htmlFor="weekly_goal" className="block text-sm font-medium text-gray-700">
+                        <label htmlFor="weekly_goal" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                           Weekly Goal (optional)
                         </label>
                         <FormInput
@@ -1169,11 +1169,11 @@ export default function GoalsPage() {
                         />
                       </div>
 
-                      <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
+                      <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-600">
                         <button
                           type="button"
                           onClick={() => setEditingGoal(null)}
-                          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
                         >
                           Cancel
                         </button>
@@ -1195,25 +1195,25 @@ export default function GoalsPage() {
                 <div key={goal.id} className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-4 lg:p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
-                      <Icon className="h-6 w-6 text-blue-600 mr-3" />
+                      <Icon className="h-6 w-6 text-blue-600 dark:text-blue-400 mr-3" />
                       <div>
-                        <h3 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-white">
+                        <h3 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white">
                           {goal.goal_category === 'weight' ? 'Weight Goal' : `${goal.measurement_field?.field_name} Goal`}
                         </h3>
-                        <p className="text-sm text-gray-600">Active Goal</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Active Goal</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleCompleteClick(goal)}
-                        className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
+                        className="p-2 text-green-600 hover:bg-green-100 dark:bg-green-400/20 rounded-lg transition-colors"
                         title="Mark as complete"
                       >
                         <Check className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleEdit(goal)}
-                        className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                        className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 rounded-lg transition-colors"
                         title="Edit goal"
                       >
                         <Edit2 className="h-4 w-4" />
@@ -1231,7 +1231,7 @@ export default function GoalsPage() {
                   {progress && (
                     <>
                       <div className="mb-4">
-                        <div className="flex justify-between text-sm text-gray-600 mb-2">
+                        <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
                           <span>{progress.startingValue} {unit}</span>
                           <span>{progress.targetValue} {unit}</span>
                         </div>
@@ -1245,11 +1245,11 @@ export default function GoalsPage() {
                       
                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                         <div>
-                          <p className="text-gray-600">Current</p>
-                          <p className="font-semibold text-gray-900 dark:text-white">{progress.currentValue} {unit}</p>
+                          <p className="text-gray-600 dark:text-gray-400">Current</p>
+                          <p className="font-semibold text-gray-900 dark:text-gray-100 dark:text-white">{progress.currentValue} {unit}</p>
                         </div>
                         <div>
-                          <p className="text-gray-600">Progress</p>
+                          <p className="text-gray-600 dark:text-gray-400">Progress</p>
                           <div className="flex items-center">
                             {(() => {
                               const ProgressIcon = getProgressIcon(progress.currentChange);
@@ -1266,14 +1266,14 @@ export default function GoalsPage() {
                           </div>
                         </div>
                         <div>
-                          <p className="text-gray-600">Remaining</p>
-                          <p className="font-semibold text-gray-900 dark:text-white">
+                          <p className="text-gray-600 dark:text-gray-400">Remaining</p>
+                          <p className="font-semibold text-gray-900 dark:text-gray-100 dark:text-white">
                             {Math.abs(progress.remaining).toFixed(1)} {unit}
                           </p>
                         </div>
                         <div>
-                          <p className="text-gray-600">Completion</p>
-                          <p className="font-semibold text-gray-900 dark:text-white">
+                          <p className="text-gray-600 dark:text-gray-400">Completion</p>
+                          <p className="font-semibold text-gray-900 dark:text-gray-100 dark:text-white">
                             {progress.progressPercentage.toFixed(0)}%
                           </p>
                         </div>
@@ -1287,9 +1287,9 @@ export default function GoalsPage() {
         )}
 
         {/* Goals History */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="p-4 lg:p-6 border-b border-gray-200">
-            <h2 className="text-base lg:text-lg font-semibold text-gray-900">Goals History</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+          <div className="p-4 lg:p-6 border-b border-gray-200 dark:border-gray-600">
+            <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Goals History</h2>
           </div>
           <div className="p-4 lg:p-6">
             {inactiveGoals.length > 0 ? (
@@ -1298,17 +1298,17 @@ export default function GoalsPage() {
                   const progress = getGoalProgress(goal);
                   const unit = getGoalUnit(goal);
                   const ProgressIcon = progress ? getProgressIcon(progress.currentChange) : Minus;
-                  const progressColor = progress ? getProgressColor(goal, progress.currentChange) : 'text-gray-600';
+                  const progressColor = progress ? getProgressColor(goal, progress.currentChange) : 'text-gray-600 dark:text-gray-400';
 
                   // Check if this goal is being edited
                   if (editingGoal?.id === goal.id) {
                     return (
-                      <div ref={editFormRef} key={goal.id} className="bg-blue-50 border border-blue-200 rounded-lg p-4 lg:p-6">
+                      <div ref={editFormRef} key={goal.id} className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-4 lg:p-6">
                         <div className="flex items-center justify-between mb-6">
-                          <h3 className="text-base lg:text-lg font-semibold text-gray-900">Edit Goal</h3>
+                          <h3 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Edit Goal</h3>
                           <button
                             onClick={() => setEditingGoal(null)}
-                            className="text-gray-400 hover:text-gray-600 p-1"
+                            className="text-gray-400 hover:text-gray-600 dark:text-gray-400 p-1"
                           >
                             <X className="h-5 w-5" />
                           </button>
@@ -1317,14 +1317,14 @@ export default function GoalsPage() {
                         <form onSubmit={handleSubmit} className="space-y-6">
                           {/* Goal Category Selection */}
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-3">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
                               Goal Category
                             </label>
                             <div className="grid grid-cols-2 gap-3">
                               <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
                                 formData.goal_category === 'weight'
                                   ? 'border-blue-500 bg-blue-50'
-                                  : 'border-gray-300 bg-white hover:bg-gray-50'
+                                  : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
                               }`}>
                                 <input
                                   type="radio"
@@ -1346,7 +1346,7 @@ export default function GoalsPage() {
                               <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
                                 formData.goal_category === 'measurement'
                                   ? 'border-blue-500 bg-blue-50'
-                                  : 'border-gray-300 bg-white hover:bg-gray-50'
+                                  : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
                               }`}>
                                 <input
                                   type="radio"
@@ -1370,7 +1370,7 @@ export default function GoalsPage() {
                           {/* Measurement Field Selection (only for measurement goals) */}
                           {formData.goal_category === 'measurement' && (
                             <div>
-                              <label htmlFor="measurement_field_id" className="block text-sm font-medium text-gray-700">
+                              <label htmlFor="measurement_field_id" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                                 Measurement Field
                               </label>
                               <FormInput
@@ -1395,7 +1395,7 @@ export default function GoalsPage() {
                           {/* Target Value */}
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             <div>
-                              <label htmlFor={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'} className="block text-sm font-medium text-gray-700">
+                              <label htmlFor={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'} className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                                 Target {formData.goal_category === 'weight' ? 'Weight (lbs)' : 'Value'}
                                 {formData.goal_category === 'measurement' && formData.measurement_field_id && (
                                   <span className="text-gray-500">
@@ -1418,7 +1418,7 @@ export default function GoalsPage() {
                             </div>
 
                             <div>
-                              <label htmlFor="target_date" className="block text-sm font-medium text-gray-700">
+                              <label htmlFor="target_date" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                                 Target Date (optional)
                               </label>
                               <FormInput
@@ -1432,7 +1432,7 @@ export default function GoalsPage() {
                           </div>
 
                           <div>
-                            <label htmlFor="weekly_goal" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="weekly_goal" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                               Weekly Goal (optional)
                             </label>
                             <FormInput
@@ -1445,11 +1445,11 @@ export default function GoalsPage() {
                             />
                           </div>
 
-                          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
+                          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-600">
                             <button
                               type="button"
                               onClick={() => setEditingGoal(null)}
-                              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
                             >
                               Cancel
                             </button>
@@ -1470,17 +1470,17 @@ export default function GoalsPage() {
                   return (
                     <div
                       key={goal.id}
-                      className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors"
                     >
                       <div className="flex items-center justify-between">
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            <h3 className="font-medium text-gray-900">
+                            <h3 className="font-medium text-gray-900 dark:text-gray-100">
                               {goal.goal_category === 'weight' ? 'Weight' : goal.measurement_field?.field_name} Goal
                             </h3>
                           </div>
                           
-                          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
+                          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600 dark:text-gray-400">
                             <div>
                               <span className="font-medium">Target:</span> {getTargetValue(goal)} {unit}
                             </div>
@@ -1513,7 +1513,7 @@ export default function GoalsPage() {
                           </button>
                           <button
                             onClick={() => handleEdit(goal)}
-                            className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                            className="p-2 text-gray-400 hover:text-blue-600 dark:text-blue-400 transition-colors"
                             title="Edit goal"
                           >
                             <Edit2 className="h-4 w-4" />
@@ -1537,7 +1537,7 @@ export default function GoalsPage() {
                 <p className="text-gray-500 mb-2 text-sm lg:text-base">No goals in history yet</p>
                 <button
                   onClick={() => setShowForm(true)}
-                  className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
+                  className="mt-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:text-blue-300 text-sm font-medium"
                 >
                   Create your first goal
                 </button>

@@ -199,8 +199,8 @@ export default function Profile() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Profile</h1>
-          <p className="mt-2 text-sm lg:text-base text-gray-600">Manage your account information and preferences.</p>
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100">Profile</h1>
+          <p className="mt-2 text-sm lg:text-base text-gray-600 dark:text-gray-400">Manage your account information and preferences.</p>
         </div>
         {!editing && (
           <button
@@ -215,25 +215,25 @@ export default function Profile() {
 
       {/* Success/Error Messages */}
       {success && (
-        <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg flex items-center">
+        <div className="bg-green-50 dark:bg-green-200/10 border border-green-200 dark:border-green-400/40 text-green-600 px-4 py-3 rounded-lg flex items-center">
           <Check className="h-5 w-5 mr-2 flex-shrink-0" />
           <span className="text-sm lg:text-base">{success}</span>
         </div>
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm lg:text-base">
+        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-400/40 text-red-600 px-4 py-3 rounded-lg text-sm lg:text-base">
           {error}
         </div>
       )}
 
       {/* Profile Information */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
         {editing ? (
           /* Edit Form */
           <form ref={formRef} onSubmit={handleSubmit} className="p-4 lg:p-6 space-y-6">
-            <div className="flex items-center justify-between border-b border-gray-200 pb-4">
-              <h2 className="text-base lg:text-lg font-semibold text-gray-900">Edit Profile Information</h2>
+            <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-600 pb-4">
+              <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Edit Profile Information</h2>
               <button
                 type="button"
                 onClick={() => {
@@ -241,7 +241,7 @@ export default function Profile() {
                   setError('');
                   setSuccess('');
                 }}
-                className="text-gray-400 hover:text-gray-600 p-1"
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-400 p-1"
               >
                 <X className="h-5 w-5 lg:h-6 lg:w-6" />
               </button>
@@ -250,10 +250,10 @@ export default function Profile() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Basic Information */}
               <div className="space-y-4">
-                <h3 className="text-sm lg:text-base font-medium text-gray-900">Basic Information</h3>
+                <h3 className="text-sm lg:text-base font-medium text-gray-900 dark:text-gray-100">Basic Information</h3>
                 
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Full Name
                   </label>
                   <FormInput
@@ -267,7 +267,7 @@ export default function Profile() {
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Email Address
                   </label>
                   <FormInput
@@ -281,7 +281,7 @@ export default function Profile() {
                 </div>
 
                 <div>
-                  <label htmlFor="birth_date" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="birth_date" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Birth Date
                   </label>
                   <FormInput
@@ -294,7 +294,7 @@ export default function Profile() {
                 </div>
 
                 <div>
-                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Gender
                   </label>
                   <FormInput
@@ -315,10 +315,10 @@ export default function Profile() {
 
               {/* Physical Information */}
               <div className="space-y-4">
-                <h3 className="text-sm lg:text-base font-medium text-gray-900">Physical Information</h3>
+                <h3 className="text-sm lg:text-base font-medium text-gray-900 dark:text-gray-100">Physical Information</h3>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Height
                   </label>
                   <div className="mt-1 grid grid-cols-2 gap-2">
@@ -356,7 +356,7 @@ export default function Profile() {
                 </div>
 
                 <div>
-                  <label htmlFor="activity_level" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="activity_level" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Activity Level
                   </label>
                   <FormInput
@@ -379,7 +379,7 @@ export default function Profile() {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-600">
               <button
                 type="button"
                 onClick={() => {
@@ -387,7 +387,7 @@ export default function Profile() {
                   setError('');
                   setSuccess('');
                 }}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
               >
                 Cancel
               </button>
@@ -404,22 +404,22 @@ export default function Profile() {
         ) : (
           /* View Mode */
           <div className="p-4 lg:p-6">
-            <div className="border-b border-gray-200 pb-4 mb-6">
-              <h2 className="text-base lg:text-lg font-semibold text-gray-900">Profile Information</h2>
+            <div className="border-b border-gray-200 dark:border-gray-600 pb-4 mb-6">
+              <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Profile Information</h2>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
               {/* Basic Information */}
               <div className="space-y-6">
-                <h3 className="text-sm lg:text-base font-medium text-gray-900 flex items-center">
-                  <User className="h-4 w-4 lg:h-5 lg:w-5 mr-2 text-blue-600" />
+                <h3 className="text-sm lg:text-base font-medium text-gray-900 dark:text-gray-100 flex items-center">
+                  <User className="h-4 w-4 lg:h-5 lg:w-5 mr-2 text-blue-600 dark:text-blue-400" />
                   Basic Information
                 </h3>
                 
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-500">Full Name</label>
-                    <p className="mt-1 text-sm lg:text-base text-gray-900">
+                    <p className="mt-1 text-sm lg:text-base text-gray-900 dark:text-gray-100">
                       {formData.name || 'Not provided'}
                     </p>
                   </div>
@@ -428,7 +428,7 @@ export default function Profile() {
                     <label className="block text-sm font-medium text-gray-500">Email Address</label>
                     <div className="mt-1 flex items-center">
                       <Mail className="h-4 w-4 text-gray-400 mr-2 flex-shrink-0" />
-                      <p className="text-sm lg:text-base text-gray-900 truncate">{formData.email}</p>
+                      <p className="text-sm lg:text-base text-gray-900 dark:text-gray-100 truncate">{formData.email}</p>
                     </div>
                   </div>
 
@@ -436,7 +436,7 @@ export default function Profile() {
                     <label className="block text-sm font-medium text-gray-500">Birth Date</label>
                     <div className="mt-1 flex items-center">
                       <Calendar className="h-4 w-4 text-gray-400 mr-2 flex-shrink-0" />
-                      <p className="text-sm lg:text-base text-gray-900">
+                      <p className="text-sm lg:text-base text-gray-900 dark:text-gray-100">
                         {formData.birth_date ? (
                           <>
                             {formatDate(formData.birth_date).toLocaleDateString()} 
@@ -453,7 +453,7 @@ export default function Profile() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-500">Gender</label>
-                    <p className="mt-1 text-sm lg:text-base text-gray-900 capitalize">
+                    <p className="mt-1 text-sm lg:text-base text-gray-900 dark:text-gray-100 capitalize">
                       {formData.gender || 'Not provided'}
                     </p>
                   </div>
@@ -462,7 +462,7 @@ export default function Profile() {
 
               {/* Physical Information */}
               <div className="space-y-6">
-                <h3 className="text-sm lg:text-base font-medium text-gray-900 flex items-center">
+                <h3 className="text-sm lg:text-base font-medium text-gray-900 dark:text-gray-100 flex items-center">
                   <Ruler className="h-4 w-4 lg:h-5 lg:w-5 mr-2 text-green-600" />
                   Physical Information
                 </h3>
@@ -470,7 +470,7 @@ export default function Profile() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-500">Height</label>
-                    <p className="mt-1 text-sm lg:text-base text-gray-900">
+                    <p className="mt-1 text-sm lg:text-base text-gray-900 dark:text-gray-100">
                       {profile?.height_inches ? (
                         <>
                           {formatHeight(profile.height_inches)}
@@ -488,7 +488,7 @@ export default function Profile() {
                     <label className="block text-sm font-medium text-gray-500">Activity Level</label>
                     <div className="mt-1 flex items-center">
                       <Activity className="h-4 w-4 text-gray-400 mr-2 flex-shrink-0" />
-                      <p className="text-sm lg:text-base text-gray-900">
+                      <p className="text-sm lg:text-base text-gray-900 dark:text-gray-100">
                         {profile?.activity_level ? getActivityLevelLabel(profile.activity_level) : 'Not provided'}
                       </p>
                     </div>
@@ -498,18 +498,18 @@ export default function Profile() {
             </div>
 
             {/* Account Information */}
-            <div className="mt-6 lg:mt-8 pt-6 border-t border-gray-200">
-              <h3 className="text-sm lg:text-base font-medium text-gray-900 mb-4">Account Information</h3>
+            <div className="mt-6 lg:mt-8 pt-6 border-t border-gray-200 dark:border-gray-600">
+              <h3 className="text-sm lg:text-base font-medium text-gray-900 dark:text-gray-100 mb-4">Account Information</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div>
                   <label className="block text-sm font-medium text-gray-500">Member Since</label>
-                  <p className="mt-1 text-sm lg:text-base text-gray-900">
+                  <p className="mt-1 text-sm lg:text-base text-gray-900 dark:text-gray-100">
                     {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}
                   </p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-500">Last Updated</label>
-                  <p className="mt-1 text-sm lg:text-base text-gray-900">
+                  <p className="mt-1 text-sm lg:text-base text-gray-900 dark:text-gray-100">
                     {profile?.updated_at ? new Date(profile.updated_at).toLocaleDateString() : 'Never'}
                   </p>
                 </div>

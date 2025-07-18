@@ -237,8 +237,8 @@ export default function ProgressPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Progress</h1>
-          <p className="mt-2 text-sm lg:text-base text-gray-600">Track your fitness journey and achievements.</p>
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100">Progress</h1>
+          <p className="mt-2 text-sm lg:text-base text-gray-600 dark:text-gray-400">Track your fitness journey and achievements.</p>
         </div>
         
         {/* Timeframe Selector */}
@@ -249,8 +249,8 @@ export default function ProgressPage() {
               onClick={() => setTimeframe(period)}
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 timeframe === period
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100'
               }`}
             >
               {period.charAt(0).toUpperCase() + period.slice(1)}
@@ -264,20 +264,20 @@ export default function ProgressPage() {
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-4 lg:p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              <Target className="h-6 w-6 text-blue-600 mr-3" />
+              <Target className="h-6 w-6 text-blue-600 dark:text-blue-400 mr-3" />
               <div>
-                <h3 className="text-base lg:text-lg font-semibold text-gray-900">Current Goal</h3>
-                <p className="text-sm text-gray-600 capitalize">{goalProgress.goal.goal_type} Goal</p>
+                <h3 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Current Goal</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">{goalProgress.goal.goal_type} Goal</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold text-blue-600">{goalProgress.progressPercentage.toFixed(0)}%</p>
-              <p className="text-sm text-gray-600">Complete</p>
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{goalProgress.progressPercentage.toFixed(0)}%</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Complete</p>
             </div>
           </div>
           
           <div className="mb-4">
-            <div className="flex justify-between text-sm text-gray-600 mb-2">
+            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
               <span>{goalProgress.goal.starting_weight} lbs</span>
               <span>{goalProgress.goal.target_weight} lbs</span>
             </div>
@@ -291,12 +291,12 @@ export default function ProgressPage() {
           
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="text-gray-600">Current Weight</p>
-              <p className="font-semibold text-gray-900">{goalProgress.currentWeight} lbs</p>
+              <p className="text-gray-600 dark:text-gray-400">Current Weight</p>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">{goalProgress.currentWeight} lbs</p>
             </div>
             <div>
-              <p className="text-gray-600">Remaining</p>
-              <p className="font-semibold text-gray-900">
+              <p className="text-gray-600 dark:text-gray-400">Remaining</p>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">
                 {Math.abs(goalProgress.remaining).toFixed(1)} lbs
               </p>
             </div>
@@ -308,9 +308,9 @@ export default function ProgressPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         {/* Weight Progress */}
         {weightProgress && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
             <div className="flex items-center justify-between mb-3">
-              <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600" />
+              <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600 dark:text-blue-400" />
               {weightProgress.trend === 'up' ? (
                 <TrendingUp className={`h-5 w-5 ${
                   weightProgress.isGoodProgress ? 'text-green-500' : 'text-red-500'
@@ -324,7 +324,7 @@ export default function ProgressPage() {
               )}
             </div>
             <div>
-              <p className="text-xs lg:text-sm font-medium text-gray-600">Weight Change</p>
+              <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Weight Change</p>
               <p className={`text-lg lg:text-2xl font-bold ${
                 weightProgress.isGoodProgress ? 'text-green-600' : 'text-red-600'
               }`}>
@@ -339,7 +339,7 @@ export default function ProgressPage() {
 
         {/* Body Fat Progress */}
         {bodyFatProgress && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
             <div className="flex items-center justify-between mb-3">
               <Ruler className="h-6 w-6 lg:h-8 lg:w-8 text-green-600" />
               {bodyFatProgress.trend === 'down' ? (
@@ -351,7 +351,7 @@ export default function ProgressPage() {
               )}
             </div>
             <div>
-              <p className="text-xs lg:text-sm font-medium text-gray-600">Body Fat Change</p>
+              <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Body Fat Change</p>
               <p className={`text-lg lg:text-2xl font-bold ${
                 bodyFatProgress.isGoodProgress ? 'text-green-600' : 'text-red-600'
               }`}>
@@ -365,14 +365,14 @@ export default function ProgressPage() {
         )}
 
         {/* Workout Frequency */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
           <div className="flex items-center justify-between mb-3">
             <Dumbbell className="h-6 w-6 lg:h-8 lg:w-8 text-purple-600" />
             <Calendar className="h-5 w-5 text-gray-400" />
           </div>
           <div>
-            <p className="text-xs lg:text-sm font-medium text-gray-600">Workouts</p>
-            <p className="text-lg lg:text-2xl font-bold text-gray-900">{workoutProgress.count}</p>
+            <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Workouts</p>
+            <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">{workoutProgress.count}</p>
             <p className="text-xs text-gray-500">
               {timeframe === 'week' ? 'This week' : 
                timeframe === 'month' ? 'This month' :
@@ -382,14 +382,14 @@ export default function ProgressPage() {
         </div>
 
         {/* Workout Duration */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
           <div className="flex items-center justify-between mb-3">
             <Award className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600" />
             <div className="text-xs text-gray-500">AVG</div>
           </div>
           <div>
-            <p className="text-xs lg:text-sm font-medium text-gray-600">Avg Duration</p>
-            <p className="text-lg lg:text-2xl font-bold text-gray-900">{workoutProgress.avgDuration}m</p>
+            <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Avg Duration</p>
+            <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">{workoutProgress.avgDuration}m</p>
             <p className="text-xs text-gray-500">
               Total: {Math.round(workoutProgress.totalDuration / 60)}h
             </p>
@@ -400,9 +400,9 @@ export default function ProgressPage() {
       {/* Recent Activity Summary */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
         {/* Weight Trend */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="p-4 lg:p-6 border-b border-gray-200">
-            <h3 className="text-base lg:text-lg font-semibold text-gray-900">Recent Weight Entries</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+          <div className="p-4 lg:p-6 border-b border-gray-200 dark:border-gray-600">
+            <h3 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Weight Entries</h3>
           </div>
           <div className="p-4 lg:p-6">
             {stats.weightEntries.slice(0, 5).length > 0 ? (
@@ -414,7 +414,7 @@ export default function ProgressPage() {
                         index === 0 ? 'bg-blue-600' : 'bg-gray-300'
                       }`} />
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{entry.weight} lbs</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{entry.weight} lbs</p>
                         <p className="text-xs text-gray-500">
                           {formatDate(entry.date).toLocaleDateString()}
                         </p>
@@ -427,7 +427,7 @@ export default function ProgressPage() {
                             ? 'text-red-600'
                             : entry.weight < stats.weightEntries[index - 1].weight
                             ? 'text-green-600'
-                            : 'text-gray-600'
+                            : 'text-gray-600 dark:text-gray-400'
                         }`}>
                           {entry.weight > stats.weightEntries[index - 1].weight ? '+' : ''}
                           {(entry.weight - stats.weightEntries[index - 1].weight).toFixed(1)}
@@ -447,9 +447,9 @@ export default function ProgressPage() {
         </div>
 
         {/* Recent Workouts */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="p-4 lg:p-6 border-b border-gray-200">
-            <h3 className="text-base lg:text-lg font-semibold text-gray-900">Recent Workouts</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+          <div className="p-4 lg:p-6 border-b border-gray-200 dark:border-gray-600">
+            <h3 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Workouts</h3>
           </div>
           <div className="p-4 lg:p-6">
             {stats.workouts.slice(0, 5).length > 0 ? (
@@ -461,7 +461,7 @@ export default function ProgressPage() {
                         index === 0 ? 'bg-purple-600' : 'bg-gray-300'
                       }`} />
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-gray-900 truncate">{workout.name}</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{workout.name}</p>
                         <p className="text-xs text-gray-500">
                           {formatDate(workout.date).toLocaleDateString()}
                         </p>
@@ -469,7 +469,7 @@ export default function ProgressPage() {
                     </div>
                     {workout.duration_minutes && (
                       <div className="text-right ml-3 flex-shrink-0">
-                        <p className="text-sm font-medium text-gray-600">
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                           {workout.duration_minutes}m
                         </p>
                       </div>

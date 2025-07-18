@@ -188,18 +188,18 @@ export default function WeightTracker() {
       {/* Delete Confirmation Modal */}
       {deleteConfirmation.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-theme rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
                   <AlertTriangle className="h-6 w-6 text-red-600" />
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-theme">Delete Weight Entry</h3>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Delete Weight Entry</h3>
                 </div>
               </div>
               <div className="mb-6">
-                <p className="text-sm text-subheading-theme">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   Are you sure you want to delete the weight entry of{' '}
                   <span className="font-medium">{deleteConfirmation.entryWeight} lbs</span> from{' '}
                   <span className="font-medium">{deleteConfirmation.entryDate}</span>?
@@ -209,7 +209,7 @@ export default function WeightTracker() {
               <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
                 <button
                   onClick={handleDeleteCancel}
-                  className="px-4 py-2 border border-input-theme rounded-lg text-input-label-theme bg-hover-theme transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-input-theme rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -228,8 +228,8 @@ export default function WeightTracker() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-theme">Weight Tracking</h1>
-            <p className="mt-2 text-sm lg:text-base text-subheading-theme">Monitor your weight progress over time.</p>
+            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100">Weight Tracking</h1>
+            <p className="mt-2 text-sm lg:text-base text-gray-600 dark:text-gray-400">Monitor your weight progress over time.</p>
           </div>
           <button
             onClick={handleAddNew}
@@ -243,18 +243,18 @@ export default function WeightTracker() {
         {/* Stats */}
         {entries.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-            <div className="bg-theme rounded-lg shadow-sm border border-theme p-4 lg:p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
               <div className="flex items-center">
                 <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-link-theme flex-shrink-0" />
                 <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-                  <p className="text-xs lg:text-sm font-medium text-subheading-theme">Current Weight</p>
-                  <p className="text-lg lg:text-2xl font-bold text-theme">{entries[0].weight} lbs</p>
+                  <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Current Weight</p>
+                  <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">{entries[0].weight} lbs</p>
                 </div>
               </div>
             </div>
   
             {trend !== null && (
-              <div className="bg-theme rounded-lg shadow-sm border border-theme p-4 lg:p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
                 <div className="flex items-center">
                   {trend > 0 ? (
                     <TrendingUp className="h-6 w-6 lg:h-8 lg:w-8 text-red-600 flex-shrink-0" />
@@ -262,7 +262,7 @@ export default function WeightTracker() {
                     <TrendingDown className="h-6 w-6 lg:h-8 lg:w-8 text-green-600 flex-shrink-0" />
                   )}
                   <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-                    <p className="text-xs lg:text-sm font-medium text-subheading-theme">Recent Change</p>
+                    <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Recent Change</p>
                     <p className={`text-lg lg:text-2xl font-bold ${trend > 0 ? 'text-red-600' : 'text-green-600'}`}>
                       {trend > 0 ? '+' : ''}{trend.toFixed(1)} lbs
                     </p>
@@ -271,12 +271,12 @@ export default function WeightTracker() {
               </div>
             )}
   
-            <div className="bg-theme rounded-lg shadow-sm border border-theme p-4 lg:p-6 sm:col-span-2 lg:col-span-1">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6 sm:col-span-2 lg:col-span-1">
               <div className="flex items-center">
-                <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-subheading-theme flex-shrink-0" />
+                <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-gray-600 dark:text-gray-400 flex-shrink-0" />
                 <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-                  <p className="text-xs lg:text-sm font-medium text-subheading-theme">Total Entries</p>
-                  <p className="text-lg lg:text-2xl font-bold text-theme">{entries.length}</p>
+                  <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Total Entries</p>
+                  <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">{entries.length}</p>
                 </div>
               </div>
             </div>
@@ -285,12 +285,12 @@ export default function WeightTracker() {
   
         {/* Add Entry Form */}
         {showForm && (
-          <div ref={formRef} className="bg-theme rounded-lg shadow-sm border border-theme p-4 lg:p-6">
+          <div ref={formRef} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
             <div className="flex items-center justify-between mb-4 lg:mb-6">
-              <h2 className="text-base lg:text-lg font-semibold text-theme">Add Weight Entry</h2>
+              <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Add Weight Entry</h2>
               <button
                 onClick={resetForm}
-                className="text-gray-400 hover:text-subheading-theme p-1"
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-400 p-1"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -299,7 +299,7 @@ export default function WeightTracker() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="weight" className="block text-sm font-medium text-input-label-theme">
+                  <label htmlFor="weight" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Weight (lbs)
                   </label>
                   <FormInput
@@ -313,7 +313,7 @@ export default function WeightTracker() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="date" className="block text-sm font-medium text-input-label-theme">
+                  <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Date
                   </label>
                   <FormInput
@@ -326,7 +326,7 @@ export default function WeightTracker() {
                 </div>
               </div>
               <div>
-                <label htmlFor="notes" className="block text-sm font-medium text-input-label-theme">
+                <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Notes (optional)
                 </label>
                 <FormInput
@@ -338,11 +338,11 @@ export default function WeightTracker() {
                   placeholder="Any notes about this entry..."
                 />
               </div>
-              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-theme">
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-600">
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-4 py-2 border border-input-theme rounded-lg text-input-label-theme bg-hover-theme transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-input-theme rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -358,9 +358,9 @@ export default function WeightTracker() {
         )}
   
         {/* Weight History */}
-        <div className="bg-theme rounded-lg shadow-sm border border-theme">
-          <div className="p-4 lg:p-6 border-b border-theme">
-            <h2 className="text-base lg:text-lg font-semibold text-theme">Weight History</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+          <div className="p-4 lg:p-6 border-b border-gray-200 dark:border-gray-600">
+            <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Weight History</h2>
           </div>
           <div className="p-4 lg:p-6">
             {entries.length > 0 ? (
@@ -372,11 +372,11 @@ export default function WeightTracker() {
                       <div className="border border-blue-200 rounded-lg p-4 bg-light-blue-theme">
                         <form onSubmit={handleSubmit} className="space-y-4">
                           <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-medium text-theme">Edit Weight Entry</h3>
+                            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">Edit Weight Entry</h3>
                             <button
                               type="button"
                               onClick={() => setEditingEntry(null)}
-                              className="text-gray-400 hover:text-subheading-theme p-1"
+                              className="text-gray-400 hover:text-gray-600 dark:text-gray-400 p-1"
                             >
                               <X className="h-4 w-4" />
                             </button>
@@ -384,7 +384,7 @@ export default function WeightTracker() {
                           
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-sm font-medium text-input-label-theme">
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                                 Weight (lbs)
                               </label>
                               <FormInput
@@ -396,7 +396,7 @@ export default function WeightTracker() {
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-input-label-theme">
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                                 Date
                               </label>
                               <FormInput
@@ -409,7 +409,7 @@ export default function WeightTracker() {
                           </div>
                           
                           <div>
-                            <label className="block text-sm font-medium text-input-label-theme">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                               Notes (optional)
                             </label>
                             <FormInput
@@ -425,7 +425,7 @@ export default function WeightTracker() {
                             <button
                               type="button"
                               onClick={() => setEditingEntry(null)}
-                              className="px-3 py-2 border border-input-theme bg-theme rounded-lg text-input-label-theme bg-hover-theme transition-colors text-sm"
+                              className="px-3 py-2 border border-input-theme bg-white dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm"
                             >
                               Cancel
                             </button>
@@ -441,17 +441,17 @@ export default function WeightTracker() {
                       </div>
                     ) : (
                       /* Regular Entry Display */
-                      <div className="flex items-center justify-between p-3 lg:p-4 border border-theme rounded-lg bg-hover-theme transition-colors">
+                      <div className="flex items-center justify-between p-3 lg:p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <p className="font-medium text-theme text-sm lg:text-base">{Number(entry.weight).toFixed(1)} lbs</p>
+                            <p className="font-medium text-gray-900 dark:text-gray-100 text-sm lg:text-base">{Number(entry.weight).toFixed(1)} lbs</p>
                             <div className="flex items-center text-xs lg:text-sm text-label-theme">
                               <Calendar className="h-3 w-3 lg:h-4 lg:w-4 mr-1" />
                               {formatDate(entry.date).toLocaleDateString()}
                             </div>
                           </div>
                           {entry.notes && (
-                            <p className="text-xs lg:text-sm text-subheading-theme truncate">{entry.notes}</p>
+                            <p className="text-xs lg:text-sm text-gray-600 dark:text-gray-400 truncate">{entry.notes}</p>
                           )}
                         </div>
                         <div className="flex items-center gap-2 ml-3">
@@ -479,7 +479,7 @@ export default function WeightTracker() {
                 <p className="text-label-theme mb-2 text-sm lg:text-base">No weight entries yet</p>
                 <button
                   onClick={handleAddNew}
-                  className="mt-2 text-link-theme hover:text-blue-700 text-sm font-medium"
+                  className="mt-2 text-link-theme hover:text-blue-700 dark:text-blue-300 text-sm font-medium"
                 >
                   Add your first entry
                 </button>
