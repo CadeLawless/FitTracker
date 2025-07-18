@@ -46,9 +46,9 @@ export default function Layout({ children }: LayoutProps) {
   ];
 
   return (
-    <div className="min-h-[100dvh] bg-gray-50 dark:bg-gray-800 pb-20">
+    <div className="min-h-[100dvh] bg-gray-50">
       {/* Mobile menu button */}
-      <div id="navbar" className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
+      <div id="navbar" className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 pb-20">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Dumbbell className="h-6 w-6 text-blue-600 dark:text-blue-400" />
