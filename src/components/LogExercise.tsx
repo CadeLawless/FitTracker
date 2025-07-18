@@ -144,11 +144,11 @@ export default function LogExercise() {
           onClick={() => navigate('/workouts')}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
-          <ArrowLeft className="h-5 w-5 text-gray-600" />
+          <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-400" />
         </button>
         <div className="flex-1">
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Log Exercise</h1>
-          <p className="mt-2 text-sm lg:text-base text-gray-600">
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100">Log Exercise</h1>
+          <p className="mt-2 text-sm lg:text-base text-gray-600 dark:text-gray-400">
             Quickly log a single exercise without creating a full routine.
           </p>
         </div>
@@ -156,24 +156,24 @@ export default function LogExercise() {
 
       {/* Success/Error Messages */}
       {success && (
-        <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg flex items-center">
+        <div className="bg-green-50 dark:bg-green-200/10 border border-green-200 dark:border-green-400/40 text-green-600 px-4 py-3 rounded-lg flex items-center">
           <Dumbbell className="h-5 w-5 mr-2 flex-shrink-0" />
           <span className="text-sm lg:text-base">{success}</span>
         </div>
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm lg:text-base">
+        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-400/40 text-red-600 px-4 py-3 rounded-lg text-sm lg:text-base">
           {error}
         </div>
       )}
 
       {/* Form */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Exercise Selection */}
           <div>
-            <label htmlFor="exercise_id" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="exercise_id" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
               Exercise *
             </label>
             <FormInput
@@ -193,21 +193,21 @@ export default function LogExercise() {
               ))}
             </FormInput>
             {selectedExercise && (
-              <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 rounded-lg">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-medium text-blue-900">{selectedExercise.name}</h3>
+                  <h3 className="font-medium text-blue-900 dark:text-blue-100">{selectedExercise.name}</h3>
                   {selectedExercise.is_custom && (
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-400/20 text-green-800 dark:text-green-200">
                       Custom
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-blue-700">{selectedExercise.muscle_group}</p>
+                <p className="text-sm text-blue-700 dark:text-blue-300">{selectedExercise.muscle_group}</p>
                 {selectedExercise.equipment && (
-                  <p className="text-xs text-blue-600">{selectedExercise.equipment}</p>
+                  <p className="text-xs text-blue-600 dark:text-blue-400">{selectedExercise.equipment}</p>
                 )}
                 {selectedExercise.instructions && (
-                  <p className="text-xs text-blue-600 mt-1">{selectedExercise.instructions}</p>
+                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">{selectedExercise.instructions}</p>
                 )}
               </div>
             )}
@@ -215,7 +215,7 @@ export default function LogExercise() {
 
           {/* Date */}
           <div>
-            <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
               <Calendar className="h-4 w-4 inline mr-1" />
               Date *
             </label>
@@ -231,7 +231,7 @@ export default function LogExercise() {
 
           {/* Duration */}
           <div>
-            <label htmlFor="duration_minutes" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="duration_minutes" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
               <Clock className="h-4 w-4 inline mr-1" />
               Duration (minutes)
             </label>
@@ -253,7 +253,7 @@ export default function LogExercise() {
 
           {/* Notes */}
           <div>
-            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
               <FileText className="h-4 w-4 inline mr-1" />
               Notes / Description
             </label>
@@ -272,11 +272,11 @@ export default function LogExercise() {
           </div>
 
           {/* Submit Button */}
-          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-600">
             <button
               type="button"
               onClick={() => navigate('/workouts')}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
             >
               Cancel
             </button>
@@ -293,9 +293,9 @@ export default function LogExercise() {
       </div>
 
       {/* Help Text */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="font-medium text-blue-900 mb-2">💡 Quick Tips</h3>
-        <ul className="text-sm text-blue-700 space-y-1">
+      <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 rounded-lg p-4">
+        <h3 className="font-medium text-blue-900 dark:text-blue-100 mb-2">💡 Quick Tips</h3>
+        <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
           <li>• This creates a single-exercise workout session</li>
           <li>• Perfect for cardio, stretching, or standalone exercises</li>
           <li>• Use the notes field to track sets, reps, distance, or any other details</li>

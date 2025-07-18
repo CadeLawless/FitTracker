@@ -114,32 +114,32 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
       name: 'Cutting',
       description: 'Lose weight while maintaining muscle',
       icon: TrendingDown,
-      color: 'text-red-600 bg-red-50 border-red-200',
+      color: 'text-red-600 bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-400/40',
     },
     {
       id: 'bulking',
       name: 'Bulking',
       description: 'Gain weight to build muscle',
       icon: TrendingUp,
-      color: 'text-green-600 bg-green-50 border-green-200',
+      color: 'text-green-600 bg-green-50 dark:bg-green-200/10 border-green-200 dark:border-green-400/40',
     },
     {
       id: 'maintaining',
       name: 'Maintaining',
       description: 'Maintain weight, improve body composition',
       icon: Minus,
-      color: 'text-blue-600 bg-blue-50 border-blue-200',
+      color: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border-blue-200',
     },
   ];
 
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl w-full space-y-6 lg:space-y-8 p-6 lg:p-8 bg-white rounded-xl shadow-lg">
+      <div className="max-w-2xl w-full space-y-6 lg:space-y-8 p-6 lg:p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
         {/* Header */}
         <div className="text-center">
-          <Target className="h-10 w-10 lg:h-12 lg:w-12 text-blue-600 mx-auto" />
-          <h2 className="mt-4 text-2xl lg:text-3xl font-bold text-gray-900">Set Your Goals</h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <Target className="h-10 w-10 lg:h-12 lg:w-12 text-blue-600 dark:text-blue-400 mx-auto" />
+          <h2 className="mt-4 text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100">Set Your Goals</h2>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             Let's personalize your fitness journey
           </p>
           <div className="mt-4 flex justify-center">
@@ -157,7 +157,7 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+          <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-400/40 text-red-600 px-4 py-3 rounded-lg text-sm">
             {error}
           </div>
         )}
@@ -166,11 +166,11 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
           {/* Step 1: Basic Info */}
           {step === 1 && (
             <div className="space-y-6">
-              <h3 className="text-lg lg:text-xl font-semibold text-gray-900">Basic Information</h3>
+              <h3 className="text-lg lg:text-xl font-semibold text-gray-900 dark:text-gray-100">Basic Information</h3>
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                 <div>
-                  <label htmlFor="starting_weight" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="starting_weight" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Current Weight (lbs)
                   </label>
                   <div className="mt-1 relative">
@@ -189,7 +189,7 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Height
                   </label>
                   <div className="mt-1 grid grid-cols-2 gap-2">
@@ -230,7 +230,7 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
               </div>
 
               <div>
-                <label htmlFor="activity_level" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="activity_level" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Activity Level
                 </label>
                 <FormInput
@@ -257,7 +257,7 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
           {/* Step 2: Goal Type */}
           {step === 2 && (
             <div className="space-y-6">
-              <h3 className="text-lg lg:text-xl font-semibold text-gray-900">What's Your Goal?</h3>
+              <h3 className="text-lg lg:text-xl font-semibold text-gray-900 dark:text-gray-100">What's Your Goal?</h3>
               
               <div className="grid grid-cols-1 gap-3 lg:gap-4">
                 {goalTypes.map((goal) => {
@@ -268,7 +268,7 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
                       className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
                         formData.goal_type === goal.id
                           ? goal.color
-                          : 'border-gray-300 bg-white hover:bg-gray-50'
+                          : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
                       }`}
                     >
                       <input
@@ -296,11 +296,11 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
           {/* Step 3: Target */}
           {step === 3 && (
             <div className="space-y-6">
-              <h3 className="text-lg lg:text-xl font-semibold text-gray-900">Set Your Target</h3>
+              <h3 className="text-lg lg:text-xl font-semibold text-gray-900 dark:text-gray-100">Set Your Target</h3>
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                 <div>
-                  <label htmlFor="target_weight" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="target_weight" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Target Weight (lbs)
                   </label>
                   <FormInput
@@ -316,7 +316,7 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
                 </div>
 
                 <div>
-                  <label htmlFor="target_date" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="target_date" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Target Date (optional)
                   </label>
                   <FormInput
@@ -331,15 +331,15 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
               </div>
 
               {formData.starting_weight && formData.target_weight && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-4">
                   <div className="flex items-center">
-                    <Target className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0" />
+                    <Target className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2 flex-shrink-0" />
                     <div>
-                      <p className="text-sm font-medium text-blue-900">
+                      <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
                         Goal: {formData.goal_type === 'cutting' ? 'Lose' : formData.goal_type === 'bulking' ? 'Gain' : 'Maintain'} {' '}
                         {Math.abs(parseFloat(formData.target_weight) - parseFloat(formData.starting_weight)).toFixed(1)} lbs
                       </p>
-                      <p className="text-xs text-blue-700">
+                      <p className="text-xs text-blue-700 dark:text-blue-300">
                         From {formData.starting_weight} lbs to {formData.target_weight} lbs
                       </p>
                     </div>
@@ -355,7 +355,7 @@ export default function GoalSetup({ onComplete }: GoalSetupProps) {
               <button
                 type="button"
                 onClick={() => setStep(step - 1)}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
               >
                 Previous
               </button>

@@ -523,13 +523,13 @@ export default function MeasurementsTracker() {
   const getNotificationColors = (type: Notification['type']) => {
     switch (type) {
       case 'success':
-        return 'bg-green-50 border-green-200 text-green-800';
+        return 'bg-green-50 dark:bg-green-200/10 border-green-200 dark:border-green-400/40 text-green-800 dark:text-green-200';
       case 'error':
-        return 'bg-red-50 border-red-200 text-red-800';
+        return 'bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-400/40 text-red-800';
       case 'warning':
         return 'bg-yellow-50 border-yellow-200 text-yellow-800';
       default:
-        return 'bg-blue-50 border-blue-200 text-blue-800';
+        return 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 text-blue-800';
     }
   };
 
@@ -554,7 +554,7 @@ export default function MeasurementsTracker() {
                 <div className="ml-4 flex-shrink-0 flex">
                   <button
                     onClick={() => removeNotification(notification.id)}
-                    className="inline-flex text-gray-400 hover:text-subheading-theme focus:outline-none"
+                    className="inline-flex text-gray-400 hover:text-gray-600 dark:text-gray-400 focus:outline-none"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -568,18 +568,18 @@ export default function MeasurementsTracker() {
       {/* Delete Confirmation Modal */}
       {deleteConfirmation.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-theme rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
                   <AlertTriangle className="h-6 w-6 text-red-600" />
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-theme">Delete Measurement Entry</h3>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Delete Measurement Entry</h3>
                 </div>
               </div>
               <div className="mb-6">
-                <p className="text-sm text-subheading-theme">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   Are you sure you want to delete the measurement entry from{' '}
                   <span className="font-medium">{deleteConfirmation.entryDate}</span>?
                   This action cannot be undone.
@@ -588,7 +588,7 @@ export default function MeasurementsTracker() {
               <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
                 <button
                   onClick={handleDeleteCancel}
-                  className="px-4 py-2 border border-input-theme rounded-lg text-input-label-theme hover:bg-secondary-theme transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-input-theme rounded-lg text-gray-700 dark:text-gray-200 hover:bg-secondary-theme transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -607,13 +607,13 @@ export default function MeasurementsTracker() {
       {/* Customize Fields Modal */}
       {showCustomizeFields && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-theme rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-medium text-theme">Customize Measurement Fields</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Customize Measurement Fields</h3>
                 <button
                   onClick={() => setShowCustomizeFields(false)}
-                  className="text-gray-400 hover:text-subheading-theme p-1"
+                  className="text-gray-400 hover:text-gray-600 dark:text-gray-400 p-1"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -621,7 +621,7 @@ export default function MeasurementsTracker() {
 
               {/* Add Custom Field */}
               <div className="mb-6 p-4 bg-secondary-theme rounded-lg">
-                <h4 className="text-sm font-medium text-theme mb-3">Add Custom Field</h4>
+                <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Add Custom Field</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <FormInput
                     type="text"
@@ -648,13 +648,13 @@ export default function MeasurementsTracker() {
 
               {/* Active Fields */}
               <div className="mb-6">
-                <h4 className="text-sm font-medium text-theme mb-3">Active Fields (shown in add form)</h4>
+                <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Active Fields (shown in add form)</h4>
                 <div className="space-y-2">
                   {activeFields.map((field) => (
-                    <div key={field.id} className="flex items-center justify-between p-3 bg-light-green-theme border border-green-theme rounded-lg">
+                    <div key={field.id} className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-200/10 border border-green-200 dark:border-green-400/40 rounded-lg">
                       <div>
-                        <span className="font-medium text-theme">{field.field_name}</span>
-                        <span className="text-sm text-subheading-theme ml-2">({field.unit})</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{field.field_name}</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-400 ml-2">({field.unit})</span>
                       </div>
                       <button
                         onClick={() => toggleFieldActive(field)}
@@ -671,17 +671,17 @@ export default function MeasurementsTracker() {
               {/* Inactive Fields */}
               {inactiveFields.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-medium text-theme mb-3">Hidden Fields</h4>
+                  <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Hidden Fields</h4>
                   <div className="space-y-2">
                     {inactiveFields.map((field) => (
-                      <div key={field.id} className="flex items-center justify-between p-3 bg-secondary-theme border border-theme rounded-lg">
+                      <div key={field.id} className="flex items-center justify-between p-3 bg-secondary-theme border border-gray-200 dark:border-gray-600 rounded-lg">
                         <div>
-                          <span className="font-medium text-theme">{field.field_name}</span>
-                          <span className="text-sm text-subheading-theme ml-2">({field.unit})</span>
+                          <span className="font-medium text-gray-900 dark:text-gray-100">{field.field_name}</span>
+                          <span className="text-sm text-gray-600 dark:text-gray-400 ml-2">({field.unit})</span>
                         </div>
                         <button
                           onClick={() => toggleFieldActive(field)}
-                          className="flex items-center px-2 py-1 text-input-label-theme bg-hover-light-theme rounded transition-colors text-sm"
+                          className="flex items-center px-2 py-1 text-gray-700 dark:text-gray-200 bg-hover-light-theme rounded transition-colors text-sm"
                         >
                           <Eye className="h-4 w-4 mr-1" />
                           Show
@@ -692,7 +692,7 @@ export default function MeasurementsTracker() {
                 </div>
               )}
 
-              <div className="flex justify-end pt-6 border-t border-theme mt-6">
+              <div className="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-600 mt-6">
                 <button
                   onClick={() => setShowCustomizeFields(false)}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm lg:text-base"
@@ -709,13 +709,13 @@ export default function MeasurementsTracker() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-theme">Body Measurements</h1>
-            <p className="mt-2 text-sm lg:text-base text-subheading-theme">Track your body measurements and progress over time.</p>
+            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100">Body Measurements</h1>
+            <p className="mt-2 text-sm lg:text-base text-gray-600 dark:text-gray-400">Track your body measurements and progress over time.</p>
           </div>
           <div className="flex gap-3">
             <button
               onClick={() => setShowCustomizeFields(true)}
-              className="flex items-center justify-center px-4 py-2 border border-input-theme text-input-label-theme rounded-lg hover:bg-secondary-theme transition-colors text-sm lg:text-base"
+              className="flex items-center justify-center px-4 py-2 border border-input-theme text-gray-700 dark:text-gray-200 rounded-lg hover:bg-secondary-theme transition-colors text-sm lg:text-base"
             >
               <Settings className="h-4 w-4 mr-2" />
               Customize Fields
@@ -738,7 +738,7 @@ export default function MeasurementsTracker() {
               const change = getMeasurementChange(field.field_name);
               
               return (
-                <div key={field.id} className="bg-theme rounded-lg shadow-sm border border-theme p-4 lg:p-6">
+                <div key={field.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
                   <div className="flex items-center justify-between mb-3">
                     <Ruler className="h-6 w-6 lg:h-8 lg:w-8 text-blue-theme" />
                     {change !== null && (
@@ -752,8 +752,8 @@ export default function MeasurementsTracker() {
                     )}
                   </div>
                   <div>
-                    <p className="text-xs lg:text-sm font-medium text-subheading-theme">{field.field_name}</p>
-                    <p className="text-lg lg:text-2xl font-bold text-theme">
+                    <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">{field.field_name}</p>
+                    <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">
                       {latest !== null ? `${latest} ${field.unit}` : 'No data'}
                     </p>
                     {change !== null && (
@@ -770,12 +770,12 @@ export default function MeasurementsTracker() {
   
         {/* Add Entry Form */}
         {showForm && (
-          <div ref={formRef} className="bg-theme rounded-lg shadow-sm border border-theme p-4 lg:p-6">
+          <div ref={formRef} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
             <div className="flex items-center justify-between mb-4 lg:mb-6">
-              <h2 className="text-base lg:text-lg font-semibold text-theme">Add Measurement Entry</h2>
+              <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Add Measurement Entry</h2>
               <button
                 onClick={resetForm}
-                className="text-gray-400 hover:text-subheading-theme p-1"
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-400 p-1"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -784,7 +784,7 @@ export default function MeasurementsTracker() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="date" className="block text-sm font-medium text-input-label-theme">
+                  <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                     Date
                   </label>
                   <FormInput
@@ -800,11 +800,11 @@ export default function MeasurementsTracker() {
               {/* Measurement Fields */}
               {activeFields.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-input-label-theme mb-3">Measurements</h3>
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">Measurements</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {activeFieldsWithoutBodyFat.map((field) => (
                       <div key={field.id}>
-                        <label className="block text-sm font-medium text-input-label-theme">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                           {field.field_name} ({field.unit})
                         </label>
                         <FormInput
@@ -825,30 +825,30 @@ export default function MeasurementsTracker() {
 
               {/* Body Fat Calculator Section - Mobile Responsive */}
               {bodyFatField && (
-                <div className="border-t border-theme pt-6">
+                <div className="border-t border-gray-200 dark:border-gray-600 pt-6">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-                    <h3 className="text-sm lg:text-base font-medium text-theme flex items-center">
+                    <h3 className="text-sm lg:text-base font-medium text-gray-900 dark:text-gray-100 flex items-center">
                       <Calculator className="h-4 w-4 lg:h-5 lg:w-5 mr-2 text-green-600 flex-shrink-0" />
                       Body Fat Calculator
                     </h3>
                     <button
                       type="button"
                       onClick={resetBodyFatCalculator}
-                      className="text-sm text-input-label-theme hover:text-label-theme self-start sm:self-auto"
+                      className="text-sm text-gray-700 dark:text-gray-200 hover:text-label-theme self-start sm:self-auto"
                     >
                       Reset
                     </button>
                   </div>
                   
                   <div className="bg-secondary-theme rounded-lg p-4 space-y-4">
-                    <p className="text-sm text-subheading-theme">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                       Use skinfold calipers to measure at the specified sites. Measurements should be in millimeters.
                     </p>
                     
                     {/* User Info - Mobile Responsive */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-input-label-theme">Gender</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Gender</label>
                         <FormInput
                           inputType='select'
                           value={bodyFatData.gender}
@@ -862,7 +862,7 @@ export default function MeasurementsTracker() {
                         </FormInput>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-input-label-theme">Age</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Age</label>
                         <FormInput
                           type="number"
                           value={bodyFatData.age}
@@ -875,10 +875,10 @@ export default function MeasurementsTracker() {
                     {/* Skinfold Measurements - Mobile Responsive */}
                     {bodyFatData.gender === 'male' ? (
                       <div className="space-y-4">
-                        <h4 className="font-medium text-theme">Male Protocol (3-Site)</h4>
+                        <h4 className="font-medium text-gray-900 dark:text-gray-100">Male Protocol (3-Site)</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-input-label-theme">Chest (mm)</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Chest (mm)</label>
                             <FormInput
                               type="number"
                               step="0.1"
@@ -888,7 +888,7 @@ export default function MeasurementsTracker() {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-input-label-theme">Abdominal (mm)</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Abdominal (mm)</label>
                             <FormInput
                               type="number"
                               step="0.1"
@@ -898,7 +898,7 @@ export default function MeasurementsTracker() {
                             />
                           </div>
                           <div className="sm:col-span-2 lg:col-span-1">
-                            <label className="block text-sm font-medium text-input-label-theme">Thigh (mm)</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Thigh (mm)</label>
                             <FormInput
                               type="number"
                               step="0.1"
@@ -911,10 +911,10 @@ export default function MeasurementsTracker() {
                       </div>
                     ) : bodyFatData.gender === 'female' ? (
                       <div className="space-y-4">
-                        <h4 className="font-medium text-theme">Female Protocol (3-Site)</h4>
+                        <h4 className="font-medium text-gray-900 dark:text-gray-100">Female Protocol (3-Site)</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-input-label-theme">Tricep (mm)</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Tricep (mm)</label>
                             <FormInput
                               type="number"
                               step="0.1"
@@ -924,7 +924,7 @@ export default function MeasurementsTracker() {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-input-label-theme">Suprailiac (mm)</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Suprailiac (mm)</label>
                             <FormInput
                               type="number"
                               step="0.1"
@@ -934,7 +934,7 @@ export default function MeasurementsTracker() {
                             />
                           </div>
                           <div className="sm:col-span-2 lg:col-span-1">
-                            <label className="block text-sm font-medium text-input-label-theme">Thigh (mm)</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Thigh (mm)</label>
                             <FormInput
                               type="number"
                               step="0.1"
@@ -966,7 +966,7 @@ export default function MeasurementsTracker() {
 
               {/* Body Fat Result - Mobile Responsive */}
               <div>
-                <label htmlFor="body_fat_percentage" className="block text-sm font-medium text-input-label-theme">
+                <label htmlFor="body_fat_percentage" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Body Fat Percentage (%)
                 </label>
                 <FormInput
@@ -986,7 +986,7 @@ export default function MeasurementsTracker() {
               </div>
   
               <div>
-                <label htmlFor="notes" className="block text-sm font-medium text-input-label-theme">
+                <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Notes (optional)
                 </label>
                 <FormInput
@@ -999,11 +999,11 @@ export default function MeasurementsTracker() {
                 />
               </div>
               
-              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-theme">
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-600">
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-4 py-2 border border-input-theme rounded-lg text-input-label-theme hover:bg-secondary-theme transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-input-theme rounded-lg text-gray-700 dark:text-gray-200 hover:bg-secondary-theme transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -1019,9 +1019,9 @@ export default function MeasurementsTracker() {
         )}
   
         {/* Measurement History */}
-        <div className="bg-theme rounded-lg shadow-sm border border-theme">
-          <div className="p-4 lg:p-6 border-b border-theme">
-            <h2 className="text-base lg:text-lg font-semibold text-theme">Measurement History</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+          <div className="p-4 lg:p-6 border-b border-gray-200 dark:border-gray-600">
+            <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Measurement History</h2>
           </div>
           <div className="p-4 lg:p-6">
             {entries.length > 0 ? (
@@ -1034,11 +1034,11 @@ export default function MeasurementsTracker() {
                         <div className="border border-blue-200 rounded-lg p-4 bg-light-blue-theme">
                           <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="flex items-center justify-between mb-4">
-                              <h3 className="text-sm font-medium text-theme">Edit Measurement Entry</h3>
+                              <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">Edit Measurement Entry</h3>
                               <button
                                 type="button"
                                 onClick={() => setEditingEntry(null)}
-                                className="text-gray-400 hover:text-subheading-theme p-1"
+                                className="text-gray-400 hover:text-gray-600 dark:text-gray-400 p-1"
                               >
                                 <X className="h-4 w-4" />
                               </button>
@@ -1046,7 +1046,7 @@ export default function MeasurementsTracker() {
                             
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div>
-                                <label className="block text-sm font-medium text-input-label-theme">Date</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Date</label>
                                 <FormInput
                                   type="date"
                                   required
@@ -1058,7 +1058,7 @@ export default function MeasurementsTracker() {
   
                             {/* Show all fields that have data or are currently active */}
                             <div>
-                              <h4 className="text-sm font-medium text-input-label-theme mb-3">Measurements</h4>
+                              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">Measurements</h4>
                               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {measurementFields
                                   .filter(field => {
@@ -1066,7 +1066,7 @@ export default function MeasurementsTracker() {
                                   })
                                   .map((field) => (
                                     <div key={field.id}>
-                                      <label className="block text-sm font-medium text-input-label-theme">
+                                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                                         {field.field_name} ({field.unit})
                                         {!field.is_active && (
                                           <span className="text-xs text-gray-500 ml-1">(hidden field)</span>
@@ -1087,7 +1087,7 @@ export default function MeasurementsTracker() {
                             </div>
                             
                             <div>
-                              <label className="block text-sm font-medium text-input-label-theme">Notes (optional)</label>
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">Notes (optional)</label>
                               <FormInput
                                 inputType='textarea'
                                 rows={2}
@@ -1100,7 +1100,7 @@ export default function MeasurementsTracker() {
                               <button
                                 type="button"
                                 onClick={() => setEditingEntry(null)}
-                                className="px-3 py-2 border border-input-theme rounded-lg text-input-label-theme hover:bg-secondary-theme transition-colors text-sm"
+                                className="px-3 py-2 border border-input-theme rounded-lg text-gray-700 dark:text-gray-200 hover:bg-secondary-theme transition-colors text-sm"
                               >
                                 Cancel
                               </button>
@@ -1116,18 +1116,18 @@ export default function MeasurementsTracker() {
                         </div>
                       ) : (
                         /* Regular Entry Display - Restored Original Styling */
-                        <div className="border border-theme rounded-lg p-4 lg:p-6">
+                        <div className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 lg:p-6">
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
                             <div className="flex items-center">
                               <Calendar className="h-4 w-4 lg:h-5 lg:w-5 text-gray-400 mr-2 flex-shrink-0" />
-                              <span className="font-medium text-theme text-sm lg:text-base">
+                              <span className="font-medium text-gray-900 dark:text-gray-100 text-sm lg:text-base">
                                 {formatDate(entry.date).toLocaleDateString()}
                               </span>
                             </div>
                             <div className="flex space-x-2">
                               <button
                                 onClick={() => handleEdit(entry)}
-                                className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                                className="p-2 text-gray-400 hover:text-blue-600 dark:text-blue-400 transition-colors"
                               >
                                 <Edit2 className="h-4 w-4" />
                               </button>
@@ -1148,7 +1148,7 @@ export default function MeasurementsTracker() {
                                     <p className="text-xs text-secondary-label-theme uppercase tracking-wide truncate">
                                       {value.field?.field_name}
                                     </p>
-                                    <p className="text-sm lg:text-base font-semibold text-theme">
+                                    <p className="text-sm lg:text-base font-semibold text-gray-900 dark:text-gray-100">
                                       {value.value} {value.field?.unit}
                                     </p>
                                   </div>
@@ -1174,7 +1174,7 @@ export default function MeasurementsTracker() {
                 <p className="text-gray-500 mb-2 text-sm lg:text-base">No measurements recorded yet</p>
                 <button
                   onClick={handleAddNew}
-                  className="mt-2 text-blue-theme hover:text-blue-700 text-sm font-medium"
+                  className="mt-2 text-blue-theme hover:text-blue-700 dark:text-blue-300 text-sm font-medium"
                 >
                   Add your first measurement
                 </button>

@@ -281,13 +281,13 @@ export default function RoutineBuilder() {
       {/* Exercise Selector Modal */}
       {showExerciseSelector && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-600">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Add Exercise</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Add Exercise</h3>
                 <button
                   onClick={() => setShowExerciseSelector(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 dark:text-gray-400"
                 >
                   <X className="h-6 w-6" />
                 </button>
@@ -318,17 +318,17 @@ export default function RoutineBuilder() {
             <div className="flex-1 overflow-y-auto p-6">
               <div className="space-y-2">
                 {filteredExercises.map((exercise) => (
-                  <div key={exercise.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div key={exercise.id} className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
                     <div className="flex-1 min-w-0 cursor-pointer" onClick={() => addExercise(exercise)}>
                       <div className="flex items-center gap-2">
-                        <p className="font-medium text-gray-900">{exercise.name}</p>
+                        <p className="font-medium text-gray-900 dark:text-gray-100">{exercise.name}</p>
                         {exercise.is_custom && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-400/20 text-green-800 dark:text-green-200">
                             Custom
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600">{exercise.muscle_group}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{exercise.muscle_group}</p>
                       {exercise.equipment && (
                         <p className="text-xs text-gray-500">{exercise.equipment}</p>
                       )}
@@ -398,17 +398,17 @@ export default function RoutineBuilder() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100">
               {isEditing ? 'Edit Routine' : 'Create New Routine'}
             </h1>
-            <p className="mt-2 text-sm lg:text-base text-gray-600">
+            <p className="mt-2 text-sm lg:text-base text-gray-600 dark:text-gray-400">
               {isEditing ? 'Modify your workout routine' : 'Build a custom workout routine with exercises and sets'}
             </p>
           </div>
           <div className="flex gap-3">
             <button
               onClick={() => navigate('/workouts')}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
             >
               Cancel
             </button>
@@ -424,12 +424,12 @@ export default function RoutineBuilder() {
         </div>
   
         {/* Routine Form */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
-          <h2 className="text-base lg:text-lg font-semibold text-gray-900 mb-4">Routine Details</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
+          <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Routine Details</h2>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                 Routine Name
               </label>
               <FormInput
@@ -442,7 +442,7 @@ export default function RoutineBuilder() {
               />
             </div>
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                 Description (optional)
               </label>
               <FormInput
@@ -457,10 +457,10 @@ export default function RoutineBuilder() {
         </div>
   
         {/* Exercises */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="p-4 lg:p-6 border-b border-gray-200">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+          <div className="p-4 lg:p-6 border-b border-gray-200 dark:border-gray-600">
             <div className="flex items-center justify-between">
-              <h2 className="text-base lg:text-lg font-semibold text-gray-900">Exercises</h2>
+              <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Exercises</h2>
               <button
                 onClick={() => setShowExerciseSelector(true)}
                 className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
@@ -477,7 +477,7 @@ export default function RoutineBuilder() {
                 {routineExercises.map((routineExercise, index) => (
                   <div 
                     key={routineExercise.id} 
-                    className={`border border-gray-200 rounded-lg p-4 transition-all duration-200 ${
+                    className={`border border-gray-200 dark:border-gray-600 rounded-lg p-4 transition-all duration-200 ${
                       draggedIndex === index ? 'opacity-50 scale-95' : 'hover:shadow-md'
                     }`}
                     draggable
@@ -489,7 +489,7 @@ export default function RoutineBuilder() {
                   >
                     <div className="flex items-start gap-4">
                       <div className="flex items-center cursor-move">
-                        <GripVertical className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
+                        <GripVertical className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:text-gray-400 transition-colors" />
                         <span className="ml-2 text-sm font-medium text-gray-500">#{index + 1}</span>
                       </div>
                       
@@ -497,14 +497,14 @@ export default function RoutineBuilder() {
                         <div className="flex items-center justify-between mb-3">
                           <div>
                             <div className="flex items-center gap-2">
-                              <h3 className="font-medium text-gray-900">{routineExercise.exercise?.name}</h3>
+                              <h3 className="font-medium text-gray-900 dark:text-gray-100">{routineExercise.exercise?.name}</h3>
                               {routineExercise.exercise?.is_custom && (
-                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-400/20 text-green-800 dark:text-green-200">
                                   Custom
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm text-gray-600">{routineExercise.exercise?.muscle_group}</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">{routineExercise.exercise?.muscle_group}</p>
                             {routineExercise.exercise?.equipment && (
                               <p className="text-xs text-gray-500">{routineExercise.exercise.equipment}</p>
                             )}
@@ -527,7 +527,7 @@ export default function RoutineBuilder() {
                                 onChange={(e) => updateExercise(index, 'requires_weight', !e.target.checked)}
                                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                               />
-                              <span className="ml-2 text-sm text-gray-700">Skip Weight</span>
+                              <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">Skip Weight</span>
                             </label>
                             <label className="flex items-center">
                               <input
@@ -536,14 +536,14 @@ export default function RoutineBuilder() {
                                 onChange={(e) => updateExercise(index, 'requires_reps', !e.target.checked)}
                                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                               />
-                              <span className="ml-2 text-sm text-gray-700">Skip Reps</span>
+                              <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">Skip Reps</span>
                             </label>
                           </div>
                         </div>
                         
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">Sets</label>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Sets</label>
                             <FormInput
                               inputMode="numeric"
                               type="number"
@@ -554,7 +554,7 @@ export default function RoutineBuilder() {
                           </div>
                           {routineExercise.requires_reps && (
                             <div>
-                              <label className="block text-xs font-medium text-gray-700 mb-1">Reps</label>
+                              <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Reps</label>
                               <FormInput
                                 inputMode="numeric"
                                 type="number"
@@ -567,7 +567,7 @@ export default function RoutineBuilder() {
                           )}
                           {routineExercise.requires_weight && (
                             <div>
-                              <label className="block text-xs font-medium text-gray-700 mb-1">Weight (lbs)</label>
+                              <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Weight (lbs)</label>
                               <FormInput
                                 type="number"
                                 step="0.5"
@@ -582,7 +582,7 @@ export default function RoutineBuilder() {
 
                         {/* Rest Timer - Minutes and Seconds */}
                         <div className="mt-3">
-                          <label className="block text-xs font-medium text-gray-700 mb-2">
+                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-2">
                             <Timer className="h-3 w-3 inline mr-1" />
                             Rest Time
                           </label>
@@ -630,7 +630,7 @@ export default function RoutineBuilder() {
                         </div>
                         
                         <div className="mt-3">
-                          <label className="block text-xs font-medium text-gray-700 mb-1">Notes (optional)</label>
+                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Notes (optional)</label>
                           <FormInput
                             type="text"
                             value={routineExercise.notes || ''}
@@ -649,7 +649,7 @@ export default function RoutineBuilder() {
                 <p className="text-gray-500 mb-2">No exercises added yet</p>
                 <button
                   onClick={() => setShowExerciseSelector(true)}
-                  className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                  className="text-blue-600 hover:text-blue-700 dark:text-blue-300 text-sm font-medium"
                 >
                   Add your first exercise
                 </button>

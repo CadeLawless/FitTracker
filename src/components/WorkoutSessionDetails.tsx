@@ -6,6 +6,8 @@ import { formatDate } from '../lib/date';
 import type { WorkoutSession, ExerciseSet, Exercise } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import FormInput from './ui/FormInput';
+import { formatMinutes } from '../lib/formatMinutes';
+import { getSessionStatusBadge } from '../lib/getSessionStatusBadge';
 
 interface WorkoutSessionWithSets extends WorkoutSession {
   sets: (ExerciseSet & { exercise: Exercise })[];
@@ -232,33 +234,6 @@ export default function WorkoutSessionDetails() {
     return '';
   };
 
-  const getSessionStatusBadge = () => {
-    if (!session) return null;
-    
-    switch (session.status) {
-      case 'active':
-        return (
-          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            Active Session
-          </span>
-        );
-      case 'cancelled':
-        return (
-          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-            Cancelled
-          </span>
-        );
-      case 'completed':
-        return (
-          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            Completed
-          </span>
-        );
-      default:
-        return null;
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -273,7 +248,7 @@ export default function WorkoutSessionDetails() {
         <p className="text-gray-500">Workout session not found</p>
         <button
           onClick={() => navigate('/workouts')}
-          className="mt-4 text-blue-600 hover:text-blue-700"
+          className="mt-4 text-blue-600 hover:text-blue-700 dark:text-blue-300"
         >
           Back to Workouts
         </button>
@@ -292,14 +267,14 @@ export default function WorkoutSessionDetails() {
           onClick={() => navigate('/workouts')}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
-          <ArrowLeft className="h-5 w-5 text-gray-600" />
+          <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-400" />
         </button>
         <div className="flex-1">
           <div className="flex flex-wrap items-center gap-3 mb-2">
-            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">{session.name}</h1>
-            {getSessionStatusBadge()}
+            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100">{session.name}</h1>
+            {getSessionStatusBadge(session)}
           </div>
-          <div className="flex items-center flex-wrap gap-4 text-sm text-gray-600">
+          <div className="flex items-center flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
             <div className="flex items-center">
               <Calendar className="h-4 w-4 mr-1" />
               {formatDate(session.date).toLocaleDateString('en-US', {
@@ -312,7 +287,7 @@ export default function WorkoutSessionDetails() {
             {session.duration_minutes && (
               <div className="flex items-center">
                 <Clock className="h-4 w-4 mr-1" />
-                {session.duration_minutes} minutes
+                {formatMinutes(session.duration_minutes)}
               </div>
             )}
             {session.routine && (
@@ -346,37 +321,37 @@ export default function WorkoutSessionDetails() {
 
       {/* Workout Stats */}
       <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 lg:gap-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
           <div className="flex items-center">
             <Dumbbell className="h-6 w-6 lg:h-8 lg:w-8 text-purple-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-              <p className="text-xs lg:text-sm font-medium text-gray-600">Total Sets</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900">{getTotalSets()}</p>
+              <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Total Sets</p>
+              <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">{getTotalSets()}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
           <div className="flex items-center">
-            <Target className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600 flex-shrink-0" />
+            <Target className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600 dark:text-blue-400 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-              <p className="text-xs lg:text-sm font-medium text-gray-600">Total Reps</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900">{getTotalReps()}</p>
+              <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Total Reps</p>
+              <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">{getTotalReps()}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
           <div className="flex items-center">
             <TrendingUp className="h-6 w-6 lg:h-8 lg:w-8 text-green-600 flex-shrink-0" />
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-              <p className="text-xs lg:text-sm font-medium text-gray-600">Total Volume</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900">{getTotalVolume().toLocaleString()} lbs</p>
+              <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Total Volume</p>
+              <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">{getTotalVolume().toLocaleString()} lbs</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
           <div className="flex items-center">
             {totalDurationMinutes > 0 ? (
               <Timer className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 flex-shrink-0" />
@@ -384,8 +359,8 @@ export default function WorkoutSessionDetails() {
               <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 flex-shrink-0" />
             )}
             <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-              <p className="text-xs lg:text-sm font-medium text-gray-600">{totalDurationMinutes > 0 ? "Exercise Time" : "Avg Weight"}</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900">
+              <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">{totalDurationMinutes > 0 ? "Exercise Time" : "Avg Weight"}</p>
+              <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {totalDurationMinutes > 0 ? `${totalDurationMinutes}min` : `${getAverageWeight().toFixed(1)} lbs`}
               </p>
             </div>
@@ -396,18 +371,18 @@ export default function WorkoutSessionDetails() {
       {/* Exercise Details */}
       <div className="space-y-6">
         {exerciseGroups.map((group) => (
-          <div key={group.exercise.id} className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-4 lg:p-6 border-b border-gray-200">
+          <div key={group.exercise.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+            <div className="p-4 lg:p-6 border-b border-gray-200 dark:border-gray-600">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{group.exercise.name}</h3>
-                  <p className="text-sm text-gray-600">{group.exercise.muscle_group}</p>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{group.exercise.name}</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{group.exercise.muscle_group}</p>
                   {group.exercise.equipment && (
                     <p className="text-xs text-gray-500">{group.exercise.equipment}</p>
                   )}
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">{group.sets.length} sets</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{group.sets.length} sets</p>
                   <p className="text-xs text-gray-500">
                     {group.sets.reduce((total, set) => total + (set.reps || 0), 0) > 0 && 
                       `${group.sets.reduce((total, set) => total + (set.reps || 0), 0)} total reps`
@@ -423,14 +398,14 @@ export default function WorkoutSessionDetails() {
             <div className="p-4 lg:p-6">
               <div className="space-y-3">
                 {group.sets.map((set) => (
-                  <div key={set.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm font-medium text-gray-600 w-12">
+                  <div key={set.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div className="flex flex-grow sm:flex-grow-0 items-center gap-4">
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400 w-12">
                         Set {set.set_number}
                       </span>
                       
                       {editingSet === set.id ? (
-                        <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex flex-grow sm:flex-grow-0 flex-col sm:flex-row sm:items-center gap-2 flex-wrap p-2">
                           {/* Weight Input */}
                           <div className="flex items-center gap-1">
                             <FormInput
@@ -438,10 +413,10 @@ export default function WorkoutSessionDetails() {
                               step="0.5"
                               value={editFormData.weight}
                               onChange={(e) => setEditFormData({ ...editFormData, weight: e.target.value })}
-                              className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                              className="w-16 basis-[120px] flex-grow px-2 py-1 border border-gray-300 rounded text-sm"
                               placeholder="Weight"
                             />
-                            <span className="text-xs text-gray-500">lbs</span>
+                            <span className="text-xs basis-[40px] text-gray-500">lbs</span>
                           </div>
                           
                           {/* Reps Input */}
@@ -451,29 +426,28 @@ export default function WorkoutSessionDetails() {
                               type="number"
                               value={editFormData.reps}
                               onChange={(e) => setEditFormData({ ...editFormData, reps: e.target.value })}
-                              className="w-12 px-2 py-1 border border-gray-300 rounded text-sm"
+                              className="w-12 basis-[120px] flex-grow px-2 py-1 border border-gray-300 rounded text-sm"
                               placeholder="Reps"
                             />
-                            <span className="text-xs text-gray-500">reps</span>
+                            <span className="text-xs basis-[40px] text-gray-500">reps</span>
                           </div>
                           
                           {/* Duration Input */}
                           <div className="flex items-center gap-1">
-                            <Timer className="h-3 w-3 text-gray-400" />
                             <FormInput
                               type="number"
                               step="0.5"
                               value={editFormData.durationMinutes}
                               onChange={(e) => setEditFormData({ ...editFormData, durationMinutes: e.target.value })}
-                              className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                              className="w-16 basis-[120px] flex-grow px-2 py-1 border border-gray-300 rounded text-sm"
                               placeholder="Min"
                             />
-                            <span className="text-xs text-gray-500">min</span>
+                            <span className="text-xs basis-[40px] text-gray-500">min</span>
                           </div>
                         </div>
                       ) : (
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-gray-900">
+                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                             {formatSetDisplay(set)}
                           </span>
                           {getVolumeForSet(set) && (
@@ -490,7 +464,7 @@ export default function WorkoutSessionDetails() {
                         <>
                           <button
                             onClick={() => handleSaveSet(set.id)}
-                            className="p-1.5 text-green-600 hover:bg-green-100 rounded transition-colors"
+                            className="p-1.5 text-green-600 hover:bg-green-100 dark:bg-green-400/20 rounded transition-colors"
                           >
                             <Save className="h-4 w-4" />
                           </button>
@@ -528,15 +502,15 @@ export default function WorkoutSessionDetails() {
 
       {/* Notes Section */}
       {session.notes && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">Workout Notes</h3>
-          <p className="text-gray-700">{session.notes}</p>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Workout Notes</h3>
+          <p className="text-gray-700 dark:text-gray-200">{session.notes}</p>
         </div>
       )}
 
       {/* Empty State */}
       {exerciseGroups.length === 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 lg:p-12 text-center">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-8 lg:p-12 text-center">
           <Dumbbell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
           <p className="text-gray-500 mb-2">No exercises logged for this workout</p>
           <p className="text-sm text-gray-400">

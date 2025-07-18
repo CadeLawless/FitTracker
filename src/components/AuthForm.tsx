@@ -82,12 +82,12 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
 
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4 sm:px-6 lg:px-8 transition-colors">
-      <div className="max-w-md w-full my-3 space-y-6 lg:space-y-8 p-6 lg:p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+      <div className="max-w-md w-full my-3 space-y-6 lg:space-y-8 p-6 lg:p-8 bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-xl shadow-lg">
         {/* Header */}
         <div className='text-right'>
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
             title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
             {theme === 'light' ? (
@@ -101,8 +101,8 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
           <div className="flex justify-center">
             <Dumbbell className="h-10 w-10 lg:h-12 lg:w-12 text-blue-600 dark:text-blue-400" />
           </div>
-          <h2 className="mt-4 text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">FitTracker</h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+          <h2 className="mt-4 text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 dark:text-white">FitTracker</h2>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300">
             {isLogin ? 'Sign in to your account' : 'Create your account'}
           </p>
         </div>
@@ -110,7 +110,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
         {/* Form */}
         <form className="mt-6 lg:mt-8 space-y-4 lg:space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+            <div className="bg-red-50 dark:bg-red-500/10 dark:bg-red-900/50 border border-red-200 dark:border-red-400/40 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
               {error}
             </div>
           )}
@@ -119,7 +119,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
             {!isLogin && (
               <>
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-200 dark:text-gray-300">
                     Full Name
                   </label>
                   <div className="mt-1 relative">
@@ -138,7 +138,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
                 </div>
 
                 <div>
-                  <label htmlFor="birth_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label htmlFor="birth_date" className="block text-sm font-medium text-gray-700 dark:text-gray-200 dark:text-gray-300">
                     Birth Date
                   </label>
                   <div className="mt-1 relative">
@@ -156,7 +156,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
                 </div>
 
                 <div>
-                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-200 dark:text-gray-300">
                     Gender
                   </label>
                   <FormInput
@@ -178,7 +178,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-200 dark:text-gray-300">
                 Email Address
               </label>
               <FormInput
@@ -193,7 +193,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-200 dark:text-gray-300">
                 Password
               </label>
               <div className="mt-1 relative">

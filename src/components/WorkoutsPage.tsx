@@ -8,6 +8,8 @@ import { useCustomExercises } from '../hooks/useCustomExercises';
 import { CustomExerciseForm } from '../components/CustomExerciseForm';
 import { useAuth } from '../contexts/AuthContext';
 import FormInput from './ui/FormInput';
+import { formatMinutes } from '../lib/formatMinutes';
+import { getSessionStatusBadge } from '../lib/getSessionStatusBadge';
 
 interface DeleteConfirmation {
   isOpen: boolean;
@@ -165,31 +167,6 @@ export default function WorkoutsPage() {
     setShowStartWorkout(false);
   };
 
-  const getSessionStatusBadge = (session: WorkoutSession) => {
-    switch (session.status) {
-      case 'active':
-        return (
-          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            Active
-          </span>
-        );
-      case 'cancelled':
-        return (
-          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-            Cancelled
-          </span>
-        );
-      case 'completed':
-        return (
-          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            Completed
-          </span>
-        );
-      default:
-        return null;
-    }
-  };
-
   const getThisWeekSessions = () => {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -226,20 +203,20 @@ export default function WorkoutsPage() {
       {/* Delete Confirmation Modal */}
       {deleteConfirmation.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
                   <AlertTriangle className="h-6 w-6 text-red-600" />
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-gray-900">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                     Delete {deleteConfirmation.type === 'session' ? 'Workout' : 'Routine'}
                   </h3>
                 </div>
               </div>
               <div className="mb-6">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   Are you sure you want to delete{' '}
                   <span className="font-medium">"{deleteConfirmation.name}"</span>
                   {deleteConfirmation.date && (
@@ -254,7 +231,7 @@ export default function WorkoutsPage() {
               <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
                 <button
                   onClick={handleDeleteCancel}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -273,29 +250,29 @@ export default function WorkoutsPage() {
       {/* Start Workout Modal */}
       {showStartWorkout && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-4 lg:p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                   Start Workout
                 </h3>
                 <button
                   onClick={() => setShowStartWorkout(false)}
-                  className="text-gray-400 hover:text-gray-600 p-1"
+                  className="text-gray-400 hover:text-gray-600 dark:text-gray-400 p-1"
                 >
                   <X className="h-5 w-5 lg:h-6 lg:w-6" />
                 </button>
               </div>
 
               {/* Tabs */}
-              <div className="border-b border-gray-200 mb-4">
+              <div className="border-b border-gray-200 dark:border-gray-600 mb-4">
                 <nav className="-mb-px flex">
                   <button
                     onClick={() => setStartWorkoutTab('routines')}
                     className={`flex-1 py-2 px-1 text-center border-b-2 font-medium text-sm ${
                       startWorkoutTab === 'routines'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? 'border-blue-500 dark:border-blue-300 text-blue-600 dark:text-blue-400'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-200'
                     }`}
                   >
                     Routines
@@ -304,8 +281,8 @@ export default function WorkoutsPage() {
                     onClick={() => setStartWorkoutTab('exercises')}
                     className={`flex-1 py-2 px-1 text-center border-b-2 font-medium text-sm ${
                       startWorkoutTab === 'exercises'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? 'border-blue-500 dark:border-blue-300 text-blue-600 dark:text-blue-400'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-200'
                     }`}
                   >
                     Log Exercise
@@ -316,17 +293,17 @@ export default function WorkoutsPage() {
               {/* Tab Content */}
               {startWorkoutTab === 'routines' ? (
                 <div>
-                  <p className="text-sm text-gray-600 mb-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                     Select a routine to start a full workout:
                   </p>
                   <div className="space-y-2 mb-4">
                     {routines.map((routine) => (
-                      <div key={routine.id} className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors">
+                      <div key={routine.id} className="border border-gray-200 dark:border-gray-600 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
                         <div className="flex items-center justify-between">
                           <div className="min-w-0 flex-1">
-                            <h3 className="font-medium text-gray-900 text-sm lg:text-base truncate">{routine.name}</h3>
+                            <h3 className="font-medium text-gray-900 dark:text-gray-100 text-sm lg:text-base truncate">{routine.name}</h3>
                             {routine.description && (
-                              <p className="text-xs text-gray-600 truncate">{routine.description}</p>
+                              <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{routine.description}</p>
                             )}
                           </div>
                           <Link
@@ -350,7 +327,7 @@ export default function WorkoutsPage() {
                 </div>
               ) : (
                 <div>
-                  <p className="text-sm text-gray-600 mb-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                     Select an exercise to log:
                   </p>
                   
@@ -371,20 +348,20 @@ export default function WorkoutsPage() {
                     {filteredExercises.map((exercise) => (
                       <div 
                         key={exercise.id} 
-                        className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors cursor-pointer"
+                        className="border border-gray-200 dark:border-gray-600 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors cursor-pointer"
                         onClick={() => handleExerciseSelect(exercise)}
                       >
                         <div className="flex items-center justify-between">
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                              <h3 className="font-medium text-gray-900 text-sm">{exercise.name}</h3>
+                              <h3 className="font-medium text-gray-900 dark:text-gray-100 text-sm">{exercise.name}</h3>
                               {exercise.is_custom && (
-                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-400/20 text-green-800 dark:text-green-200">
                                   Custom
                                 </span>
                               )}
                             </div>
-                            <p className="text-xs text-gray-600">{exercise.muscle_group}</p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400">{exercise.muscle_group}</p>
                             {exercise.equipment && (
                               <p className="text-xs text-gray-500">{exercise.equipment}</p>
                             )}
@@ -404,10 +381,10 @@ export default function WorkoutsPage() {
                 </div>
               )}
 
-              <div className="flex justify-end pt-4 border-t border-gray-200">
+              <div className="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-600">
                 <button
                   onClick={() => setShowStartWorkout(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm lg:text-base"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
                 >
                   Cancel
                 </button>
@@ -438,8 +415,8 @@ export default function WorkoutsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Workouts</h1>
-            <p className="mt-2 text-sm lg:text-base text-gray-600">Manage your workout routines and track your sessions.</p>
+            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100">Workouts</h1>
+            <p className="mt-2 text-sm lg:text-base text-gray-600 dark:text-gray-400">Manage your workout routines and track your sessions.</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
@@ -462,42 +439,42 @@ export default function WorkoutsPage() {
         {/* Stats */}
         {sessions.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
               <div className="flex items-center">
                 <Dumbbell className="h-6 w-6 lg:h-8 lg:w-8 text-purple-600 flex-shrink-0" />
                 <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-                  <p className="text-xs lg:text-sm font-medium text-gray-600">Total Workouts</p>
-                  <p className="text-lg lg:text-2xl font-bold text-gray-900">{getCompletedSessionsCount()}</p>
+                  <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Total Workouts</p>
+                  <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">{getCompletedSessionsCount()}</p>
                 </div>
               </div>
             </div>
   
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
               <div className="flex items-center">
                 <Calendar className="h-6 w-6 lg:h-8 lg:w-8 text-green-600 flex-shrink-0" />
                 <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-                  <p className="text-xs lg:text-sm font-medium text-gray-600">This Week</p>
-                  <p className="text-lg lg:text-2xl font-bold text-gray-900">{getThisWeekSessions().length}</p>
+                  <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">This Week</p>
+                  <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">{getThisWeekSessions().length}</p>
                 </div>
               </div>
             </div>
   
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
               <div className="flex items-center">
-                <Clock className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600 flex-shrink-0" />
+                <Clock className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                 <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-                  <p className="text-xs lg:text-sm font-medium text-gray-600">Total Time</p>
-                  <p className="text-lg lg:text-2xl font-bold text-gray-900">{Math.round(getTotalDuration() / 60)}h</p>
+                  <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Total Time</p>
+                  <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">{Math.round(getTotalDuration() / 60)}h</p>
                 </div>
               </div>
             </div>
   
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
               <div className="flex items-center">
                 <Play className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 flex-shrink-0" />
                 <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-                  <p className="text-xs lg:text-sm font-medium text-gray-600">Routines</p>
-                  <p className="text-lg lg:text-2xl font-bold text-gray-900">{routines.length}</p>
+                  <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Routines</p>
+                  <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">{routines.length}</p>
                 </div>
               </div>
             </div>
@@ -505,14 +482,14 @@ export default function WorkoutsPage() {
         )}
   
         {/* Tabs */}
-        <div className="border-b border-gray-200">
+        <div className="border-b border-gray-200 dark:border-gray-600">
           <nav className="-mb-px flex space-x-4 lg:space-x-8 overflow-x-auto">
             <button
               onClick={() => setActiveTab('sessions')}
               className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'sessions'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 dark:border-blue-300 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-200'
               }`}
             >
               Recent Workouts ({sessions.length})
@@ -521,8 +498,8 @@ export default function WorkoutsPage() {
               onClick={() => setActiveTab('routines')}
               className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'routines'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 dark:border-blue-300 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-200'
               }`}
             >
               My Routines ({routines.length})
@@ -531,8 +508,8 @@ export default function WorkoutsPage() {
               onClick={() => setActiveTab('log_exercise')}
               className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'log_exercise'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 dark:border-blue-300 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-200'
               }`}
             >
               Log Exercise
@@ -541,8 +518,8 @@ export default function WorkoutsPage() {
               onClick={() => setActiveTab('custom_exercises')}
               className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'custom_exercises'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 dark:border-blue-300 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-200'
               }`}
             >
               Custom Exercises ({customExercises.length})
@@ -553,9 +530,9 @@ export default function WorkoutsPage() {
         {/* Tab Content */}
         {activeTab === 'sessions' && (
           /* Recent Workouts */
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-4 lg:p-6 border-b border-gray-200">
-              <h2 className="text-base lg:text-lg font-semibold text-gray-900">Recent Workouts</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+            <div className="p-4 lg:p-6 border-b border-gray-200 dark:border-gray-600">
+              <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Workouts</h2>
             </div>
             <div className="p-4 lg:p-6">
               {sessions.length > 0 ? (
@@ -565,10 +542,10 @@ export default function WorkoutsPage() {
                       key={session.id}
                       className={`flex items-center justify-between p-3 lg:p-4 border rounded-lg transition-colors group ${
                         session.status === 'active' 
-                          ? 'border-green-200 bg-green-50' 
+                          ? 'border-green-200 dark:border-green-400/40 bg-green-50 dark:bg-green-200/10' 
                           : session.status === 'cancelled'
-                          ? 'border-red-200 bg-red-50'
-                          : 'border-gray-200 hover:bg-gray-50'
+                          ? 'border-red-200 dark:border-red-400/40 bg-red-50 dark:bg-red-500/10'
+                          : 'border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900/50'
                       }`}
                     >
                       <Link
@@ -578,14 +555,9 @@ export default function WorkoutsPage() {
                         }
                         className="min-w-0 flex-1 cursor-pointer"
                       >
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="font-medium text-gray-900 text-sm lg:text-base">{session.name}</p>
+                        <div className="flex items-center flex-wrap gap-2 mb-1">
+                          <p className="font-medium text-gray-900 dark:text-gray-100 text-sm lg:text-base">{session.name}</p>
                           {getSessionStatusBadge(session)}
-                          {session.routine && (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                              {session.routine.name}
-                            </span>
-                          )}
                         </div>
                         <div className="flex items-center gap-4 text-xs lg:text-sm text-gray-500">
                           <div className="flex items-center">
@@ -595,12 +567,12 @@ export default function WorkoutsPage() {
                           {session.duration_minutes && (
                             <div className="flex items-center">
                               <Clock className="h-3 w-3 lg:h-4 lg:w-4 mr-1" />
-                              {session.duration_minutes}m
+                              {formatMinutes(session.duration_minutes)}
                             </div>
                           )}
                         </div>
                         {session.notes && (
-                          <p className="text-xs lg:text-sm text-gray-600 truncate mt-1">{session.notes}</p>
+                          <p className="text-xs lg:text-sm text-gray-600 dark:text-gray-400 truncate mt-1">{session.notes}</p>
                         )}
                       </Link>
                       <div className="flex items-center gap-2 ml-3">
@@ -619,7 +591,7 @@ export default function WorkoutsPage() {
                                 e.stopPropagation();
                                 handleCompleteSession(session.id);
                               }}
-                              className="p-2 text-blue-600 hover:text-blue-700 transition-colors"
+                              className="p-2 text-blue-600 hover:text-blue-700 dark:text-blue-300 transition-colors"
                               title="Mark as complete"
                             >
                               <Square className="h-4 w-4" />
@@ -636,7 +608,7 @@ export default function WorkoutsPage() {
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
-                        <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                        <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 transition-colors" />
                       </div>
                     </div>
                   ))}
@@ -647,7 +619,7 @@ export default function WorkoutsPage() {
                   <p className="text-gray-500 mb-2 text-sm lg:text-base">No workouts logged yet</p>
                   <button
                     onClick={() => setShowStartWorkout(true)}
-                    className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
+                    className="mt-2 text-blue-600 hover:text-blue-700 dark:text-blue-300 text-sm font-medium"
                   >
                     Start your first workout
                   </button>
@@ -658,20 +630,20 @@ export default function WorkoutsPage() {
         )}
         {activeTab === 'routines' && (
           /* My Routines */
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-4 lg:p-6 border-b border-gray-200">
-              <h2 className="text-base lg:text-lg font-semibold text-gray-900">My Routines</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+            <div className="p-4 lg:p-6 border-b border-gray-200 dark:border-gray-600">
+              <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">My Routines</h2>
             </div>
             <div className="p-4 lg:p-6">
               {routines.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {routines.map((routine) => (
-                    <div key={routine.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                    <div key={routine.id} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
                       <div className="flex items-start justify-between mb-3">
                         <div className="min-w-0 flex-1">
-                          <h3 className="font-medium text-gray-900 text-sm lg:text-base truncate">{routine.name}</h3>
+                          <h3 className="font-medium text-gray-900 dark:text-gray-100 text-sm lg:text-base truncate">{routine.name}</h3>
                           {routine.description && (
-                            <p className="text-xs lg:text-sm text-gray-600 mt-1 line-clamp-2">{routine.description}</p>
+                            <p className="text-xs lg:text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">{routine.description}</p>
                           )}
                         </div>
                         <div className="flex items-center gap-1 ml-2">
@@ -691,7 +663,7 @@ export default function WorkoutsPage() {
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-xs lg:text-sm text-gray-500">
-                          Created {new Date(routine.created_at).toLocaleDateString()}
+                          Created {new Date(routine.created_at ?? '').toLocaleDateString()}
                         </span>
                         <Link
                           to={`/workouts/start?routine=${routine.id}`}
@@ -710,7 +682,7 @@ export default function WorkoutsPage() {
                   <p className="text-gray-500 mb-2 text-sm lg:text-base">No routines created yet</p>
                   <Link
                     to="/workouts/routines/new"
-                    className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
+                    className="mt-2 text-blue-600 hover:text-blue-700 dark:text-blue-300 text-sm font-medium"
                   >
                     Create your first routine
                   </Link>
@@ -723,9 +695,9 @@ export default function WorkoutsPage() {
           <LogExerciseTab allExercises={allExercises} />
         )}
         {activeTab === 'custom_exercises' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 lg:p-6 border-b border-gray-200">
-              <h2 className="text-base lg:text-lg font-semibold text-gray-900">Manage Custom Exercises</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 lg:p-6 border-b border-gray-200 dark:border-gray-600">
+              <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Manage Custom Exercises</h2>
               <button
                 onClick={() => {
                   setEditingExercise(null);
@@ -743,11 +715,11 @@ export default function WorkoutsPage() {
                   {customExercises.map((exercise) => (
                     <div
                       key={exercise.id}
-                      className="flex items-center justify-between p-3 lg:p-4 border border-gray-200 rounded-lg"
+                      className="flex items-center justify-between p-3 lg:p-4 border border-gray-200 dark:border-gray-600 rounded-lg"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="font-medium text-gray-900 text-sm lg:text-base">{exercise.name}</p>
-                        <p className="text-sm text-gray-600">{exercise.muscle_group}</p>
+                        <p className="font-medium text-gray-900 dark:text-gray-100 text-sm lg:text-base">{exercise.name}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{exercise.muscle_group}</p>
                         {exercise.equipment && (
                           <p className="text-xs text-gray-500">{exercise.equipment}</p>
                         )}
@@ -798,10 +770,10 @@ function LogExerciseTab({ allExercises }: { allExercises: Exercise[] }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-      <div className="p-4 lg:p-6 border-b border-gray-200">
-        <h2 className="text-base lg:text-lg font-semibold text-gray-900">Log Single Exercise</h2>
-        <p className="text-sm text-gray-600 mt-1">Quickly log a single exercise without creating a full routine.</p>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+      <div className="p-4 lg:p-6 border-b border-gray-200 dark:border-gray-600">
+        <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Log Single Exercise</h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Quickly log a single exercise without creating a full routine.</p>
       </div>
       <div className="p-4 lg:p-6">
         {/* Search */}
@@ -822,21 +794,21 @@ function LogExerciseTab({ allExercises }: { allExercises: Exercise[] }) {
             {filteredExercises.map((exercise) => (
               <div 
                 key={exercise.id} 
-                className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors cursor-pointer"
                 onClick={() => handleExerciseSelect(exercise)}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-medium text-gray-900 text-sm">{exercise.name}</h3>
+                    <h3 className="font-medium text-gray-900 dark:text-gray-100 text-sm">{exercise.name}</h3>
                     {exercise.is_custom && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-400/20 text-green-800 dark:text-green-200">
                         Custom
                       </span>
                     )}
                   </div>
                   <ChevronRight className="h-4 w-4 text-gray-400" />
                 </div>
-                <p className="text-sm text-gray-600">{exercise.muscle_group}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{exercise.muscle_group}</p>
                 {exercise.equipment && (
                   <p className="text-xs text-gray-500 mt-1">{exercise.equipment}</p>
                 )}
