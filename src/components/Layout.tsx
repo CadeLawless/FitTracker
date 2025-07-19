@@ -116,20 +116,26 @@ export default function Layout({ children }: LayoutProps) {
 
           {/* User Profile & Sign Out */}
           <div className="border-t border-gray-200 dark:border-gray-700 p-4">
-            <div className="flex items-center">
-              <UserIcon className="h-8 w-8 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-              <div className="ml-3 flex-1 min-w-0">
-                {!authLoading ? (
-                  <>
-                    <p className="text-sm font-medium max-w-[8rem] text-gray-900 dark:text-gray-100 truncate">
-                      {user?.name || user?.email || "User"}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">Fitness Enthusiast</p>
-                  </>
-                ) : (
-                  <div className="h-6 w-[90%] bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div> // Skeleton loading
-                )}
-              </div>
+            <div className="flex justify-between items-center">
+              <Link
+                to={'/profile'}
+                onClick={() => setSidebarOpen(false)}
+                className="py-2 pl-1 flex flex-grow items-center gap-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900"
+              >
+                <UserIcon className="h-8 w-8 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                <div className="ml-3 flex-1 min-w-0">
+                  {!authLoading ? (
+                    <>
+                      <p className="text-sm font-medium max-w-[8rem] text-gray-900 dark:text-gray-100 truncate">
+                        {user?.name || user?.email || "User"}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">Fitness Enthusiast</p>
+                    </>
+                  ) : (
+                    <div className="h-6 w-[90%] bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div> // Skeleton loading
+                  )}
+                </div>
+              </Link>
               <button
                 onClick={handleSignOut}
                 className="rounded-lg p-2 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300 flex-shrink-0"

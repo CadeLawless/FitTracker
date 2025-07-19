@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase.ts'; // adjust as needed
+import { Exercise } from '../types/index.ts';
 
 export const useCustomExercises = (
   setExercises: React.Dispatch<React.SetStateAction<Exercise[]>>,

@@ -568,7 +568,7 @@ export default function MeasurementsTracker() {
       {/* Delete Confirmation Modal */}
       {deleteConfirmation.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md max-h-[90dvh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
@@ -607,7 +607,7 @@ export default function MeasurementsTracker() {
       {/* Customize Fields Modal */}
       {showCustomizeFields && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90dvh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Customize Measurement Fields</h3>
