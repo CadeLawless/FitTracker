@@ -661,15 +661,17 @@ export default function WorkoutsPage() {
               {routines.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {routines.map((routine) => (
-                    <Link to={`/workouts/routines/${routine.id}/edit`} key={routine.id} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
+                    <div className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
                       <div className="flex items-start justify-between mb-3">
-                        <div className="min-w-0 flex-1">
+                        <Link to={`/workouts/routines/${routine.id}/edit`} className="min-w-0 flex-1">
                           <h3 className="font-medium text-gray-900 dark:text-gray-100 text-sm lg:text-base truncate">{routine.name}</h3>
                           {routine.description && (
                             <p className="text-xs lg:text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">{routine.description}</p>
                           )}
-                        </div>
-                        <div className="flex items-center gap-1 ml-2">
+                        </Link>
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center gap-1 ml-2">
                           <Link
                             to={`/workouts/routines/${routine.id}/edit`}
                             className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors"
@@ -685,9 +687,9 @@ export default function WorkoutsPage() {
                         </div>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs lg:text-sm text-gray-500">
+                        <Link to={`/workouts/routines/${routine.id}/edit`} className="text-xs flex-grow lg:text-sm text-gray-500">
                           Created {new Date(routine.created_at ?? '').toLocaleDateString()}
-                        </span>
+                        </Link>
                         <Link
                           to={`/workouts/start?routine=${routine.id}`}
                           className="flex items-center px-3 py-1.5 bg-blue-600 text-white rounded text-xs lg:text-sm hover:bg-blue-700 transition-colors"
@@ -696,7 +698,7 @@ export default function WorkoutsPage() {
                           Start
                         </Link>
                       </div>
-                    </Link>
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -756,10 +758,7 @@ export default function WorkoutsPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     {filteredCustomExercises.map((exercise) => (
                       <div
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditExercise(exercise);
-                        }}
+                        onClick={() => handleEditExercise(exercise)}
                         key={exercise.id}
                         className="flex items-center cursor-pointer justify-between p-3 lg:p-4 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900/50 rounded-lg"
                       >
@@ -770,12 +769,12 @@ export default function WorkoutsPage() {
                             <p className="text-xs text-gray-500">{exercise.equipment}</p>
                           )}
                         </div>
-                        <div className="flex items-center gap-2 ml-3">
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center gap-2 ml-3"
+                        >
                           <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEditExercise(exercise);
-                            }}
+                            onClick={() => handleEditExercise(exercise)}
                             className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
                           >
                             <Edit2 className="h-4 w-4" />
