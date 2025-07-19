@@ -428,6 +428,8 @@ export default function WorkoutSession() {
     const totalSeconds = customRestMinutes * 60 + customRestSeconds;
     startRestTimer(totalSeconds);
     setShowCustomTimer(false);
+    hasScrolledToRestTimer.current = false;
+    scrollToElement(restTimerDiv, true);
   };
 
   const skipRest = () => {
@@ -606,7 +608,7 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
       {/* Popup Confirmation Modal */}
       {popupConfirmation.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md max-h-[90dvh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
@@ -666,8 +668,8 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
         {/* Header */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
           <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-3">
+            <div className="space-y-2">
+              <div className="flex items-center flex-wrap gap-x-3 gap-y-2">
                 <h1 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {routine?.name || 'Custom Workout'}
                 </h1>
@@ -690,22 +692,22 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
   
         {/* Rest Timer */}
         {workoutState.isResting && (
-          <div ref={restTimerDiv} className="bg-orange-50 border border-orange-200 rounded-lg p-4 lg:p-6">
+          <div ref={restTimerDiv} className="bg-orange-50 dark:bg-orange-400/20 border border-orange-200 rounded-lg p-4 lg:p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Timer className="h-6 w-6 text-orange-600 mr-3" />
+                <Timer className="h-6 w-6 text-orange-600 dark:text-orange-300 mr-3" />
                 <div>
-                  <h3 className="font-medium text-orange-900">Rest Time</h3>
-                  <p className="text-sm text-orange-700">Take a break between sets</p>
+                  <h3 className="font-medium text-orange-900 dark:text-orange-200">Rest Time</h3>
+                  <p className="text-sm text-orange-700 dark:text-orange-400">Take a break between sets</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-bold text-orange-900">
+                <p className="text-2xl font-bold text-orange-900 dark:text-orange-200">
                   {formatTime(workoutState.restTimeRemaining)}
                 </p>
                 <button
                   onClick={skipRest}
-                  className="text-sm text-orange-600 hover:text-orange-700"
+                  className="text-sm text-orange-600 dark:text-orange-300 hover:text-orange-700"
                 >
                   Skip Rest
                 </button>
@@ -857,7 +859,7 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
           <div className="flex flex-col sm:flex-row gap-3 justify-end">
             <button
               onClick={() => handlePopupClick('cancel')}
-              className="px-4 py-2 border border-red-300 dark:border-red-200 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-800/10 transition-colors"
+              className="px-4 py-2 border border-red-300 dark:border-red-200/70 text-red-700 dark:text-red-200 rounded-lg hover:bg-red-800/10 transition-colors"
             >
               Cancel Workout
             </button>

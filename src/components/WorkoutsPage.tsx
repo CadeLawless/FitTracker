@@ -29,6 +29,11 @@ export default function WorkoutsPage() {
   const [showStartWorkout, setShowStartWorkout] = useState(false);
   const [startWorkoutTab, setStartWorkoutTab] = useState<'routines' | 'exercises'>('routines');
   const [exerciseSearchTerm, setExerciseSearchTerm] = useState('');
+  const [customExerciseSearchTerm, setCustomExerciseSearchTerm] = useState('');
+
+  const addExercise = (exercise: Exercise) => {
+    setAllExercises(prev => [...prev, exercise].sort((a, b) => a.name.localeCompare(b.name)));
+  };
   const {
     muscleGroups,
     customExerciseData,
@@ -41,7 +46,8 @@ export default function WorkoutsPage() {
     handleEditExercise,
     resetCustomExerciseForm,
     setShowCustomExerciseForm,
-  } = useCustomExercises(setCustomExercises);
+  } = useCustomExercises(setCustomExercises, addExercise);
+
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'sessions' | 'routines' | 'log_exercise' | 'custom_exercises'>('sessions');
   const [deleteConfirmation, setDeleteConfirmation] = useState<DeleteConfirmation>({
@@ -190,6 +196,11 @@ export default function WorkoutsPage() {
     exercise.muscle_group.toLowerCase().includes(exerciseSearchTerm.toLowerCase())
   );
 
+  const filteredCustomExercises = customExercises.filter(exercise =>
+    exercise.name.toLowerCase().includes(customExerciseSearchTerm.toLowerCase()) ||
+    exercise.muscle_group.toLowerCase().includes(customExerciseSearchTerm.toLowerCase())
+  );
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -203,7 +214,7 @@ export default function WorkoutsPage() {
       {/* Delete Confirmation Modal */}
       {deleteConfirmation.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md max-h-[90dvh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
@@ -250,7 +261,7 @@ export default function WorkoutsPage() {
       {/* Start Workout Modal */}
       {showStartWorkout && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90dvh] overflow-y-auto">
             <div className="p-4 lg:p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -326,59 +337,71 @@ export default function WorkoutsPage() {
                   </Link>
                 </div>
               ) : (
-                <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                    Select an exercise to log:
-                  </p>
-                  
-                  {/* Exercise Search */}
-                  <div className="relative mb-4">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <FormInput
-                      type="text"
-                      placeholder="Search exercises..."
-                      value={exerciseSearchTerm}
-                      onChange={(e) => setExerciseSearchTerm(e.target.value)}
-                      className="pl-10 pr-4 text-sm"
-                    />
-                  </div>
-
-                  {/* Exercise List */}
-                  <div className="max-h-64 overflow-y-auto space-y-2 mb-4">
-                    {filteredExercises.map((exercise) => (
-                      <div 
-                        key={exercise.id} 
-                        className="border border-gray-200 dark:border-gray-600 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors cursor-pointer"
-                        onClick={() => handleExerciseSelect(exercise)}
+                <>
+                  <div>
+                    <p className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
+                      <span>Select an exercise to log:</span>
+                      <button
+                        onClick={() => {
+                          setEditingExercise(null);
+                          setShowCustomExerciseForm(true);
+                        }}
+                        className="flex items-center justify-center px-3 py-2 bg-green-600 text-sm text-white rounded-lg hover:bg-green-700 transition-colors"
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-medium text-gray-900 dark:text-gray-100 text-sm">{exercise.name}</h3>
-                              {exercise.is_custom && (
-                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-400/20 text-green-800 dark:text-green-200">
-                                  Custom
-                                </span>
+                        <Plus className="h-3 w-3 mr-2" />
+                        New Custom Exercise
+                      </button>
+                    </p>
+                    
+                    {/* Exercise Search */}
+                    <div className="relative mb-4">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <FormInput
+                        type="text"
+                        placeholder="Search exercises..."
+                        value={exerciseSearchTerm}
+                        onChange={(e) => setExerciseSearchTerm(e.target.value)}
+                        className="pl-10 pr-4 text-sm"
+                      />
+                    </div>
+
+                    {/* Exercise List */}
+                    <div className="max-h-64 overflow-y-auto space-y-2 mb-4">
+                      {filteredExercises.map((exercise) => (
+                        <div 
+                          key={exercise.id} 
+                          className="border border-gray-200 dark:border-gray-600 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors cursor-pointer"
+                          onClick={() => handleExerciseSelect(exercise)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <h3 className="font-medium text-gray-900 dark:text-gray-100 text-sm">{exercise.name}</h3>
+                                {exercise.is_custom && (
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-400/20 text-green-800 dark:text-green-200">
+                                    Custom
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-gray-600 dark:text-gray-400">{exercise.muscle_group}</p>
+                              {exercise.equipment && (
+                                <p className="text-xs text-gray-500">{exercise.equipment}</p>
                               )}
                             </div>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">{exercise.muscle_group}</p>
-                            {exercise.equipment && (
-                              <p className="text-xs text-gray-500">{exercise.equipment}</p>
-                            )}
+                            <ChevronRight className="h-4 w-4 text-gray-400" />
                           </div>
-                          <ChevronRight className="h-4 w-4 text-gray-400" />
                         </div>
-                      </div>
-                    ))}
-                    {filteredExercises.length === 0 && (
-                      <div className="text-center py-8">
-                        <Dumbbell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                        <p className="text-gray-500 mb-2">No exercises found</p>
-                        <p className="text-sm text-gray-400">Try adjusting your search</p>
-                      </div>
-                    )}
+                      ))}
+                      {filteredExercises.length === 0 && (
+                        <div className="text-center py-8">
+                          <Dumbbell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                          <p className="text-gray-500 mb-2">No exercises found</p>
+                          <p className="text-sm text-gray-400">Try adjusting your search</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                </>
               )}
 
               <div className="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-600">
@@ -638,7 +661,7 @@ export default function WorkoutsPage() {
               {routines.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {routines.map((routine) => (
-                    <div key={routine.id} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
+                    <Link to={`/workouts/routines/${routine.id}/edit`} key={routine.id} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
                       <div className="flex items-start justify-between mb-3">
                         <div className="min-w-0 flex-1">
                           <h3 className="font-medium text-gray-900 dark:text-gray-100 text-sm lg:text-base truncate">{routine.name}</h3>
@@ -673,7 +696,7 @@ export default function WorkoutsPage() {
                           Start
                         </Link>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               ) : (
@@ -692,12 +715,19 @@ export default function WorkoutsPage() {
           </div>
         )}
         {activeTab === 'log_exercise' && (
-          <LogExerciseTab allExercises={allExercises} />
+          <LogExerciseTab
+          allExercises={allExercises}
+          setEditingExercise={setEditingExercise}
+          setShowCustomExerciseForm={setShowCustomExerciseForm}
+        />
         )}
         {activeTab === 'custom_exercises' && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 lg:p-6 border-b border-gray-200 dark:border-gray-600">
-              <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Manage Custom Exercises</h2>
+              <div>
+                <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Manage Custom Exercises</h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Create, edit, or delete custom exercises.</p>
+              </div>
               <button
                 onClick={() => {
                   setEditingExercise(null);
@@ -710,40 +740,57 @@ export default function WorkoutsPage() {
               </button>
             </div>
             <div className="p-4 lg:p-6">
-              {customExercises.length > 0 ? (
-                <div className="space-y-4">
-                  {customExercises.map((exercise) => (
-                    <div
-                      key={exercise.id}
-                      className="flex items-center justify-between p-3 lg:p-4 border border-gray-200 dark:border-gray-600 rounded-lg"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="font-medium text-gray-900 dark:text-gray-100 text-sm lg:text-base">{exercise.name}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{exercise.muscle_group}</p>
-                        {exercise.equipment && (
-                          <p className="text-xs text-gray-500">{exercise.equipment}</p>
-                        )}
+              {filteredCustomExercises.length > 0 ? (
+                <>
+                  <div className="relative mb-6">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <FormInput
+                      type="text"
+                      placeholder="Search exercises..."
+                      value={customExerciseSearchTerm}
+                      onChange={(e) => setCustomExerciseSearchTerm(e.target.value)}
+                      className="pl-10 pr-4"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {filteredCustomExercises.map((exercise) => (
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditExercise(exercise);
+                        }}
+                        key={exercise.id}
+                        className="flex items-center cursor-pointer justify-between p-3 lg:p-4 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900/50 rounded-lg"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-gray-900 dark:text-gray-100 text-sm lg:text-base">{exercise.name}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{exercise.muscle_group}</p>
+                          {exercise.equipment && (
+                            <p className="text-xs text-gray-500">{exercise.equipment}</p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 ml-3">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditExercise(exercise);
+                            }}
+                            className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick('custom_exercise', exercise)}
+                            className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 ml-3">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEditExercise(exercise);
-                          }}
-                          className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
-                        >
-                          <Edit2 className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteClick('custom_exercise', exercise)}
-                          className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </>
               ) : (
                 <p className="text-gray-500">No custom exercises found. Add some custom exercises to get started!</p>
               )}
@@ -756,7 +803,7 @@ export default function WorkoutsPage() {
 }
 
 // Log Exercise Tab Component
-function LogExerciseTab({ allExercises }: { allExercises: Exercise[] }) {
+function LogExerciseTab({ allExercises, setEditingExercise, setShowCustomExerciseForm }: { allExercises: Exercise[], setEditingExercise: React.Dispatch<React.SetStateAction<Exercise|null>>, setShowCustomExerciseForm: React.Dispatch<React.SetStateAction<boolean>> }) {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -771,9 +818,21 @@ function LogExerciseTab({ allExercises }: { allExercises: Exercise[] }) {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
-      <div className="p-4 lg:p-6 border-b border-gray-200 dark:border-gray-600">
-        <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Log Single Exercise</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Quickly log a single exercise without creating a full routine.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 lg:p-6 border-b border-gray-200 dark:border-gray-600">
+        <div>
+          <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Log Single Exercise</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Quickly log a single exercise without creating a full routine.</p>
+        </div>
+        <button
+          onClick={() => {
+            setEditingExercise(null);
+            setShowCustomExerciseForm(true);
+          }}
+          className="flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm lg:text-base"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          New Custom Exercise
+        </button>
       </div>
       <div className="p-4 lg:p-6">
         {/* Search */}
@@ -790,7 +849,7 @@ function LogExerciseTab({ allExercises }: { allExercises: Exercise[] }) {
 
         {/* Exercise Grid */}
         {filteredExercises.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {filteredExercises.map((exercise) => (
               <div 
                 key={exercise.id} 
