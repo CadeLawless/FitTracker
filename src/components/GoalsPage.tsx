@@ -1047,7 +1047,7 @@ export default function GoalsPage() {
                         <div className="grid grid-cols-2 gap-3">
                           <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
                             formData.goal_category === 'weight'
-                              ? 'border-blue-500 bg-blue-50'
+                              ? 'border-blue-500 dark:border-blue-200 bg-blue-50 dark:bg-blue-600/10'
                               : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
                           }`}>
                             <input
@@ -1061,15 +1061,15 @@ export default function GoalsPage() {
                             <div className="flex items-center">
                               <Scale className="h-5 w-5 mr-3 flex-shrink-0" />
                               <div>
-                                <div className="text-sm font-medium">Weight Goal</div>
-                                <div className="text-sm text-gray-500">Target weight changes</div>
+                                <div className="text-sm font-medium dark:text-gray-100">Weight Goal</div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400">Target weight changes</div>
                               </div>
                             </div>
                           </label>
 
                           <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
                             formData.goal_category === 'measurement'
-                              ? 'border-blue-500 bg-blue-50'
+                              ? 'border-blue-500 dark:border-blue-200 bg-blue-50 dark:bg-blue-600/10'
                               : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
                           }`}>
                             <input
@@ -1083,8 +1083,8 @@ export default function GoalsPage() {
                             <div className="flex items-center">
                               <Ruler className="h-5 w-5 mr-3 flex-shrink-0" />
                               <div>
-                                <div className="text-sm font-medium">Measurement Goal</div>
-                                <div className="text-sm text-gray-500">Target body measurements</div>
+                                <div className="text-sm font-medium dark:text-gray-100">Measurement Goal</div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400">Target body measurements</div>
                               </div>
                             </div>
                           </label>
@@ -1323,7 +1323,7 @@ export default function GoalsPage() {
                             <div className="grid grid-cols-2 gap-3">
                               <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
                                 formData.goal_category === 'weight'
-                                  ? 'border-blue-500 bg-blue-50'
+                                  ? 'border-blue-500 dark:border-blue-200 bg-blue-50 dark:bg-blue-600/10'
                                   : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
                               }`}>
                                 <input
@@ -1337,15 +1337,15 @@ export default function GoalsPage() {
                                 <div className="flex items-center">
                                   <Scale className="h-5 w-5 mr-3 flex-shrink-0" />
                                   <div>
-                                    <div className="text-sm font-medium">Weight Goal</div>
-                                    <div className="text-sm text-gray-500">Target weight changes</div>
+                                    <div className="text-sm font-medium dark:text-gray-100">Weight Goal</div>
+                                    <div className="text-sm text-gray-500 dark:text-gray-400">Target weight changes</div>
                                   </div>
                                 </div>
                               </label>
 
                               <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
                                 formData.goal_category === 'measurement'
-                                  ? 'border-blue-500 bg-blue-50'
+                                  ? 'border-blue-500 dark:border-blue-200 bg-blue-50 dark:bg-blue-600/10'
                                   : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
                               }`}>
                                 <input
@@ -1359,8 +1359,8 @@ export default function GoalsPage() {
                                 <div className="flex items-center">
                                   <Ruler className="h-5 w-5 mr-3 flex-shrink-0" />
                                   <div>
-                                    <div className="text-sm font-medium">Measurement Goal</div>
-                                    <div className="text-sm text-gray-500">Target body measurements</div>
+                                    <div className="text-sm font-medium dark:text-gray-100">Measurement Goal</div>
+                                    <div className="text-sm text-gray-500 dark:text-gray-400">Target body measurements</div>
                                   </div>
                                 </div>
                               </label>
