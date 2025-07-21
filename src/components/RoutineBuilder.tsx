@@ -518,7 +518,7 @@ export default function RoutineBuilder() {
                         </div>
 
                         {/* Skip Weight/Reps Checkboxes */}
-                        <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                           <div className="flex flex-wrap gap-4">
                             <label className="flex items-center">
                               <input
