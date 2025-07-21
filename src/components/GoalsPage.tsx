@@ -595,7 +595,7 @@ export default function GoalsPage() {
       name: 'Maintaining',
       description: 'Maintaining current weight/composition',
       icon: Minus,
-      color: 'text-blue-600 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-300',
+      color: 'text-blue-600 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-400',
     },
     {
       id: 'none',
