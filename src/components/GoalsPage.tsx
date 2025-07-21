@@ -1206,7 +1206,7 @@ export default function GoalsPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleCompleteClick(goal)}
-                        className="p-2 text-green-600 hover:bg-green-100 dark:bg-green-400/20 rounded-lg transition-colors"
+                        className="p-2 text-green-600 hover:bg-green-100 dark:hover:bg-green-400/20 rounded-lg transition-colors"
                         title="Mark as complete"
                       >
                         <Check className="h-4 w-4" />
