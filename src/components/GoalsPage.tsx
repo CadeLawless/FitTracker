@@ -844,7 +844,7 @@ export default function GoalsPage() {
                       <Scale className="h-5 w-5 mr-3 dark:text-gray-100 flex-shrink-0" />
                       <div>
                         <div className="text-sm dark:text-gray-100 font-medium">Weight Goal</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-300">Target weight changes</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">Target weight changes</div>
                       </div>
                     </div>
                   </label>
@@ -866,7 +866,7 @@ export default function GoalsPage() {
                       <Ruler className="h-5 w-5 dark:text-gray-100 mr-3 flex-shrink-0" />
                       <div>
                         <div className="text-sm dark:text-gray-100 font-medium">Measurement Goal</div>
-                        <div className="text-sm dark:text-gray-300 text-gray-500">Target body measurements</div>
+                        <div className="text-sm dark:text-gray-400 text-gray-500">Target body measurements</div>
                       </div>
                     </div>
                   </label>
