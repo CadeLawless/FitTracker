@@ -588,7 +588,7 @@ export default function GoalsPage() {
       name: 'Bulking',
       description: 'Gaining weight to build muscle',
       icon: TrendingUp,
-      color: 'text-green-600 dark:text-green-300 bg-green-50 dark:bg-green-200/10 border-green-200 dark:border-green-400/40',
+      color: 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-200/10 border-green-200 dark:border-green-400/40',
     },
     {
       id: 'maintaining',
