@@ -863,7 +863,7 @@ export default function GoalsPage() {
                       className="sr-only"
                     />
                     <div className="flex items-center">
-                      <Ruler className="h-5 w-5 mr-3 flex-shrink-0" />
+                      <Ruler className="h-5 w-5 dark:text-gray-100 mr-3 flex-shrink-0" />
                       <div>
                         <div className="text-sm dark:text-gray-100 font-medium">Measurement Goal</div>
                         <div className="text-sm dark:text-gray-300 text-gray-500">Target body measurements</div>
