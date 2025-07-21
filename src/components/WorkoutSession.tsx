@@ -763,7 +763,7 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
                   {workoutState.sets
                     .filter(set => set.exercise_id === currentExercise.exercise_id)
                     .map((set) => (
-                      <div key={set.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                      <div key={set.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-900 rounded">
                         <span className="text-sm text-gray-600 dark:text-gray-400">Set {set.set_number}</span>
                         <span className="text-sm font-medium">
                           {set.weight && `${set.weight}lbs`}
