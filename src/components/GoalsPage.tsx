@@ -1220,7 +1220,7 @@ export default function GoalsPage() {
                       </button>
                       <button
                         onClick={() => handleDeleteClick(goal)}
-                        className="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-700/20 rounded-lg transition-colors"
+                        className="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-600/20 rounded-lg transition-colors"
                         title="Delete goal"
                       >
                         <Trash2 className="h-4 w-4" />
