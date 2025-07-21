@@ -851,7 +851,7 @@ export default function GoalsPage() {
 
                   <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
                     formData.goal_category === 'measurement'
-                      ? 'border-blue-500 bg-blue-50'
+                      ? 'border-blue-500 dark:border-blue-200 bg-blue-50 dark:bg-blue-600/10'
                       : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
                   }`}>
                     <input
