@@ -602,7 +602,7 @@ export default function GoalsPage() {
       name: 'None',
       description: 'Not following a specific phase',
       icon: Target,
-      color: 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-600',
+      color: 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600',
     },
   ];
 
