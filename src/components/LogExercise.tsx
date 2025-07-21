@@ -141,8 +141,8 @@ export default function LogExercise() {
       {/* Header */}
       <div className="flex gap-4">
         <button
-          onClick={() => navigate('/workouts')}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          onClick={() => navigate('/workouts?activeTab=log_exercise')}
+          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
         >
           <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-400" />
         </button>
