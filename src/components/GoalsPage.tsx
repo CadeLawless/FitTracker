@@ -1213,7 +1213,7 @@ export default function GoalsPage() {
                       </button>
                       <button
                         onClick={() => handleEdit(goal)}
-                        className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 rounded-lg transition-colors"
+                        className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-800 rounded-lg transition-colors"
                         title="Edit goal"
                       >
                         <Edit2 className="h-4 w-4" />
