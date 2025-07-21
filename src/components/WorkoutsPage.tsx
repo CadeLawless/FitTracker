@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Dumbbell, Clock, Calendar, Play, Edit2, Trash2, X, AlertTriangle, ChevronRight, RotateCcw, Square, Search } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
 import type { WorkoutSession, WorkoutRoutine, Exercise } from '../types';
@@ -22,6 +22,7 @@ interface DeleteConfirmation {
 export default function WorkoutsPage() {
   const { user, authLoading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [sessions, setSessions] = useState<WorkoutSession[]>([]);
   const [routines, setRoutines] = useState<WorkoutRoutine[]>([]);
   const [customExercises, setCustomExercises] = useState<Exercise[]>([]);
@@ -49,7 +50,7 @@ export default function WorkoutsPage() {
   } = useCustomExercises(setCustomExercises, addExercise);
 
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'sessions' | 'routines' | 'log_exercise' | 'custom_exercises'>('sessions');
+  const [activeTab, setActiveTab] = useState<'sessions' | 'routines' | 'log_exercise' | 'custom_exercises'>(searchParams.get('activeTab') || 'sessions');
   const [deleteConfirmation, setDeleteConfirmation] = useState<DeleteConfirmation>({
     isOpen: false,
     type: 'session',
