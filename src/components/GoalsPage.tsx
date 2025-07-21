@@ -841,7 +841,7 @@ export default function GoalsPage() {
                       className="sr-only"
                     />
                     <div className="flex items-center">
-                      <Scale className="h-5 w-5 mr-3 dark:text-gray-100 flex-shrink-0" />
+                      <Scale className="h-5 w-5 mr-3 dark:text-gray-200 flex-shrink-0" />
                       <div>
                         <div className="text-sm dark:text-gray-100 font-medium">Weight Goal</div>
                         <div className="text-sm text-gray-500 dark:text-gray-300">Target weight changes</div>
