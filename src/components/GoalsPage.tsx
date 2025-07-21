@@ -1192,7 +1192,7 @@ export default function GoalsPage() {
               }
 
               return (
-                <div key={goal.id} className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-4 lg:p-6">
+                <div key={goal.id} className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 p-4 lg:p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
                       <Icon className="h-6 w-6 text-blue-600 dark:text-blue-400 mr-3" />
