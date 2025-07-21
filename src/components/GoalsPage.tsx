@@ -795,7 +795,7 @@ export default function GoalsPage() {
                   className={`relative flex flex-col items-center p-4 border rounded-lg transition-colors disabled:opacity-50 ${
                     fitnessPhase === phase.id
                       ? phase.color
-                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
+                      : 'border-gray-300 dark:border-gray-600 dark:text-gray-100 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
                   }`}
                 >
                   <Icon className="h-6 w-6 mb-2" />
