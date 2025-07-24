@@ -57,7 +57,7 @@ export const GoalForm = ({
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
                     Goal Category
                 </label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
                     formData.goal_category === 'weight'
                         ? 'border-blue-500 dark:border-blue-200 bg-blue-200/50 dark:bg-blue-600/10'
