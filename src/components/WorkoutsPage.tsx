@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus, Dumbbell, Clock, Calendar, Play, Edit2, Trash2, X, AlertTriangle, ChevronRight, RotateCcw, Square, Search } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -18,6 +18,8 @@ interface DeleteConfirmation {
   name: string;
   date?: string;
 }
+
+type TabKey = 'sessions' | 'routines' | 'log_exercise' | 'custom_exercises';
 
 export default function WorkoutsPage() {
   const { user, authLoading } = useAuth();
@@ -50,13 +52,36 @@ export default function WorkoutsPage() {
   } = useCustomExercises(setCustomExercises, addExercise);
 
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'sessions' | 'routines' | 'log_exercise' | 'custom_exercises'>(searchParams.get('activeTab') || 'sessions');
+
+  const allowedTabs: TabKey[] = ['sessions', 'routines', 'log_exercise', 'custom_exercises'];
+  const param = searchParams.get('activeTab');
+  const initialTab: TabKey = allowedTabs.includes(param as TabKey) ? (param as TabKey) : 'sessions';
+  const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
+
   const [deleteConfirmation, setDeleteConfirmation] = useState<DeleteConfirmation>({
     isOpen: false,
     type: 'session',
     id: null,
     name: '',
   });
+
+  const tabsContainerRef = useRef<HTMLDivElement|null>(null);
+  const sessionsTabRef = useRef<HTMLButtonElement | null>(null);
+  const routinesTabRef = useRef<HTMLButtonElement | null>(null);
+  const logExerciseTabRef = useRef<HTMLButtonElement | null>(null);
+  const customExercisesTabRef = useRef<HTMLButtonElement | null>(null);
+      
+  useEffect(() => {
+    let tabElement;
+    if(activeTab == 'sessions') tabElement = sessionsTabRef.current;
+    if(activeTab == 'routines') tabElement = routinesTabRef.current;
+    if(activeTab == 'log_exercise') tabElement = logExerciseTabRef.current;
+    if(activeTab == 'custom_exercises') tabElement = customExercisesTabRef.current;
+    
+    if (tabElement && tabsContainerRef.current) {
+      tabElement.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }, [activeTab, loading]);
 
   useEffect(() => {
     if(authLoading) return;
@@ -506,9 +531,11 @@ export default function WorkoutsPage() {
         )}
   
         {/* Tabs */}
-        <div className="border-b border-gray-200 dark:border-gray-600">
+        <div ref={tabsContainerRef} className="border-b border-gray-200 dark:border-gray-600">
           <nav className="-mb-px flex space-x-4 lg:space-x-8 overflow-x-auto">
             <button
+              id='sessions'
+              ref={sessionsTabRef}
               onClick={() => setActiveTab('sessions')}
               className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'sessions'
@@ -519,6 +546,8 @@ export default function WorkoutsPage() {
               Recent Workouts ({sessions.length})
             </button>
             <button
+              id='routines'
+              ref={routinesTabRef}
               onClick={() => setActiveTab('routines')}
               className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'routines'
@@ -529,6 +558,8 @@ export default function WorkoutsPage() {
               My Routines ({routines.length})
             </button>
             <button
+              id='log_exercise'
+              ref={logExerciseTabRef}
               onClick={() => setActiveTab('log_exercise')}
               className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'log_exercise'
@@ -539,6 +570,8 @@ export default function WorkoutsPage() {
               Log Exercise
             </button>
             <button
+              id='custom_exercises'
+              ref={customExercisesTabRef}
               onClick={() => setActiveTab('custom_exercises')}
               className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'custom_exercises'
@@ -662,7 +695,7 @@ export default function WorkoutsPage() {
               {routines.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {routines.map((routine) => (
-                    <div className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
+                    <div key={routine.id+routine.id} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
                       <div className="flex items-start justify-between mb-3">
                         <Link to={`/workouts/routines/${routine.id}/edit`} className="min-w-0 flex-1">
                           <h3 className="font-medium text-gray-900 dark:text-gray-100 text-sm lg:text-base truncate">{routine.name}</h3>
@@ -804,17 +837,12 @@ export default function WorkoutsPage() {
 
 // Log Exercise Tab Component
 function LogExerciseTab({ allExercises, setEditingExercise, setShowCustomExerciseForm }: { allExercises: Exercise[], setEditingExercise: React.Dispatch<React.SetStateAction<Exercise|null>>, setShowCustomExerciseForm: React.Dispatch<React.SetStateAction<boolean>> }) {
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredExercises = allExercises.filter(exercise =>
     exercise.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     exercise.muscle_group.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const handleExerciseSelect = (exercise: Exercise) => {
-    navigate(`/workouts/log-exercise?exercise=${exercise.id}`);
-  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
@@ -851,10 +879,10 @@ function LogExerciseTab({ allExercises, setEditingExercise, setShowCustomExercis
         {filteredExercises.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {filteredExercises.map((exercise) => (
-              <div 
+              <Link
+                to={`/workouts/log-exercise?exercise=${exercise.id}`} 
                 key={exercise.id} 
                 className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors cursor-pointer"
-                onClick={() => handleExerciseSelect(exercise)}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -871,7 +899,7 @@ function LogExerciseTab({ allExercises, setEditingExercise, setShowCustomExercis
                 {exercise.equipment && (
                   <p className="text-xs text-gray-500 mt-1">{exercise.equipment}</p>
                 )}
-              </div>
+              </Link>
             ))}
           </div>
         ) : (

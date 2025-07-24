@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Target, TrendingUp, TrendingDown, Minus, Save, Edit2, Plus, Scale, CheckCircle, AlertCircle, Ruler, X, Trash2, Check, AlertTriangle } from 'lucide-react';
+import { Target, TrendingUp, TrendingDown, Minus, Edit2, Plus, Scale, CheckCircle, AlertCircle, Ruler, Trash2, Check, AlertTriangle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
 import { scrollToElement } from '../lib/htmlElement';
-import type { UserGoal, WeightEntry, MeasurementField, BodyMeasurement } from '../types';
+import type { UserGoal, WeightEntry, MeasurementField, BodyMeasurement, GoalFormData } from '../types';
 import { useAuth } from '../contexts/AuthContext';
-import FormInput from './ui/FormInput';
+import { GoalForm } from './GoalForm';
 
 interface DeleteConfirmation {
   isOpen: boolean;
@@ -58,7 +58,7 @@ export default function GoalsPage() {
     newGoalData: null,
   });
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<GoalFormData>({
     goal_category: 'weight',
     target_weight: '',
     target_value: '',
@@ -704,7 +704,7 @@ export default function GoalsPage() {
                   <AlertTriangle className="h-6 w-6 text-orange-600" />
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 dark:text-white">Active Goal Conflict</h3>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Active Goal Conflict</h3>
                 </div>
               </div>
               <div className="mb-6">
@@ -750,11 +750,14 @@ export default function GoalsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 dark:text-white">Goals</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100">Goals</h1>
             <p className="mt-2 text-sm lg:text-base text-gray-600 dark:text-gray-400">Set and track goals for weight and body measurements.</p>
           </div>
           <button
-            onClick={() => setShowForm(true)}
+            onClick={() => {
+              resetForm();
+              setShowForm(true);
+            }}
             className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm lg:text-base"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -779,7 +782,7 @@ export default function GoalsPage() {
 
         {/* Fitness Phase Selection */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
-          <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white mb-4">Current Fitness Phase</h2>
+          <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Current Fitness Phase</h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             This affects how progress indicators are colored when you don't have specific goals set.
           </p>
@@ -809,216 +812,23 @@ export default function GoalsPage() {
 
         {/* Add Goal Form */}
         {showForm && (
-          <div ref={formRef} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white">Create New Goal</h2>
-              <button
-                onClick={resetForm}
-                className="text-gray-400 hover:text-gray-600 dark:text-gray-400 p-1"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Goal Category Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
-                  Goal Category
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
-                    formData.goal_category === 'weight'
-                      ? 'border-blue-500 dark:border-blue-200 bg-blue-50 dark:bg-blue-600/10'
-                      : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
-                  }`}>
-                    <input
-                      type="radio"
-                      name="goal_category"
-                      value="weight"
-                      checked={formData.goal_category === 'weight'}
-                      onChange={(e) => setFormData({ ...formData, goal_category: e.target.value, measurement_field_id: '' })}
-                      className="sr-only"
-                    />
-                    <div className="flex items-center">
-                      <Scale className="h-5 w-5 mr-3 dark:text-gray-100 flex-shrink-0" />
-                      <div>
-                        <div className="text-sm dark:text-gray-100 font-medium">Weight Goal</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">Target weight changes</div>
-                      </div>
-                    </div>
-                  </label>
-
-                  <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
-                    formData.goal_category === 'measurement'
-                      ? 'border-blue-500 dark:border-blue-200 bg-blue-50 dark:bg-blue-600/10'
-                      : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
-                  }`}>
-                    <input
-                      type="radio"
-                      name="goal_category"
-                      value="measurement"
-                      checked={formData.goal_category === 'measurement'}
-                      onChange={(e) => setFormData({ ...formData, goal_category: e.target.value, target_weight: '' })}
-                      className="sr-only"
-                    />
-                    <div className="flex items-center">
-                      <Ruler className="h-5 w-5 dark:text-gray-100 mr-3 flex-shrink-0" />
-                      <div>
-                        <div className="text-sm dark:text-gray-100 font-medium">Measurement Goal</div>
-                        <div className="text-sm dark:text-gray-400 text-gray-500">Target body measurements</div>
-                      </div>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
-              {/* Measurement Field Selection (only for measurement goals) */}
-              {formData.goal_category === 'measurement' && (
-                <div>
-                  <label htmlFor="measurement_field_id" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                    Measurement Field
-                  </label>
-                  <FormInput
-                    inputType="select"
-                    id="measurement_field_id"
-                    required
-                    value={formData.measurement_field_id}
-                    onChange={(e) => setFormData({ ...formData, measurement_field_id: e.target.value })}
-                  >
-                    <>
-                      <option value="">Select measurement field</option>
-                      {measurementFields.map((field) => (
-                        <option key={field.id} value={field.id}>
-                          {field.field_name} ({field.unit})
-                        </option>
-                      ))}
-                    </>
-                  </FormInput>
-                </div>
-              )}
-
-              {/* Target Value */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'} className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                    Target {formData.goal_category === 'weight' ? 'Weight (lbs)' : 'Value'}
-                    {formData.goal_category === 'measurement' && formData.measurement_field_id && (
-                      <span className="text-gray-500">
-                        {' '}({measurementFields.find(f => f.id === formData.measurement_field_id)?.unit})
-                      </span>
-                    )}
-                  </label>
-                  <FormInput
-                    type="number"
-                    id={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'}
-                    step="0.1"
-                    required
-                    value={formData.goal_category === 'weight' ? formData.target_weight : formData.target_value}
-                    onChange={(e) => setFormData({ 
-                      ...formData, 
-                      [formData.goal_category === 'weight' ? 'target_weight' : 'target_value']: e.target.value 
-                    })}
-                    placeholder={`Enter target ${formData.goal_category === 'weight' ? 'weight' : 'value'}`}
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="target_date" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                    Target Date (optional)
-                  </label>
-                  <FormInput
-                    type="date"
-                    id="target_date"
-                    value={formData.target_date}
-                    onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
-                    min={new Date().toISOString().split('T')[0]}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="weekly_goal" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                  Weekly Goal (optional)
-                </label>
-                <FormInput
-                  type="number"
-                  id="weekly_goal"
-                  step="0.1"
-                  value={formData.weekly_goal}
-                  onChange={(e) => setFormData({ ...formData, weekly_goal: e.target.value })}
-                  placeholder={`Units per week (${formData.goal_category === 'weight' ? 'lbs' : 'measurement units'})`}
-                />
-              </div>
-
-              {/* Current Value Info */}
-              {(() => {
-                let currentValue = null;
-                let unit = '';
-                let source = '';
-
-                if (formData.goal_category === 'weight' && latestWeight) {
-                  currentValue = latestWeight.weight;
-                  unit = 'lbs';
-                  source = formatDate(latestWeight.date).toLocaleDateString();
-                } else if (formData.goal_category === 'measurement' && formData.measurement_field_id && latestMeasurements) {
-                  const value = latestMeasurements.values?.find(v => v.field_id === formData.measurement_field_id);
-                  if (value) {
-                    currentValue = value.value;
-                    unit = value.field?.unit || '';
-                    source = formatDate(latestMeasurements.date).toLocaleDateString();
-                  }
-                }
-
-                if (currentValue) {
-                  return (
-                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-4">
-                      <div className="flex items-center">
-                        {formData.goal_category === 'weight' ? (
-                          <Scale className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2 flex-shrink-0" />
-                        ) : (
-                          <Ruler className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2 flex-shrink-0" />
-                        )}
-                        <div>
-                          <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                            Starting from current value: {currentValue} {unit}
-                          </p>
-                          <p className="text-xs text-blue-700 dark:text-blue-300">
-                            Logged on {source}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                }
-                return null;
-              })()}
-
-              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-600">
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm lg:text-base"
-                >
-                  <Save className="h-4 w-4 mr-2" />
-                  {saving ? 'Creating...' : 'Create Goal'}
-                </button>
-              </div>
-            </form>
-          </div>
+          <GoalForm
+            formRef={formRef}
+            formData={formData}
+            setFormData={setFormData}
+            handleSubmit={handleSubmit}
+            xOnClick={resetForm}
+            latestMeasurements={latestMeasurements}
+            latestWeight={latestWeight}
+            measurementFields={measurementFields}
+            saving={saving}
+          />
         )}
 
         {/* Active Goals */}
         {activeGoals.length > 0 && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white">Active Goals</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Active Goals</h2>
             {activeGoals.map((goal) => {
               const progress = getGoalProgress(goal);
               const unit = getGoalUnit(goal);
@@ -1027,177 +837,30 @@ export default function GoalsPage() {
               // Check if this goal is being edited
               if (editingGoal?.id === goal.id) {
                 return (
-                  <div ref={editFormRef} key={goal.id} className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-4 lg:p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white">Edit Goal</h3>
-                      <button
-                        onClick={() => setEditingGoal(null)}
-                        className="text-gray-400 hover:text-gray-600 dark:text-gray-400 p-1"
-                      >
-                        <X className="h-5 w-5" />
-                      </button>
-                    </div>
-
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                      {/* Goal Category Selection */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
-                          Goal Category
-                        </label>
-                        <div className="grid grid-cols-2 gap-3">
-                          <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
-                            formData.goal_category === 'weight'
-                              ? 'border-blue-500 dark:border-blue-200 bg-blue-50 dark:bg-blue-600/10'
-                              : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
-                          }`}>
-                            <input
-                              type="radio"
-                              name="goal_category"
-                              value="weight"
-                              checked={formData.goal_category === 'weight'}
-                              onChange={(e) => setFormData({ ...formData, goal_category: e.target.value, measurement_field_id: '' })}
-                              className="sr-only"
-                            />
-                            <div className="flex items-center">
-                              <Scale className="h-5 w-5 mr-3 flex-shrink-0" />
-                              <div>
-                                <div className="text-sm font-medium dark:text-gray-100">Weight Goal</div>
-                                <div className="text-sm text-gray-500 dark:text-gray-400">Target weight changes</div>
-                              </div>
-                            </div>
-                          </label>
-
-                          <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
-                            formData.goal_category === 'measurement'
-                              ? 'border-blue-500 dark:border-blue-200 bg-blue-50 dark:bg-blue-600/10'
-                              : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
-                          }`}>
-                            <input
-                              type="radio"
-                              name="goal_category"
-                              value="measurement"
-                              checked={formData.goal_category === 'measurement'}
-                              onChange={(e) => setFormData({ ...formData, goal_category: e.target.value, target_weight: '' })}
-                              className="sr-only"
-                            />
-                            <div className="flex items-center">
-                              <Ruler className="h-5 w-5 mr-3 flex-shrink-0" />
-                              <div>
-                                <div className="text-sm font-medium dark:text-gray-100">Measurement Goal</div>
-                                <div className="text-sm text-gray-500 dark:text-gray-400">Target body measurements</div>
-                              </div>
-                            </div>
-                          </label>
-                        </div>
-                      </div>
-
-                      {/* Measurement Field Selection (only for measurement goals) */}
-                      {formData.goal_category === 'measurement' && (
-                        <div>
-                          <label htmlFor="measurement_field_id" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                            Measurement Field
-                          </label>
-                          <FormInput
-                            inputType="select"
-                            id="measurement_field_id"
-                            required
-                            value={formData.measurement_field_id}
-                            onChange={(e) => setFormData({ ...formData, measurement_field_id: e.target.value })}
-                          >
-                            <>
-                              <option value="">Select measurement field</option>
-                              {measurementFields.map((field) => (
-                                <option key={field.id} value={field.id}>
-                                  {field.field_name} ({field.unit})
-                                </option>
-                              ))}
-                            </>
-                          </FormInput>
-                        </div>
-                      )}
-
-                      {/* Target Value */}
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <div>
-                          <label htmlFor={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'} className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                            Target {formData.goal_category === 'weight' ? 'Weight (lbs)' : 'Value'}
-                            {formData.goal_category === 'measurement' && formData.measurement_field_id && (
-                              <span className="text-gray-500">
-                                {' '}({measurementFields.find(f => f.id === formData.measurement_field_id)?.unit})
-                              </span>
-                            )}
-                          </label>
-                          <FormInput
-                            type="number"
-                            id={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'}
-                            step="0.1"
-                            required
-                            value={formData.goal_category === 'weight' ? formData.target_weight : formData.target_value}
-                            onChange={(e) => setFormData({ 
-                              ...formData, 
-                              [formData.goal_category === 'weight' ? 'target_weight' : 'target_value']: e.target.value 
-                            })}
-                            placeholder={`Enter target ${formData.goal_category === 'weight' ? 'weight' : 'value'}`}
-                          />
-                        </div>
-
-                        <div>
-                          <label htmlFor="target_date" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                            Target Date (optional)
-                          </label>
-                          <FormInput
-                            type="date"
-                            id="target_date"
-                            value={formData.target_date}
-                            onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
-                            min={new Date().toISOString().split('T')[0]}
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label htmlFor="weekly_goal" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                          Weekly Goal (optional)
-                        </label>
-                        <FormInput
-                          type="number"
-                          id="weekly_goal"
-                          step="0.1"
-                          value={formData.weekly_goal}
-                          onChange={(e) => setFormData({ ...formData, weekly_goal: e.target.value })}
-                          placeholder={`Units per week (${formData.goal_category === 'weight' ? 'lbs' : 'measurement units'})`}
-                        />
-                      </div>
-
-                      <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-600">
-                        <button
-                          type="button"
-                          onClick={() => setEditingGoal(null)}
-                          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="submit"
-                          disabled={saving}
-                          className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm lg:text-base"
-                        >
-                          <Save className="h-4 w-4 mr-2" />
-                          {saving ? 'Updating...' : 'Update Goal'}
-                        </button>
-                      </div>
-                    </form>
-                  </div>
+                  <GoalForm
+                    formRef={editFormRef}
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleSubmit={handleSubmit}
+                    xOnClick={resetForm}
+                    latestMeasurements={latestMeasurements}
+                    latestWeight={latestWeight}
+                    measurementFields={measurementFields}
+                    saving={saving}
+                    formTitle='Edit Goal'
+                    editForm={true}
+                    key={goal.id}
+                  />
                 );
               }
 
               return (
-                <div key={goal.id} className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 p-4 lg:p-6">
+                <div key={goal.id} className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-500/10 dark:to-indigo-500/10 rounded-lg border border-blue-200 dark:border-blue-200/50 p-4 lg:p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
                       <Icon className="h-6 w-6 text-blue-600 dark:text-blue-400 mr-3" />
                       <div>
-                        <h3 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white">
+                        <h3 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">
                           {goal.goal_category === 'weight' ? 'Weight Goal' : `${goal.measurement_field?.field_name} Goal`}
                         </h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400">Active Goal</p>
@@ -1246,7 +909,7 @@ export default function GoalsPage() {
                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                         <div>
                           <p className="text-gray-600 dark:text-gray-400">Current</p>
-                          <p className="font-semibold text-gray-900 dark:text-gray-100 dark:text-white">{progress.currentValue} {unit}</p>
+                          <p className="font-semibold text-gray-900 dark:text-gray-100">{progress.currentValue} {unit}</p>
                         </div>
                         <div>
                           <p className="text-gray-600 dark:text-gray-400">Progress</p>
@@ -1267,13 +930,13 @@ export default function GoalsPage() {
                         </div>
                         <div>
                           <p className="text-gray-600 dark:text-gray-400">Remaining</p>
-                          <p className="font-semibold text-gray-900 dark:text-gray-100 dark:text-white">
+                          <p className="font-semibold text-gray-900 dark:text-gray-100">
                             {Math.abs(progress.remaining).toFixed(1)} {unit}
                           </p>
                         </div>
                         <div>
                           <p className="text-gray-600 dark:text-gray-400">Completion</p>
-                          <p className="font-semibold text-gray-900 dark:text-gray-100 dark:text-white">
+                          <p className="font-semibold text-gray-900 dark:text-gray-100">
                             {progress.progressPercentage.toFixed(0)}%
                           </p>
                         </div>
@@ -1303,167 +966,20 @@ export default function GoalsPage() {
                   // Check if this goal is being edited
                   if (editingGoal?.id === goal.id) {
                     return (
-                      <div ref={editFormRef} key={goal.id} className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-4 lg:p-6">
-                        <div className="flex items-center justify-between mb-6">
-                          <h3 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Edit Goal</h3>
-                          <button
-                            onClick={() => setEditingGoal(null)}
-                            className="text-gray-400 hover:text-gray-600 dark:text-gray-400 p-1"
-                          >
-                            <X className="h-5 w-5" />
-                          </button>
-                        </div>
-
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                          {/* Goal Category Selection */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
-                              Goal Category
-                            </label>
-                            <div className="grid grid-cols-2 gap-3">
-                              <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
-                                formData.goal_category === 'weight'
-                                  ? 'border-blue-500 dark:border-blue-200 bg-blue-50 dark:bg-blue-600/10'
-                                  : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
-                              }`}>
-                                <input
-                                  type="radio"
-                                  name="goal_category"
-                                  value="weight"
-                                  checked={formData.goal_category === 'weight'}
-                                  onChange={(e) => setFormData({ ...formData, goal_category: e.target.value, measurement_field_id: '' })}
-                                  className="sr-only"
-                                />
-                                <div className="flex items-center">
-                                  <Scale className="h-5 w-5 mr-3 flex-shrink-0" />
-                                  <div>
-                                    <div className="text-sm font-medium dark:text-gray-100">Weight Goal</div>
-                                    <div className="text-sm text-gray-500 dark:text-gray-400">Target weight changes</div>
-                                  </div>
-                                </div>
-                              </label>
-
-                              <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
-                                formData.goal_category === 'measurement'
-                                  ? 'border-blue-500 dark:border-blue-200 bg-blue-50 dark:bg-blue-600/10'
-                                  : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
-                              }`}>
-                                <input
-                                  type="radio"
-                                  name="goal_category"
-                                  value="measurement"
-                                  checked={formData.goal_category === 'measurement'}
-                                  onChange={(e) => setFormData({ ...formData, goal_category: e.target.value, target_weight: '' })}
-                                  className="sr-only"
-                                />
-                                <div className="flex items-center">
-                                  <Ruler className="h-5 w-5 mr-3 flex-shrink-0" />
-                                  <div>
-                                    <div className="text-sm font-medium dark:text-gray-100">Measurement Goal</div>
-                                    <div className="text-sm text-gray-500 dark:text-gray-400">Target body measurements</div>
-                                  </div>
-                                </div>
-                              </label>
-                            </div>
-                          </div>
-
-                          {/* Measurement Field Selection (only for measurement goals) */}
-                          {formData.goal_category === 'measurement' && (
-                            <div>
-                              <label htmlFor="measurement_field_id" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                                Measurement Field
-                              </label>
-                              <FormInput
-                                inputType="select"
-                                id="measurement_field_id"
-                                required
-                                value={formData.measurement_field_id}
-                                onChange={(e) => setFormData({ ...formData, measurement_field_id: e.target.value })}
-                              >
-                                <>
-                                  <option value="">Select measurement field</option>
-                                  {measurementFields.map((field) => (
-                                    <option key={field.id} value={field.id}>
-                                      {field.field_name} ({field.unit})
-                                    </option>
-                                  ))}
-                                </>
-                              </FormInput>
-                            </div>
-                          )}
-
-                          {/* Target Value */}
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            <div>
-                              <label htmlFor={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'} className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                                Target {formData.goal_category === 'weight' ? 'Weight (lbs)' : 'Value'}
-                                {formData.goal_category === 'measurement' && formData.measurement_field_id && (
-                                  <span className="text-gray-500">
-                                    {' '}({measurementFields.find(f => f.id === formData.measurement_field_id)?.unit})
-                                  </span>
-                                )}
-                              </label>
-                              <FormInput
-                                type="number"
-                                id={formData.goal_category === 'weight' ? 'target_weight' : 'target_value'}
-                                step="0.1"
-                                required
-                                value={formData.goal_category === 'weight' ? formData.target_weight : formData.target_value}
-                                onChange={(e) => setFormData({ 
-                                  ...formData, 
-                                  [formData.goal_category === 'weight' ? 'target_weight' : 'target_value']: e.target.value 
-                                })}
-                                placeholder={`Enter target ${formData.goal_category === 'weight' ? 'weight' : 'value'}`}
-                              />
-                            </div>
-
-                            <div>
-                              <label htmlFor="target_date" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                                Target Date (optional)
-                              </label>
-                              <FormInput
-                                type="date"
-                                id="target_date"
-                                value={formData.target_date}
-                                onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
-                                min={new Date().toISOString().split('T')[0]}
-                              />
-                            </div>
-                          </div>
-
-                          <div>
-                            <label htmlFor="weekly_goal" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                              Weekly Goal (optional)
-                            </label>
-                            <FormInput
-                              type="number"
-                              id="weekly_goal"
-                              step="0.1"
-                              value={formData.weekly_goal}
-                              onChange={(e) => setFormData({ ...formData, weekly_goal: e.target.value })}
-                              placeholder={`Units per week (${formData.goal_category === 'weight' ? 'lbs' : 'measurement units'})`}
-                            />
-                          </div>
-
-                          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-600">
-                            <button
-                              type="button"
-                              onClick={() => setEditingGoal(null)}
-                              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              type="submit"
-                              disabled={saving}
-                              className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm lg:text-base"
-                            >
-                              <Save className="h-4 w-4 mr-2" />
-                              {saving ? 'Updating...' : 'Update Goal'}
-                            </button>
-                          </div>
-                        </form>
-                      </div>
+                      <GoalForm
+                        formRef={editFormRef}
+                        formData={formData}
+                        setFormData={setFormData}
+                        handleSubmit={handleSubmit}
+                        xOnClick={resetForm}
+                        latestMeasurements={latestMeasurements}
+                        latestWeight={latestWeight}
+                        measurementFields={measurementFields}
+                        saving={saving}
+                        formTitle='Edit Goal'
+                        editForm={true}
+                        key={goal.id}
+                      />
                     );
                   }
 
@@ -1537,7 +1053,7 @@ export default function GoalsPage() {
                 <p className="text-gray-500 mb-2 text-sm lg:text-base">No goals in history yet</p>
                 <button
                   onClick={() => setShowForm(true)}
-                  className="mt-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:text-blue-300 text-sm font-medium"
+                  className="mt-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 text-sm font-medium"
                 >
                   Create your first goal
                 </button>
