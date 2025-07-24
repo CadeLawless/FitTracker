@@ -22,6 +22,7 @@ import GoalsPage from './components/GoalsPage';
 import ProgressPage from './components/ProgressPage';
 import Profile from './components/Profile';
 import ResetSessionButton from './components/ResetSessionButton';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -137,6 +138,7 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <Router>
+          <ScrollToTop />
           <Layout>
             <Routes>
               <Route path="/" element={<Dashboard />} />

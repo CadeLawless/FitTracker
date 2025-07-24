@@ -149,3 +149,13 @@ export interface ExerciseSet {
   created_at: string;
   exercise?: Exercise; // Joined data
 }
+
+export interface GoalFormData  {
+  goal_category: string;
+  target_weight: string;
+  target_value: string;
+  measurement_field_id: string;
+  target_date: string;
+  weekly_goal: string;
+}
+
