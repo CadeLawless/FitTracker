@@ -242,7 +242,7 @@ export default function ProgressPage() {
         </div>
         
         {/* Timeframe Selector */}
-        <div className="flex bg-gray-100 rounded-lg p-1">
+        <div className="flex bg-gray-100 dark:bg-gray-500/40 rounded-lg p-1">
           {(['week', 'month', 'quarter', 'year'] as const).map((period) => (
             <button
               key={period}
@@ -261,7 +261,7 @@ export default function ProgressPage() {
 
       {/* Goal Progress */}
       {goalProgress && (
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-4 lg:p-6">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-500/10 dark:to-indigo-500/10 rounded-lg border border-blue-200 p-4 lg:p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <Target className="h-6 w-6 text-blue-600 dark:text-blue-400 mr-3" />

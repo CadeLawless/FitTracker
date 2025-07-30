@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Plus, Ruler, TrendingUp, TrendingDown, X, Edit2, Trash2, Calendar, AlertTriangle, Save, Settings, Eye, EyeOff, Calculator, CheckCircle, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
-import { scrollToElement } from '../lib/htmlElement';
+import { scrollToRef } from '../lib/htmlElement';
 import type { BodyMeasurement, BodyMeasurementValue, MeasurementField, UserProfile } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import FormInput from './ui/FormInput';
@@ -79,7 +79,7 @@ export default function MeasurementsTracker() {
 
   useEffect(() => {
       const isRefPresent = !!formRef.current;
-    scrollToElement(formRef, showForm && isRefPresent);
+    scrollToRef(formRef, showForm && isRefPresent);
   }, [showForm]);
 
   // Notification system

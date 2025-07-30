@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Target, TrendingUp, TrendingDown, Minus, Edit2, Plus, Scale, CheckCircle, AlertCircle, Ruler, Trash2, Check, AlertTriangle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
-import { scrollToElement } from '../lib/htmlElement';
+import { scrollToRef } from '../lib/htmlElement';
 import type { UserGoal, WeightEntry, MeasurementField, BodyMeasurement, GoalFormData } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { GoalForm } from './GoalForm';
@@ -86,12 +86,12 @@ export default function GoalsPage() {
 
   useEffect(() => {
     const isFormRefPresent = !!formRef.current;
-    scrollToElement(formRef, showForm && isFormRefPresent);
+    scrollToRef(formRef, showForm && isFormRefPresent);
   }, [showForm]);
 
   useEffect(() => {
     const isEditFormRefPresent = !!editFormRef.current;
-    scrollToElement(editFormRef, editingGoal !== null && isEditFormRefPresent);
+    scrollToRef(editFormRef, editingGoal !== null && isEditFormRefPresent);
   }, [editingGoal]);
 
   useEffect(() => {

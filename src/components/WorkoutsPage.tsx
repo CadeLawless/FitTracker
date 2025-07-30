@@ -10,6 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 import FormInput from './ui/FormInput';
 import { formatMinutes } from '../lib/formatMinutes';
 import { getSessionStatusBadge } from '../lib/getSessionStatusBadge';
+import { scrollToElement } from '../lib/htmlElement';
 
 interface DeleteConfirmation {
   isOpen: boolean;
@@ -64,24 +65,27 @@ export default function WorkoutsPage() {
     id: null,
     name: '',
   });
-
-  const tabsContainerRef = useRef<HTMLDivElement|null>(null);
-  const sessionsTabRef = useRef<HTMLButtonElement | null>(null);
-  const routinesTabRef = useRef<HTMLButtonElement | null>(null);
-  const logExerciseTabRef = useRef<HTMLButtonElement | null>(null);
-  const customExercisesTabRef = useRef<HTMLButtonElement | null>(null);
       
+  const activeTabChanged = useRef<boolean>(false);
+
   useEffect(() => {
-    let tabElement;
-    if(activeTab == 'sessions') tabElement = sessionsTabRef.current;
-    if(activeTab == 'routines') tabElement = routinesTabRef.current;
-    if(activeTab == 'log_exercise') tabElement = logExerciseTabRef.current;
-    if(activeTab == 'custom_exercises') tabElement = customExercisesTabRef.current;
+    const tabsContainer = document.getElementById("tabs-container")
+    const tabElement = document.getElementById(activeTab);
+
+    if(activeTab !== "sessions") activeTabChanged.current = true;
     
-    if (tabElement && tabsContainerRef.current) {
+    if (tabElement && tabsContainer && (activeTab !== "sessions" || activeTabChanged.current)) {
       tabElement.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     }
   }, [activeTab, loading]);
+
+  useEffect(() => {
+    const tabsContainer = document.getElementById("tabs-container");
+
+    if(param !== null && tabsContainer){
+      scrollToElement(tabsContainer);
+    }
+  }, [loading]);
 
   useEffect(() => {
     if(authLoading) return;
@@ -531,11 +535,10 @@ export default function WorkoutsPage() {
         )}
   
         {/* Tabs */}
-        <div ref={tabsContainerRef} className="border-b border-gray-200 dark:border-gray-600">
+        <div id="tabs-container" className="border-b border-gray-200 dark:border-gray-600">
           <nav className="-mb-px flex space-x-4 lg:space-x-8 overflow-x-auto">
             <button
               id='sessions'
-              ref={sessionsTabRef}
               onClick={() => setActiveTab('sessions')}
               className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'sessions'
@@ -547,7 +550,6 @@ export default function WorkoutsPage() {
             </button>
             <button
               id='routines'
-              ref={routinesTabRef}
               onClick={() => setActiveTab('routines')}
               className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'routines'
@@ -559,7 +561,6 @@ export default function WorkoutsPage() {
             </button>
             <button
               id='log_exercise'
-              ref={logExerciseTabRef}
               onClick={() => setActiveTab('log_exercise')}
               className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'log_exercise'
@@ -571,7 +572,6 @@ export default function WorkoutsPage() {
             </button>
             <button
               id='custom_exercises'
-              ref={customExercisesTabRef}
               onClick={() => setActiveTab('custom_exercises')}
               className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'custom_exercises'

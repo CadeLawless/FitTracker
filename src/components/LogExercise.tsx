@@ -73,6 +73,7 @@ export default function LogExercise() {
         .insert([{
           user_id: user.id,
           name: `${selectedExercise.name} - Single Exercise`,
+          single_exercise: true,
           date: formData.date,
           duration_minutes: formData.duration_minutes ? parseInt(formData.duration_minutes) : null,
           notes: formData.notes || null,

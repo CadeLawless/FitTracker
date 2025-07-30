@@ -13,6 +13,13 @@ interface WorkoutSessionWithSets extends WorkoutSession {
   sets: (ExerciseSet & { exercise: Exercise })[];
 }
 
+interface RoutineExerciseSetInfoOnly {
+  exercise_id: number;
+  order_index: number;
+  requires_weight: boolean;
+  requires_reps: boolean;
+};
+
 export default function WorkoutSessionDetails() {
   const { user, authLoading } = useAuth();
   const { id } = useParams();
@@ -52,6 +59,18 @@ export default function WorkoutSessionDetails() {
 
       if (sessionError) throw sessionError;
 
+      let routineExercisesData: RoutineExerciseSetInfoOnly[] = [];
+      if(sessionData?.routine_id !== null){
+        // Load routine exercises
+        const { data: routineExercisesResultData, error: routineExercisesError } = await supabase
+        .from('routine_exercises')
+        .select('exercise_id, order_index, requires_weight, requires_reps')
+        .eq('routine_id', sessionData?.routine_id);
+
+        if (routineExercisesError) throw routineExercisesError;
+        routineExercisesData = routineExercisesResultData;
+      }
+
       // Load exercise sets with exercise details
       const { data: setsData, error: setsError } = await supabase
         .from('exercise_sets')
@@ -64,6 +83,34 @@ export default function WorkoutSessionDetails() {
 
       if (setsError) throw setsError;
 
+      let setsWithRoutineData = setsData.map(set => {
+        return {
+          ...set,
+          requires_weight: false,
+          requires_reps: false
+        };
+      });
+
+      if(sessionData?.routine_id !== null){
+        const routineExerciseMap = new Map(
+          routineExercisesData.map(re => [
+            `${re.exercise_id}_${re.order_index}`,
+            re
+          ])
+        );
+
+        setsWithRoutineData = setsData.map(set => {
+          const key = `${set.exercise_id}_${set.order_index}`;
+          const routineExercise = routineExerciseMap.get(key);
+        
+          return {
+            ...set,
+            requires_weight: routineExercise?.requires_weight ?? true,
+            requires_reps: routineExercise?.requires_reps ?? true
+          };
+        });
+      }
+
       setSession({
         ...sessionData,
         name: sessionData.name,
@@ -73,7 +120,7 @@ export default function WorkoutSessionDetails() {
           name: sessionData.name,
           description: sessionData.description,
         },
-        sets: setsData || [],
+        sets: setsWithRoutineData || [],
       });
     } catch (error) {
       console.error('Error loading workout session:', error);
@@ -106,6 +153,8 @@ export default function WorkoutSessionDetails() {
       
       if (editFormData.durationMinutes) {
         updateData.duration_seconds = parseFloat(editFormData.durationMinutes) * 60;
+      } else {
+        updateData.duration_seconds = null;
       }
 
       const { error } = await supabase
@@ -221,7 +270,7 @@ export default function WorkoutSessionDetails() {
     }
     
     if (parts.length === 0) {
-      return 'Completed';
+      return session?.single_exercise ? 'Not entered' : 'Completed';
     }
     
     return parts.join(' × ');
@@ -264,7 +313,7 @@ export default function WorkoutSessionDetails() {
       {/* Header */}
       <div className="flex gap-4">
         <button
-          onClick={() => navigate('/workouts')}
+          onClick={() => navigate('/workouts?activeTab=sessions')}
           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
         >
           <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-400" />
@@ -320,53 +369,55 @@ export default function WorkoutSessionDetails() {
       </div>
 
       {/* Workout Stats */}
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 lg:gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
-          <div className="flex items-center">
-            <Dumbbell className="h-6 w-6 lg:h-8 lg:w-8 text-purple-600 flex-shrink-0" />
-            <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-              <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Total Sets</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">{getTotalSets()}</p>
+      {!session.single_exercise && (
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 lg:gap-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
+            <div className="flex items-center">
+              <Dumbbell className="h-6 w-6 lg:h-8 lg:w-8 text-purple-600 flex-shrink-0" />
+              <div className="ml-3 lg:ml-4 min-w-0 flex-1">
+                <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Total Sets</p>
+                <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">{getTotalSets()}</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
-          <div className="flex items-center">
-            <Target className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600 dark:text-blue-400 flex-shrink-0" />
-            <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-              <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Total Reps</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">{getTotalReps()}</p>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
+            <div className="flex items-center">
+              <Target className="h-6 w-6 lg:h-8 lg:w-8 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+              <div className="ml-3 lg:ml-4 min-w-0 flex-1">
+                <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Total Reps</p>
+                <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">{getTotalReps()}</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
-          <div className="flex items-center">
-            <TrendingUp className="h-6 w-6 lg:h-8 lg:w-8 text-green-600 flex-shrink-0" />
-            <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-              <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Total Volume</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">{getTotalVolume().toLocaleString()} lbs</p>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
+            <div className="flex items-center">
+              <TrendingUp className="h-6 w-6 lg:h-8 lg:w-8 text-green-600 flex-shrink-0" />
+              <div className="ml-3 lg:ml-4 min-w-0 flex-1">
+                <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">Total Volume</p>
+                <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">{getTotalVolume().toLocaleString()} lbs</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
-          <div className="flex items-center">
-            {totalDurationMinutes > 0 ? (
-              <Timer className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 flex-shrink-0" />
-            ) : (
-              <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 flex-shrink-0" />
-            )}
-            <div className="ml-3 lg:ml-4 min-w-0 flex-1">
-              <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">{totalDurationMinutes > 0 ? "Exercise Time" : "Avg Weight"}</p>
-              <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {totalDurationMinutes > 0 ? `${totalDurationMinutes}min` : `${getAverageWeight().toFixed(1)} lbs`}
-              </p>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
+            <div className="flex items-center">
+              {totalDurationMinutes > 0 ? (
+                <Timer className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 flex-shrink-0" />
+              ) : (
+                <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-orange-600 flex-shrink-0" />
+              )}
+              <div className="ml-3 lg:ml-4 min-w-0 flex-1">
+                <p className="text-xs lg:text-sm font-medium text-gray-600 dark:text-gray-400">{totalDurationMinutes > 0 ? "Exercise Time" : "Avg Weight"}</p>
+                <p className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  {totalDurationMinutes > 0 ? `${totalDurationMinutes}min` : `${getAverageWeight().toFixed(1)} lbs`}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Exercise Details */}
       <div className="space-y-6">
@@ -381,17 +432,20 @@ export default function WorkoutSessionDetails() {
                     <p className="text-xs text-gray-500">{group.exercise.equipment}</p>
                   )}
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{group.sets.length} sets</p>
-                  <p className="text-xs text-gray-500">
-                    {group.sets.reduce((total, set) => total + (set.reps || 0), 0) > 0 && 
-                      `${group.sets.reduce((total, set) => total + (set.reps || 0), 0)} total reps`
-                    }
-                    {group.sets.reduce((total, set) => total + (set.duration_seconds || 0), 0) > 0 && 
-                      `${Math.round(group.sets.reduce((total, set) => total + (set.duration_seconds || 0), 0) / 60)}min total`
-                    }
-                  </p>
-                </div>
+
+                {!session.single_exercise && (
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{group.sets.length} sets</p>
+                    <p className="text-xs text-gray-500">
+                      {group.sets.reduce((total, set) => total + (set.reps || 0), 0) > 0 && 
+                        `${group.sets.reduce((total, set) => total + (set.reps || 0), 0)} total reps`
+                      }
+                      {group.sets.reduce((total, set) => total + (set.duration_seconds || 0), 0) > 0 && 
+                        `${Math.round(group.sets.reduce((total, set) => total + (set.duration_seconds || 0), 0) / 60)}min total`
+                      }
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
             
@@ -400,50 +454,60 @@ export default function WorkoutSessionDetails() {
                 {group.sets.map((set) => (
                   <div key={set.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <div className="flex flex-grow sm:flex-grow-0 items-center gap-4">
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400 w-12">
-                        Set {set.set_number}
+                      <span className={`text-sm font-medium text-gray-600 dark:text-gray-400 w-${!session.single_exercise ? "12" : "18"}`}>
+                        {!session.single_exercise ? `Set ${set.set_number}` : "Duration"}
                       </span>
                       
                       {editingSet === set.id ? (
                         <div className="flex flex-grow sm:flex-grow-0 flex-col sm:flex-row sm:items-center gap-2 flex-wrap p-2">
-                          {/* Weight Input */}
-                          <div className="flex items-center gap-1">
-                            <FormInput
-                              type="number"
-                              step="0.5"
-                              value={editFormData.weight}
-                              onChange={(e) => setEditFormData({ ...editFormData, weight: e.target.value })}
-                              className="w-16 basis-[120px] flex-grow px-2 py-1 border border-gray-300 rounded text-sm"
-                              placeholder="Weight"
-                            />
-                            <span className="text-xs basis-[40px] text-gray-500">lbs</span>
-                          </div>
-                          
-                          {/* Reps Input */}
-                          <div className="flex items-center gap-1">
-                            <FormInput
-                              inputMode="numeric"
-                              type="number"
-                              value={editFormData.reps}
-                              onChange={(e) => setEditFormData({ ...editFormData, reps: e.target.value })}
-                              className="w-12 basis-[120px] flex-grow px-2 py-1 border border-gray-300 rounded text-sm"
-                              placeholder="Reps"
-                            />
-                            <span className="text-xs basis-[40px] text-gray-500">reps</span>
-                          </div>
+                          {!session.single_exercise && (
+                            <>
+                              {/* Weight Input */}
+                              {(!session.routine_id || set.requires_weight) && (
+                                <div className="flex items-center gap-1">
+                                  <FormInput
+                                    type="number"
+                                    step="0.5"
+                                    value={editFormData.weight}
+                                    onChange={(e) => setEditFormData({ ...editFormData, weight: e.target.value })}
+                                    className="w-16 basis-[120px] flex-grow px-2 py-1 border border-gray-300 rounded text-sm"
+                                    placeholder="Weight"
+                                  />
+                                  <span className="text-xs basis-[40px] text-gray-500">lbs</span>
+                                </div>
+                              )}
+                              
+                              {/* Reps Input */}
+                              {(!session.routine_id || set.requires_reps) && (
+                                <div className="flex items-center gap-1">
+                                  <FormInput
+                                    inputMode="numeric"
+                                    type="number"
+                                    value={editFormData.reps}
+                                    onChange={(e) => setEditFormData({ ...editFormData, reps: e.target.value })}
+                                    className="w-12 basis-[120px] flex-grow px-2 py-1 border border-gray-300 rounded text-sm"
+                                    placeholder="Reps"
+                                  />
+                                  <span className="text-xs basis-[40px] text-gray-500">reps</span>
+                                </div>
+                              )}
+                            </>
+                          )}
                           
                           {/* Duration Input */}
-                          <div className="flex items-center gap-1">
-                            <FormInput
-                              type="number"
-                              step="0.5"
-                              value={editFormData.durationMinutes}
-                              onChange={(e) => setEditFormData({ ...editFormData, durationMinutes: e.target.value })}
-                              className="w-16 basis-[120px] flex-grow px-2 py-1 border border-gray-300 rounded text-sm"
-                              placeholder="Min"
-                            />
-                            <span className="text-xs basis-[40px] text-gray-500">min</span>
-                          </div>
+                          {(!session.routine_id || session.single_exercise || !set.requires_weight) && (
+                            <div className="flex items-center gap-1">
+                              <FormInput
+                                type="number"
+                                step="0.5"
+                                value={editFormData.durationMinutes}
+                                onChange={(e) => setEditFormData({ ...editFormData, durationMinutes: e.target.value })}
+                                className="w-16 basis-[120px] flex-grow px-2 py-1 border border-gray-300 rounded text-sm"
+                                placeholder="Min"
+                              />
+                              <span className="text-xs basis-[40px] text-gray-500">min</span>
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <div className="flex items-center gap-2">
@@ -464,13 +528,13 @@ export default function WorkoutSessionDetails() {
                         <>
                           <button
                             onClick={() => handleSaveSet(set.id)}
-                            className="p-1.5 text-green-600 hover:bg-green-100 dark:bg-green-400/20 rounded transition-colors"
+                            className="p-1.5 text-green-600 hover:bg-green-100 dark:hover:bg-green-600/20 rounded transition-colors"
                           >
                             <Save className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => setEditingSet(null)}
-                            className="p-1.5 text-gray-400 hover:bg-gray-100 rounded transition-colors"
+                            className="p-1.5 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/30 rounded transition-colors"
                           >
                             <X className="h-4 w-4" />
                           </button>
@@ -479,13 +543,13 @@ export default function WorkoutSessionDetails() {
                         <>
                           <button
                             onClick={() => handleEditSet(set)}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-100 rounded transition-colors"
+                            className="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-500/20 rounded transition-colors"
                           >
                             <Edit2 className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteSet(set.id)}
-                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded transition-colors"
+                            className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 rounded transition-colors"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>

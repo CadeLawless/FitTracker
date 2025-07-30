@@ -182,7 +182,7 @@ export default function RoutineBuilder() {
         if (error) throw error;
       }
 
-      navigate('/workouts');
+      navigate('/workouts?activeTab=routines');
     } catch (error) {
       console.error('Error saving routine:', error);
     } finally {

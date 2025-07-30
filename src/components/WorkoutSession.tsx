@@ -1,12 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Check, Timer, ArrowLeft, ArrowRight, Dumbbell, CheckCircle, AlertTriangle, Clock } from 'lucide-react';
+import { Check, Timer, Edit2, Save, X, ArrowLeft, ArrowRight, Dumbbell, CheckCircle, AlertTriangle, Clock } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { scrollToElement } from '../lib/htmlElement';
+import { scrollToRef } from '../lib/htmlElement';
 import type { WorkoutRoutine, RoutineExercise, ExerciseSet, WorkoutSession as WorkoutSessionType } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import FormInput from './ui/FormInput';
 import { formatMinutes } from '../lib/formatMinutes';
+import { insertHTMLLineBreaks } from '../lib/insertHTMLLineBreaks';
 
 interface WorkoutState {
   session: WorkoutSessionType | null;
@@ -43,6 +44,14 @@ export default function WorkoutSession() {
     sessionStartTime: new Date(),
   });
 
+  const [editingSet, setEditingSet] = useState<string | null>(null);
+  const [editFormData, setEditFormData] = useState({ 
+    weight: '', 
+    reps: '', 
+    durationMinutes: '' 
+  });
+
+
   const [restTimer, setRestTimer] = useState<NodeJS.Timeout | null>(null);
   const [customRestMinutes, setCustomRestMinutes] = useState<number>(2);
   const [customRestSeconds, setCustomRestSeconds] = useState<number>(0);
@@ -62,7 +71,7 @@ export default function WorkoutSession() {
     const isRestTimerDivRefPresent = !!restTimerDiv.current;
     const ishasScrolledRefPresent = !!hasScrolledToRestTimer.current;
     const condition = workoutState.isResting && isRestTimerDivRefPresent && !ishasScrolledRefPresent;
-    scrollToElement(restTimerDiv, condition);
+    scrollToRef(restTimerDiv, condition);
     if (condition) {      
       hasScrolledToRestTimer.current = true;
     }
@@ -72,21 +81,21 @@ export default function WorkoutSession() {
     if(authLoading) return;
     if(!user) return;
 
-    console.log('WorkoutSession mounted');
-    console.log(workoutComplete);
+    //console.log('WorkoutSession mounted');
+    //console.log(workoutComplete);
     if (hasCreatedSessionRef.current || workoutComplete) {
-      console.log('Session creation already handled, skipping.');
+      //console.log('Session creation already handled, skipping.');
       return;
     }
     hasCreatedSessionRef.current = true;
     if (resumeSessionId) {
-      console.log('Resuming session ID:', resumeSessionId);
+      //console.log('Resuming session ID:', resumeSessionId);
       resumeExistingSession();
     } else if (routineId) {
-      console.log('Routine ID found:', routineId, '-> loading routine and creating session');
+      //console.log('Routine ID found:', routineId, '-> loading routine and creating session');
       loadRoutineAndCreateSession();
     } else {
-      console.log('No routineId or resumeSessionId -> starting custom workout');
+      //console.log('No routineId or resumeSessionId -> starting custom workout');
       startCustomWorkout();
     }
   }, [routineId, resumeSessionId, authLoading, user]);
@@ -397,6 +406,46 @@ export default function WorkoutSession() {
     }
   };
 
+  const handleEditSet = (set: ExerciseSet) => {
+    setEditingSet(set.id);
+    setEditFormData({
+      weight: set.weight?.toString() || '',
+      reps: set.reps?.toString() || '',
+      durationMinutes: set.duration_seconds ? (set.duration_seconds / 60).toString() : '',
+    });
+  };
+
+  const handleSaveSet = async (setId: string) => {
+    try {
+      const updateData: any = {};
+      
+      if (editFormData.weight) {
+        updateData.weight = parseFloat(editFormData.weight);
+      }
+      
+      if (editFormData.reps) {
+        updateData.reps = parseInt(editFormData.reps);
+      }
+      
+      if (editFormData.durationMinutes) {
+        updateData.duration_seconds = parseFloat(editFormData.durationMinutes) * 60;
+      } else {
+        updateData.duration_seconds = null;
+      }
+
+      const { error } = await supabase
+        .from('exercise_sets')
+        .update(updateData)
+        .eq('id', setId);
+
+      if (error) throw error;
+
+      setEditingSet(null);
+    } catch (error) {
+      console.error('Error updating set:', error);
+    }
+  };
+
   const startRestTimer = (seconds: number) => {
     setWorkoutState(prev => ({
       ...prev,
@@ -429,7 +478,7 @@ export default function WorkoutSession() {
     startRestTimer(totalSeconds);
     setShowCustomTimer(false);
     hasScrolledToRestTimer.current = false;
-    scrollToElement(restTimerDiv, true);
+    scrollToRef(restTimerDiv, true);
   };
 
   const skipRest = () => {
@@ -632,9 +681,9 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   Are you sure you want to {popupConfirmation.type === 'complete' ? 'finish' : 'cancel'} this workout?
                   {popupConfirmation.type === 'complete' && unfinishedExercises.length > 0 && (
-                    <div className="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-200 rounded">
-                      <p className="font-bold text-yellow-900">Sets still need finished for the following exercises:</p>
-                      <ul className="list-disc list-inside text-yellow-800">
+                    <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-400/20 border-l-4 border-yellow-200 rounded">
+                      <p className="font-bold text-yellow-900 dark:text-yellow-100">Sets still need finished for the following exercises:</p>
+                      <ul className="list-disc list-inside text-yellow-800 dark:text-yellow-200">
                         {unfinishedExercises.map(ex => (
                           <li key={ex.exercise_id}>{ex.exercise?.name} ({(workoutState.sets.filter(s => s.exercise_id === ex.exercise_id).length)} of {ex.target_sets} sets)</li>
                         ))}
@@ -725,7 +774,10 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
               </h2>
               <p className="text-gray-600 dark:text-gray-400">{currentExercise.exercise?.muscle_group}</p>
               {currentExercise.exercise?.instructions && (
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{currentExercise.exercise.instructions}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{insertHTMLLineBreaks(currentExercise.exercise.instructions)}</p>
+              )}
+              {currentExercise.notes && (
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-4">Routine Notes: {currentExercise.notes}</p>
               )}
             </div>
   
@@ -765,12 +817,90 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
                     .map((set) => (
                       <div key={set.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-900/50 rounded">
                         <span className="text-sm text-gray-600 dark:text-gray-400">Set {set.set_number}</span>
-                        <span className="text-sm dark:text-gray-100 font-medium">
-                          {set.weight && `${set.weight}lbs`}
-                          {set.weight && set.reps && ' × '}
-                          {set.reps && `${set.reps} reps`}
-                          {set.duration_seconds && `${Math.round(set.duration_seconds / 60)}min`}
-                          {!set.weight && !set.reps && !set.duration_seconds && 'Completed'}
+                        <span className="flex items-center gap-2 text-sm dark:text-gray-100 font-medium">
+                          <span>
+                            {editingSet === set.id ? (
+                              <div className="flex flex-grow sm:flex-grow-0 flex-col sm:flex-row sm:items-center gap-2 flex-wrap p-2">
+                                  {/* Weight Input */}
+                                  {currentExercise.requires_weight && (
+                                    <div className="flex items-center gap-1">
+                                      <FormInput
+                                        type="number"
+                                        step="0.5"
+                                        value={editFormData.weight}
+                                        onChange={(e) => setEditFormData({ ...editFormData, weight: e.target.value })}
+                                        className="basis-[100px] px-1 py-1 text-xs large:text-xs"
+                                        placeholder="Weight"
+                                      />
+                                      <span className="text-xs basis-[40px] text-gray-500">lbs</span>
+                                    </div>
+                                  )}
+                                  
+                                  {/* Reps Input */}
+                                  {currentExercise.requires_reps && (
+                                    <div className="flex items-center gap-1">
+                                      <FormInput
+                                        inputMode="numeric"
+                                        type="number"
+                                        value={editFormData.reps}
+                                        onChange={(e) => setEditFormData({ ...editFormData, reps: e.target.value })}
+                                        className="basis-[100px] px-1 py-1 text-xs large:text-xs"
+                                        placeholder="Reps"
+                                      />
+                                      <span className="text-xs basis-[40px] text-gray-500">reps</span>
+                                    </div>
+                                  )}
+                                
+                                {/* Duration Input */}
+                                {!currentExercise.requires_weight && (
+                                  <div className="flex items-center gap-1">
+                                    <FormInput
+                                      type="number"
+                                      step="0.5"
+                                      value={editFormData.durationMinutes}
+                                      onChange={(e) => setEditFormData({ ...editFormData, durationMinutes: e.target.value })}
+                                      className="basis-[100px] px-1 py-1 text-xs large:text-xs"
+                                      placeholder="Min"
+                                    />
+                                    <span className="text-xs basis-[40px] text-gray-500">min</span>
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <>
+                                  {set.weight && `${set.weight}lbs`}
+                                  {set.weight && set.reps && ' × '}
+                                  {set.reps && `${set.reps} reps`}
+                                  {set.duration_seconds && `${Math.round(set.duration_seconds / 60)}min`}
+                                  {!set.weight && !set.reps && !set.duration_seconds && 'Completed'}
+                              </>
+                            )}
+                          </span>
+                          {editingSet === set.id ? (
+                            <>
+                              <button
+                                onClick={() => handleSaveSet(set.id)}
+                                className="p-1.5 text-green-600 hover:bg-green-100 dark:hover:bg-green-600/20 rounded transition-colors"
+                              >
+                                <Save className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => setEditingSet(null)}
+                                className="p-1.5 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/40 rounded transition-colors"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => handleEditSet(set)}
+                                className="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-500/20 rounded transition-colors"
+                              >
+                                <Edit2 className="h-4 w-4" />
+                              </button>
+                            </>
+                          )}
                         </span>
                       </div>
                     ))}

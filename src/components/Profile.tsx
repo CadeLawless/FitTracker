@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { User, Save, Calendar, Ruler, Activity, Mail, Edit2, X, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
-import { scrollToElement } from '../lib/htmlElement';
+import { scrollToRef } from '../lib/htmlElement';
 import type { UserProfile } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import FormInput from './ui/FormInput';
@@ -50,7 +50,7 @@ export default function Profile() {
 
   useEffect(() => {
     const isRefPresent = !!formRef.current;
-    scrollToElement(formRef, editing && isRefPresent);
+    scrollToRef(formRef, editing && isRefPresent);
   }, [editing]);
   
   const loadProfile = async () => {

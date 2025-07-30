@@ -126,6 +126,7 @@ export interface WorkoutSession {
   user_id: string;
   routine_id?: string;
   name: string;
+  single_exercise: boolean;
   date: string;
   duration_minutes?: number;
   notes?: string;
@@ -148,6 +149,8 @@ export interface ExerciseSet {
   notes?: string;
   created_at: string;
   exercise?: Exercise; // Joined data
+  requires_weight?: boolean;
+  requires_reps?: boolean;
 }
 
 export interface GoalFormData  {
