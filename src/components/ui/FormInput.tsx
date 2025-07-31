@@ -88,7 +88,8 @@ const FormInput: React.FC<FormInputProps> = ({
         onBlur: () => {
           if (!inputProps.value) setDateInputType("text");
         },
-        type: dateInputType
+        type: dateInputType,
+        readOnly: dateInputType == "text",
       }
     : {};
 
