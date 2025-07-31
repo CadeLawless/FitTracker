@@ -39,7 +39,7 @@ const FormInput: React.FC<FormInputProps> = ({
   ...props
 }) => {
   const baseClasses =
-    "mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-400 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base";
+    "mt-1 block w-full h-[2.4rem] lg:h-[3rem] px-3 py-2 border border-gray-300 dark:border-gray-400 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm lg:text-base";
   const combinedClasses = `${baseClasses} ${className}`;
 
   if (inputType === "textarea") {
@@ -75,20 +75,10 @@ const FormInput: React.FC<FormInputProps> = ({
   const isDateType = inputProps.type === "date";
   const isNumberType = inputProps.type === "number";
 
-  const [dateInputType, setDateInputType] = useState<"text" | "date">(inputProps.value ? "date" : "text");
-
   const dateProps = isDateType
     ? {
         max: inputProps.max ?? '9999-12-31',
         placeholder: inputProps.placeholder ?? "mm/dd/yyyy",
-        onFocus: (e: React.FocusEvent<HTMLInputElement>) => {
-          setDateInputType("date");
-        },
-        onBlur: () => {
-          if (!inputProps.value) setDateInputType("text");
-        },
-        type: dateInputType,
-        readOnly: dateInputType == "text",
       }
     : {};
 
