@@ -441,6 +441,16 @@ export default function WorkoutSession() {
       if (error) throw error;
 
       setEditingSet(null);
+
+      setWorkoutState(prev => ({
+        ...prev,
+        sets: workoutState.sets.map(ex => ex.id === editingSet ? {
+          ...ex,
+          weight: updateData.weight,
+          reps: updateData.reps,
+          duration_seconds: updateData.duration_seconds,
+        } : ex)
+      }));
     } catch (error) {
       console.error('Error updating set:', error);
     }
