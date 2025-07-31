@@ -171,22 +171,6 @@ export default function WorkoutSessionDetails() {
     }
   };
 
-  const handleDeleteSet = async (setId: string) => {
-    if (!confirm('Are you sure you want to delete this set?')) return;
-
-    try {
-      const { error } = await supabase
-        .from('exercise_sets')
-        .delete()
-        .eq('id', setId);
-
-      if (error) throw error;
-      loadWorkoutSession();
-    } catch (error) {
-      console.error('Error deleting set:', error);
-    }
-  };
-
   const handleCompleteSession = async () => {
     if (!session || session.status !== 'active') return;
 
@@ -546,12 +530,6 @@ export default function WorkoutSessionDetails() {
                             className="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-500/20 rounded transition-colors"
                           >
                             <Edit2 className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteSet(set.id)}
-                            className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 rounded transition-colors"
-                          >
-                            <Trash2 className="h-4 w-4" />
                           </button>
                         </>
                       )}
