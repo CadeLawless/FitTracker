@@ -612,7 +612,7 @@ export default function WorkoutSessionDetails() {
             </div>
           </form>
         ) : (
-          <p className="text-gray-700 dark:text-gray-200">{insertHTMLLineBreaks(session?.notes ?? "")}</p>
+          <p className="text-gray-700 dark:text-gray-200">{insertHTMLLineBreaks(session?.notes ?? "No notes")}</p>
         )}
       </div>
 
