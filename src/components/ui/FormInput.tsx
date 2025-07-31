@@ -1,4 +1,5 @@
 import React, {
+  useState,
   InputHTMLAttributes,
   TextareaHTMLAttributes,
   SelectHTMLAttributes,
@@ -74,10 +75,17 @@ const FormInput: React.FC<FormInputProps> = ({
   const isDateType = inputProps.type === "date";
   const isNumberType = inputProps.type === "number";
 
+  const [dateInputType, setDateInputType] = useState<"text" | "date">(inputProps.value ? "date" : "text");
+
   const dateProps = isDateType
     ? {
         max: inputProps.max ?? '9999-12-31',
         placeholder: inputProps.placeholder ?? "mm/dd/yyyy",
+        onFocus: () => setDateInputType("date"),
+        onBlur: () => {
+          if (!inputProps.value) setDateInputType("text");
+        },
+        type: dateInputType
       }
     : {};
 
