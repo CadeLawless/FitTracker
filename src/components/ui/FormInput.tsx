@@ -81,7 +81,10 @@ const FormInput: React.FC<FormInputProps> = ({
     ? {
         max: inputProps.max ?? '9999-12-31',
         placeholder: inputProps.placeholder ?? "mm/dd/yyyy",
-        onFocus: () => setDateInputType("date"),
+        onFocus: (e: React.FocusEvent<HTMLInputElement>) => {
+          e.preventDefault();
+          setDateInputType("date");
+        },
         onBlur: () => {
           if (!inputProps.value) setDateInputType("text");
         },
