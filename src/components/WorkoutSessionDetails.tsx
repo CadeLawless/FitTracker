@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import FormInput from './ui/FormInput';
 import { formatMinutes } from '../lib/formatMinutes';
 import { getSessionStatusBadge } from '../lib/getSessionStatusBadge';
+import { insertHTMLLineBreaks } from '../lib/insertHTMLLineBreaks';
 
 interface WorkoutSessionWithSets extends WorkoutSession {
   sets: (ExerciseSet & { exercise: Exercise })[];
@@ -25,7 +26,9 @@ export default function WorkoutSessionDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [session, setSession] = useState<WorkoutSessionWithSets | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [showNotesForm, setShowNotesForm] = useState<boolean>(false);
+  const [workoutNotes, setWorkOutNotes] = useState<string>("");
   const [editingSet, setEditingSet] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState({ 
     weight: '', 
@@ -58,6 +61,8 @@ export default function WorkoutSessionDetails() {
         .single();
 
       if (sessionError) throw sessionError;
+
+      setWorkOutNotes(sessionData?.notes ?? "");
 
       let routineExercisesData: RoutineExerciseSetInfoOnly[] = [];
       if(sessionData?.routine_id !== null){
@@ -187,6 +192,26 @@ export default function WorkoutSessionDetails() {
       loadWorkoutSession();
     } catch (error) {
       console.error('Error completing session:', error);
+    }
+  };
+
+  const handleSaveNotes = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!session) return;
+
+    try {
+      const { error } = await supabase
+        .from('workout_sessions')
+        .update({ 
+          notes: workoutNotes,
+        })
+        .eq('id', session.id);
+
+      if (error) throw error;
+      setShowNotesForm(false);
+      loadWorkoutSession();
+    } catch (error) {
+      console.error('Error updating notes:', error);
     }
   };
 
@@ -543,12 +568,53 @@ export default function WorkoutSessionDetails() {
       </div>
 
       {/* Notes Section */}
-      {session.notes && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Workout Notes</h3>
-          <p className="text-gray-700 dark:text-gray-200">{session.notes}</p>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
+        <div className="flex flex-wrap justify-between items-center gap-2 mb-3">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Workout Notes</h3>
+          {!showNotesForm && (
+            <button
+              onClick={() => setShowNotesForm(true)}
+              className="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-500/20 rounded transition-colors"
+            >
+              <Edit2 className="h-4 w-4" />
+            </button>
+          )}
         </div>
-      )}
+        {showNotesForm ? (
+          <form
+            onSubmit={handleSaveNotes}
+          >
+            <FormInput
+              inputType="textarea"
+              rows={4}
+              value={workoutNotes}
+              onChange={(e) => setWorkOutNotes(e.target.value)}
+              placeholder="e.g., I ran for 3 miles, I did 3 sets at 100 lbs, felt great today..."
+            />
+            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-600">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowNotesForm(false);
+                  setWorkOutNotes(session?.notes ?? "");
+                }}
+                className="px-4 py-2 border border-input-theme rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex items-center justify-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+              >
+                <Save className="h-4 w-4 mr-1" />
+                Save
+              </button>
+            </div>
+          </form>
+        ) : (
+          <p className="text-gray-700 dark:text-gray-200">{insertHTMLLineBreaks(session?.notes ?? "")}</p>
+        )}
+      </div>
 
       {/* Empty State */}
       {exerciseGroups.length === 0 && (
