@@ -36,7 +36,7 @@ export const GoalForm = ({
         (saving ? 'Creating...' : 'Create Goal');
 
     const cssClasses = editForm ?
-        "bg-blue-50 dark:bg-blue-400/10 border-blue-200 dark:border-blue-200/50" :
+        "bg-blue-50 dark:bg-blue-300/10 border-blue-200 dark:border-blue-200/50" :
         "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600";
 
     return (
@@ -60,8 +60,8 @@ export const GoalForm = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
                     formData.goal_category === 'weight'
-                        ? 'border-blue-500 dark:border-blue-200 bg-blue-200/50 dark:bg-blue-600/10'
-                        : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
+                        ? 'border-blue-500 dark:border-blue-200 bg-blue-200/50 dark:bg-blue-300/20'
+                        : 'border-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/70'
                     }`}>
                     <input
                         type="radio"
@@ -82,8 +82,8 @@ export const GoalForm = ({
 
                     <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
                     formData.goal_category === 'measurement'
-                        ? 'border-blue-500 dark:border-blue-200 bg-blue-200/50 dark:bg-blue-600/10'
-                        : 'border-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
+                        ? 'border-blue-500 dark:border-blue-200 bg-blue-200/50 dark:bg-blue-300/20'
+                        : 'border-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/70'
                     }`}>
                     <input
                         type="radio"
@@ -203,7 +203,7 @@ export const GoalForm = ({
 
                 if (currentValue) {
                     return (
-                    <div className="bg-blue-200/50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-4">
+                    <div className="bg-blue-200/50 dark:bg-blue-200/10 border border-blue-200 rounded-lg p-4">
                         <div className="flex items-center">
                         {formData.goal_category === 'weight' ? (
                             <Scale className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2 flex-shrink-0" />
