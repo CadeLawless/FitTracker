@@ -25,6 +25,15 @@ interface ConflictConfirmation {
   newGoalData: any;
 }
 
+interface Phase {
+  id: 'cutting' | 'bulking' | 'maintaining' | 'none';
+  name: string;
+  description: string;
+  color: string;
+  icon: React.ElementType;
+};
+
+
 export default function GoalsPage() {
   const { user, authLoading } = useAuth();
   const [goals, setGoals] = useState<UserGoal[]>([]);
@@ -35,6 +44,7 @@ export default function GoalsPage() {
   const [latestMeasurements, setLatestMeasurements] = useState<BodyMeasurement | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showPhaseForm, setShowPhaseForm] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingGoal, setEditingGoal] = useState<UserGoal | null>(null);
   const [error, setError] = useState('');
@@ -69,9 +79,6 @@ export default function GoalsPage() {
 
   const [fitnessPhase, setFitnessPhase] = useState<'cutting' | 'bulking' | 'maintaining' | 'none'>('none');
   const [updatingPhase, setUpdatingPhase] = useState(false);
-
-  // Ref for timeout on fitness phase success messages
-  const fitnessPhaseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   // Ref for the form section to enable auto-scrolling
   const formRef = useRef<HTMLDivElement>(null);
@@ -193,18 +200,8 @@ export default function GoalsPage() {
       if (error) throw error;
 
       setFitnessPhase(newPhase);
-      setSuccess('Fitness phase updated successfully!');
-      
-      // Clear the old timeout if it exists
-      if(fitnessPhaseTimeoutRef.current){
-        clearTimeout(fitnessPhaseTimeoutRef.current);
-      }
-    
-      // Set a new timeout
-      fitnessPhaseTimeoutRef.current = setTimeout(() => {
-        setSuccess('');
-        fitnessPhaseTimeoutRef.current = null;
-      }, 3000);
+
+      setShowPhaseForm(false);
     } catch (error) {
       console.error('Error updating fitness phase:', error);
       setError('Failed to update fitness phase');
@@ -373,6 +370,7 @@ export default function GoalsPage() {
       weekly_goal: goal.weekly_goal?.toString() || '',
     });
     setShowForm(false); // Hide the main form when editing inline
+    setShowPhaseForm(false);
   };
 
   const handleSetActive = async (goalId: string, category: string) => {
@@ -575,7 +573,7 @@ export default function GoalsPage() {
     return goal.measurement_field?.unit || '';
   };
 
-  const fitnessPhases = [
+  const fitnessPhases: Phase[] = [
     {
       id: 'cutting',
       name: 'Cutting',
@@ -605,6 +603,8 @@ export default function GoalsPage() {
       color: 'text-gray-600 dark:text-gray-100 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-600',
     },
   ];
+
+  const currentFitnessPhase = fitnessPhases.find((phase) => phase.id === fitnessPhase);
 
   if (loading) {
     return (
@@ -757,6 +757,7 @@ export default function GoalsPage() {
             onClick={() => {
               resetForm();
               setShowForm(true);
+              setShowPhaseForm(false);
             }}
             className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm lg:text-base"
           >
@@ -782,32 +783,58 @@ export default function GoalsPage() {
 
         {/* Fitness Phase Selection */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
-          <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Current Fitness Phase</h2>
+          <div className="flex flex-wrap justify-between gap-2">
+            <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Current Fitness Phase</h2>
+            {showPhaseForm ? (
+              <button
+                onClick={() => setShowPhaseForm(false)}
+                className="px-4 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm"
+              >
+                Cancel
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  setShowPhaseForm(true);
+                  setShowForm(false);
+                  setEditingGoal(null);
+                }}
+                className="flex items-center justify-center px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+              >
+                <Edit2 className="h-4 w-4 mr-2" />
+                Change Fitness Phase
+              </button>
+            )}
+          </div>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             This affects how progress indicators are colored when you don't have specific goals set.
           </p>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {fitnessPhases.map((phase) => {
-              const Icon = phase.icon;
-              return (
-                <button
-                  key={phase.id}
-                  onClick={() => updateFitnessPhase(phase.id as any)}
-                  disabled={updatingPhase}
-                  className={`relative flex flex-col items-center p-4 border rounded-lg transition-colors disabled:opacity-50 ${
-                    fitnessPhase === phase.id
-                      ? phase.color
-                      : 'border-gray-300 dark:border-gray-600 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
-                  }`}
-                >
-                  <Icon className="h-6 w-6 mb-2" />
-                  <div className="text-sm font-medium">{phase.name}</div>
-                  <div className="text-xs text-center mt-1 opacity-75">{phase.description}</div>
-                </button>
-              );
-            })}
-          </div>
+          {showPhaseForm || !currentFitnessPhase ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {fitnessPhases.map((phase) => {
+                const Icon = phase.icon;
+                return (
+                  <button
+                    key={phase.id}
+                    onClick={() => updateFitnessPhase(phase.id as any)}
+                    disabled={updatingPhase}
+                    className={`relative flex flex-col items-center p-4 border rounded-lg transition-colors disabled:opacity-50 ${
+                      fitnessPhase === phase.id
+                        ? phase.color
+                        : 'border-gray-300 dark:border-gray-600 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50'
+                    }`}
+                  >
+                    <Icon className="h-6 w-6 mb-2" />
+                    <div className="text-sm font-medium">{phase.name}</div>
+                    <div className="text-xs text-center mt-1 opacity-75">{phase.description}</div>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <PhaseCard phase={currentFitnessPhase} />
+          )}
         </div>
 
         {/* Add Goal Form */}
@@ -1052,7 +1079,10 @@ export default function GoalsPage() {
                 <Target className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                 <p className="text-gray-500 mb-2 text-sm lg:text-base">No goals in history yet</p>
                 <button
-                  onClick={() => setShowForm(true)}
+                  onClick={() => {
+                    setShowForm(true);
+                    setShowPhaseForm(false);
+                  }}
                   className="mt-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 text-sm font-medium"
                 >
                   Create your first goal
@@ -1063,5 +1093,22 @@ export default function GoalsPage() {
         </div>
       </div>
     </>
+  );
+}
+
+type PhaseCardProps = {
+  phase: Phase;
+};
+const PhaseCard = ({ phase }: PhaseCardProps) => {
+  const Icon = phase?.icon ?? 'div';
+
+  return (
+    <div
+      className={`relative flex flex-col items-center p-4 border rounded-lg transition-colors disabled:opacity-50 ${phase.color}`}
+    >
+      <Icon className="h-6 w-6 mb-2" />
+      <div className="text-sm font-medium">{phase.name}</div>
+      <div className="text-xs text-center mt-1 opacity-75">{phase.description}</div>
+    </div>
   );
 }
