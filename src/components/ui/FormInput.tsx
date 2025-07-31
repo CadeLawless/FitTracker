@@ -86,6 +86,7 @@ const FormInput: React.FC<FormInputProps> = ({
       // Delay to ensure type change is registered by DOM
       setTimeout(() => {
         dateInputRef.current?.click(); // simulate click to open picker
+        dateInputRef.current?.showPicker?.();
         setShouldTriggerClick(false);
       }, 0);
     }
