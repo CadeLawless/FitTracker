@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Save, Calendar, Clock, FileText, Dumbbell } from 'lucide-react';
+import { ArrowLeft, Save, Calendar, Clock, FileText } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Exercise } from '../types';
@@ -16,7 +16,6 @@ export default function LogExercise() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   const [formData, setFormData] = useState({
     exercise_id: exerciseId || '',
@@ -59,7 +58,6 @@ export default function LogExercise() {
     e.preventDefault();
     setSaving(true);
     setError('');
-    setSuccess('');
 
     try {
       if (!user) throw new Error('No authenticated user');
@@ -97,20 +95,8 @@ export default function LogExercise() {
 
       if (setError) throw setError;
 
-      setSuccess('Exercise logged successfully!');
-      
-      // Reset form
-      setFormData({
-        exercise_id: '',
-        date: new Date().toISOString().split('T')[0],
-        duration_minutes: '',
-        notes: '',
-      });
-
       // Navigate to workout session details after a short delay
-      setTimeout(() => {
-        navigate(`/workouts/session/${sessionData.id}`);
-      }, 1500);
+      navigate(`/workouts/session/${sessionData.id}`);
 
     } catch (error: any) {
       console.error('Error logging exercise:', error);
@@ -154,14 +140,6 @@ export default function LogExercise() {
           </p>
         </div>
       </div>
-
-      {/* Success/Error Messages */}
-      {success && (
-        <div className="bg-green-50 dark:bg-green-200/10 border border-green-200 dark:border-green-400/40 text-green-600 px-4 py-3 rounded-lg flex items-center">
-          <Dumbbell className="h-5 w-5 mr-2 flex-shrink-0" />
-          <span className="text-sm lg:text-base">{success}</span>
-        </div>
-      )}
 
       {error && (
         <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-400/40 text-red-600 px-4 py-3 rounded-lg text-sm lg:text-base">
