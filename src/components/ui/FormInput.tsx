@@ -4,8 +4,6 @@ import React, {
   TextareaHTMLAttributes,
   SelectHTMLAttributes,
   ReactNode,
-  useRef,
-  useEffect
 } from "react";
 
 type BaseProps = {
@@ -78,36 +76,19 @@ const FormInput: React.FC<FormInputProps> = ({
   const isNumberType = inputProps.type === "number";
 
   const [dateInputType, setDateInputType] = useState<"text" | "date">(inputProps.value ? "date" : "text");
-  const [shouldTriggerClick, setShouldTriggerClick] = useState<boolean>(false);
-  const dateInputRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    if (dateInputType === "date" && shouldTriggerClick) {
-      // Delay to ensure type change is registered by DOM
-      setTimeout(() => {
-        dateInputRef.current?.click(); // simulate click to open picker
-        dateInputRef.current?.showPicker?.();
-        setShouldTriggerClick(false);
-      }, 0);
-    }
-  }, [inputType, shouldTriggerClick]);
 
   const dateProps = isDateType
     ? {
         max: inputProps.max ?? '9999-12-31',
         placeholder: inputProps.placeholder ?? "mm/dd/yyyy",
-        onFocus: () => {
-          if (dateInputType === "text") {
-            setDateInputType("date");
-            setShouldTriggerClick(true); // trigger click after switching type
-          }
+        onFocus: (e: React.FocusEvent<HTMLInputElement>) => {
+          setDateInputType("date");
         },
         onBlur: () => {
           if (!inputProps.value) setDateInputType("text");
         },
         type: dateInputType,
         readOnly: dateInputType == "text",
-        ref: dateInputRef,
       }
     : {};
 
