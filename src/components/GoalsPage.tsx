@@ -783,12 +783,12 @@ export default function GoalsPage() {
 
         {/* Fitness Phase Selection */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
-          <div className="flex flex-wrap justify-between gap-2">
-            <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Current Fitness Phase</h2>
+          <div className="flex flex-wrap justify-between gap-3">
+            <h2 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-gray-100">Current Fitness Phase</h2>
             {showPhaseForm ? (
               <button
                 onClick={() => setShowPhaseForm(false)}
-                className="px-4 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm"
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm"
               >
                 Cancel
               </button>
@@ -799,14 +799,14 @@ export default function GoalsPage() {
                   setShowForm(false);
                   setEditingGoal(null);
                 }}
-                className="flex items-center justify-center px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
               >
                 <Edit2 className="h-4 w-4 mr-2" />
                 Change Fitness Phase
               </button>
             )}
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          <p className="text-sm text-gray-600 dark:text-gray-400 my-4">
             This affects how progress indicators are colored when you don't have specific goals set.
           </p>
           
