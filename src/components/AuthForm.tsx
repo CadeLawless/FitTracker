@@ -2,7 +2,7 @@
 // This handles user login and registration with enhanced profile fields
 
 import React, { useState, useEffect } from 'react';
-import { Dumbbell, Eye, EyeOff, Calendar, User, Moon, Sun } from 'lucide-react';
+import { Dumbbell, Eye, EyeOff, Calendar, User, Moon, Sun, ChevronLeft } from 'lucide-react';
 import { auth } from '../lib/supabase';
 import FormInput from './ui/FormInput';
 
@@ -18,9 +18,10 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
     const defaultTheme: Theme = prefersDark ? 'dark' : 'light';
     return defaultTheme;
   });
-  const [isLogin, setIsLogin] = useState(true);
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [formType, setFormType] = useState<'login'|'sign-up'|'forgot-password'>('login');
+  const [message, setMessage] = useState<string>('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -51,10 +52,10 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
     setError('');
 
     try {
-      if (isLogin) {
+      if (formType === 'login') {
         const { error } = await auth.signIn(formData.email, formData.password);
         if (error) throw error;
-      } else {
+      } else if (formType === 'sign-up') {
         const { error } = await auth.signUp(
           formData.email, 
           formData.password, 
@@ -64,8 +65,17 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
         );
 
         if (error) throw error;
+      } else if (formType === 'forgot-password') {
+        const res = await fetch('/api/send-reset-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: formData.email }),
+        });
+    
+        const data = await res.json();
+        setMessage(data.message);
       }
-      onAuthSuccess();
+      if(formType !== 'forgot-password') onAuthSuccess();
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -103,12 +113,28 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
           </div>
           <h2 className="mt-4 text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 dark:text-white">FitTracker</h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300">
-            {isLogin ? 'Sign in to your account' : 'Create your account'}
+            {formType === 'login' ? 'Sign in to your account' : (formType === 'sign-up' ? 'Create your account' : 'Reset your password')}
           </p>
         </div>
 
         {/* Form */}
         <form className="mt-6 lg:mt-8 space-y-4 lg:space-y-6" onSubmit={handleSubmit}>
+
+          {formType === 'forgot-password' && (
+            <>
+              <button
+                type="button"
+                onClick={() => setFormType('login')}
+                className="text-sm flex gap-1 items-center text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Back to login
+              </button>
+
+              {message && <p>{message}</p>}
+            </>
+          )}
+
           {error && (
             <div className="bg-red-50 dark:bg-red-500/10 dark:bg-red-900/50 border border-red-200 dark:border-red-400/40 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
               {error}
@@ -116,7 +142,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
           )}
 
           <div className="space-y-4">
-            {!isLogin && (
+            {formType === 'sign-up' && (
               <>
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-200 dark:text-gray-300">
@@ -127,7 +153,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
                       id="name"
                       name="name"
                       type="text"
-                      required={!isLogin}
+                      required={formType === 'sign-up'}
                       value={formData.name}
                       onChange={handleInputChange}
                       className="pl-10"
@@ -146,7 +172,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
                       id="birth_date"
                       name="birth_date"
                       type="date"
-                      required={!isLogin}
+                      required={formType === 'sign-up'}
                       value={formData.birth_date}
                       onChange={handleInputChange}
                       className="pl-10"
@@ -163,7 +189,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
                     inputType='select'
                     id="gender"
                     name="gender"
-                    required={!isLogin}
+                    required={formType === 'sign-up'}
                     value={formData.gender}
                     onChange={handleInputChange}
                   >
@@ -192,34 +218,49 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
               />
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-200 dark:text-gray-300">
-                Password
-              </label>
-              <div className="mt-1 relative">
-                <FormInput
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className="pr-10"
-                  placeholder="Enter your password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute top-[50%] translate-y-[-50%] right-0 pr-3 flex items-center"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+            {formType !== 'forgot-password' && (
+              <>
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-200 dark:text-gray-300">
+                    Password
+                  </label>
+                  <div className="mt-1 relative">
+                    <FormInput
+                      id="password"
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      className="pr-10"
+                      placeholder="Enter your password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute top-[50%] translate-y-[-50%] right-0 pr-3 flex items-center"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                      )}
+                    </button>
+                  </div>
+                  {formType === 'login' && (
+                    <div className="mt-2 text-right">
+                      <button
+                        type="button"
+                        onClick={() => setFormType('forgot-password')}
+                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300"
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
                   )}
-                </button>
-              </div>
-            </div>
+                </div>
+              </>
+            )}
           </div>
 
           <button
@@ -227,16 +268,16 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
             disabled={loading}
             className="w-full flex justify-center py-2.5 lg:py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {loading ? 'Loading...' : (isLogin ? 'Sign In' : 'Create Account')}
+            {loading ? 'Loading...' : (formType === 'login' ? 'Sign In' : (formType === 'forgot-password' ? 'Send Reset Link' : 'Create Account'))}
           </button>
 
           <div className="text-center">
             <button
               type="button"
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => setFormType(formType === 'login' ? 'sign-up' : 'login')}
               className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300"
             >
-              {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+              {formType === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
             </button>
           </div>
         </form>
