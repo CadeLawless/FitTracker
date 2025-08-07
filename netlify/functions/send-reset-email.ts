@@ -1,6 +1,6 @@
 import { Handler } from '@netlify/functions';
 import nodemailer from 'nodemailer';
-import { supabase, doesUserExist } from '../../src/lib/supabase';
+import { supabase, doesUserExist } from '../../src/lib/supabaseServer';
 import { v4 as uuidv4 } from 'uuid';
 
 const handler: Handler = async (event, context) => {
