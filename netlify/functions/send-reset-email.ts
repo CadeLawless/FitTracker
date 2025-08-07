@@ -25,14 +25,16 @@ const handler: Handler = async (event, context) => {
 
     if (userId !== false) {
       // Delete all previous password resets/tokens with same email
-      await supabase
+      const { error: deleteError } = await supabase
       .from('password_resets')
       .delete()
       .eq('email', email);
 
+      if (deleteError) throw deleteError;
+
       const resetToken = uuidv4();
 
-      const { error } = await supabase
+      const { error: insertError } = await supabase
       .from('password_resets')
       .insert([
         {
@@ -42,6 +44,8 @@ const handler: Handler = async (event, context) => {
           expires_at: new Date(Date.now() + 1000 * 60 * 60), // 1 hour from now
         },
       ]);
+
+      if (insertError) throw insertError;
 
       const transporter = nodemailer.createTransport({
         host: 'smtp.ionos.com',
