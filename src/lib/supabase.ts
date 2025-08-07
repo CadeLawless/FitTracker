@@ -45,6 +45,22 @@ export const auth = {
   },
 };
 
+export const doesUserExist = async (email: string): Promise<boolean|string> => {
+  const { data, error } = await supabase.auth.admin.listUsers();
+
+  if (error) {
+    console.error('Error fetching user:', error);
+    throw error;
+  }
+
+  const found = data.users.find((user) => user.email?.toLowerCase() === email.toLowerCase());
+  if(!!found){
+    return found.id;
+  }else{
+    return false;
+  }
+}
+
 // Body fat calculation utilities
 export const bodyFatCalculations = {
   // Navy Method for body fat calculation
