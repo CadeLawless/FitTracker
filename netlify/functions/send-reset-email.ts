@@ -30,7 +30,7 @@ const handler: Handler = async (event, context) => {
     });
 
     await transporter.sendMail({
-      from: '"FitTracker" <no-reply@fittracker.cadelawless.com>',
+      from: '"FitTracker" <support@cadelawless.com>',
       to: email,
       subject: 'Password Reset',
       text: 'Click the link to reset your password',
