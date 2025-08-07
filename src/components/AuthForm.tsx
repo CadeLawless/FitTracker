@@ -66,7 +66,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
 
         if (error) throw error;
       } else if (formType === 'forgot-password') {
-        const res = await fetch('/api/send-reset-email', {
+        const res = await fetch('/.netlify/functions/send-reset-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: formData.email }),
