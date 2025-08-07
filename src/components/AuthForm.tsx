@@ -13,7 +13,7 @@ interface AuthFormProps {
 }
 
 export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
-  const [theme, setTheme] = useState(() => {
+  const [theme, setTheme] = useState<Theme>(() => {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const defaultTheme: Theme = prefersDark ? 'dark' : 'light';
     return defaultTheme;
@@ -66,6 +66,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
 
         if (error) throw error;
       } else if (formType === 'forgot-password') {
+
         const res = await fetch('/.netlify/functions/send-reset-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -131,7 +132,11 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
                 Back to login
               </button>
 
-              {message && <p>{message}</p>}
+              {message &&
+                <div className="bg-green-50 dark:bg-green-500/10 dark:bg-green-900/50 border border-green-200 dark:border-green-400/40 dark:border-green-800 text-green-600 dark:text-green-400 px-4 py-3 rounded-lg text-sm">
+                  {message}
+                </div>
+              }
             </>
           )}
 
