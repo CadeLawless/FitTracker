@@ -3,6 +3,9 @@ import nodemailer from 'nodemailer';
 import { supabase, doesUserExist } from '../../src/lib/supabaseServer';
 import { v4 as uuidv4 } from 'uuid';
 
+console.log('SUPABASE_URL:', process.env.SUPABASE_URL);
+console.log('SUPABASE_ANON_KEY:', process.env.SUPABASE_ANON_KEY);
+
 const handler: Handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
     return {
