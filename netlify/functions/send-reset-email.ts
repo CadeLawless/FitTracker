@@ -77,8 +77,26 @@ const handler: Handler = async (event, context) => {
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="background:#fff; border-radius:8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding:30px;">
                       <tr>
                         <td align="center" style="padding-bottom:30px;">
-                          <!-- Simple text fallback logo -->
-                          <div style="font-weight:bold; font-size:28px; color:#3b82f6; margin-bottom:10px; font-family: Arial, sans-serif;">🏋️‍♂️</div>
+                          <svg xmlns="http://www.w3.org/2000/svg" 
+                            viewBox="0 0 24 24" fill="none" 
+                              stroke="currentColor" 
+                              stroke-width="2" 
+                              stroke-linecap="round" 
+                              stroke-linejoin="round" 
+                              style="
+                                width: 40px;  /* h-10 w-10 */
+                                height: 40px;
+                                color: #2563EB; /* text-blue-600 */
+                                /* no direct dark mode support in emails */
+                              ">
+                            <path d="m6.5 6.5 11 11"></path>
+                            <path d="m21 21-1-1"></path>
+                            <path d="m3 3 1 1"></path>
+                            <path d="m18 22 4-4"></path>
+                            <path d="m2 6 4-4"></path>
+                            <path d="m3 10 7-7"></path>
+                            <path d="m14 21 7-7"></path>
+                          </svg>
                           <h1 style="color:#007BFF; font-weight:700; margin:0; font-size:24px;">FitTracker Password Reset</h1>
                         </td>
                       </tr>
