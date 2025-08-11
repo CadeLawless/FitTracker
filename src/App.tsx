@@ -2,7 +2,7 @@
 // React Router handles navigation between different pages
 
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { supabase, auth } from './lib/supabase';
 import { User } from './types';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -21,10 +21,12 @@ import LogExercise from './components/LogExercise';
 import GoalsPage from './components/GoalsPage';
 import ProgressPage from './components/ProgressPage';
 import Profile from './components/Profile';
+import ResetPassword from './components/ResetPassword';
 import ResetSessionButton from './components/ResetSessionButton';
 import ScrollToTop from './components/ScrollToTop';
 
 function App() {
+  const location = useLocation();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [needsGoalSetup, setNeedsGoalSetup] = useState(false);
@@ -127,7 +129,7 @@ function App() {
   }
 
   if (!user) {
-    return <AuthForm onAuthSuccess={() => checkUser()} />;
+    return location.pathname === '/reset-password/' ? <ResetPassword /> : <AuthForm onAuthSuccess={() => checkUser()} />;
   }
 
   if (needsGoalSetup) {
