@@ -50,6 +50,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setMessage('');
 
     try {
       if (formType === 'login') {
@@ -125,7 +126,11 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
             <>
               <button
                 type="button"
-                onClick={() => setFormType('login')}
+                onClick={() => {
+                  setFormType('login');
+                  setMessage('');
+                  setError('');
+                }}
                 className="text-sm flex gap-1 items-center text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -276,15 +281,20 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
             {loading ? 'Loading...' : (formType === 'login' ? 'Sign In' : (formType === 'forgot-password' ? 'Send Reset Link' : 'Create Account'))}
           </button>
 
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => setFormType(formType === 'login' ? 'sign-up' : 'login')}
-              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300"
-            >
-              {formType === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
-            </button>
-          </div>
+          {formType !== 'forgot-password' && 
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setFormType(formType === 'login' ? 'sign-up' : 'login');
+                  setError('');
+                }}
+                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300"
+              >
+                {formType === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+              </button>
+            </div>
+          }
         </form>
       </div>
     </div>

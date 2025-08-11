@@ -7,6 +7,30 @@
   transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
+/* Fix for auto-filled inputs */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #FFF inset !important;
+  background-color: #fff !important;
+  -webkit-text-fill-color: rgb(17 24 39) !important;
+  color: rgb(17 24 39) !important;
+  caret-color: rgb(17 24 39) !important;
+}
+
+.dark :is(input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active) {
+  -webkit-box-shadow: 0 0 0 1000px rgb(55 65 81) inset !important;
+  -webkit-text-fill-color: rgb(243 244 246) !important;
+  background-color: rgb(55 65 81) !important;
+  color: rgb(243 244 246) !important;
+  caret-color: rgb(243 244 246) !important;
+
+}
+
 /* Custom scrollbar for dark mode */
 @layer base {
   ::-webkit-scrollbar {

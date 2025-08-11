@@ -57,7 +57,7 @@ const handler: Handler = async (event, context) => {
         },
       });
 
-      const resetLink = `https://fittracker.cadelawless.com/reset-password?token=${resetToken}`;
+      const resetLink = `https://fittracker.cadelawless.com/reset-password/?token=${resetToken}`;
 
       await transporter.sendMail({
         from: '"FitTracker" <support@cadelawless.com>',

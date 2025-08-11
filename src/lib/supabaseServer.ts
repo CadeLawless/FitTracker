@@ -24,3 +24,43 @@ export const doesUserExist = async (email: string): Promise<boolean|string> => {
     return false;
   }
 }
+
+interface resetPasswordResult {
+  success: boolean;
+  message: string;
+};
+
+export const resetPassword = async (token: string, newPassword: string): Promise<resetPasswordResult> => {
+  const { data: tokenData, error } = await supabase
+    .from('password_resets')
+    .select('user_id, expires_at, used')
+    .eq('token', token)
+    .maybeSingle();
+
+  if (error || !tokenData || tokenData.used || new Date(tokenData.expires_at) < new Date()) {
+    return {
+      success: false,
+      message: 'Invalid or expired password reset token',
+    };
+  }
+
+  // 2. Update user password in Supabase Auth using Admin API
+  const { data: user, error: updateError } = await supabase.auth.admin.updateUserById(tokenData.user_id, {
+    password: newPassword,
+  });
+
+  if (updateError) {
+    throw updateError;
+  }
+
+  // 3. Mark token as used
+  await supabase
+    .from('password_resets')
+    .update({ used: true })
+    .eq('token', token);
+
+    return {
+      success: !!user,
+      message: user ? 'Password changed successfully. Click the button below to log in.' : 'Unknown error. Failed to reset password.',
+    };
+}
