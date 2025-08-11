@@ -139,27 +139,25 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <Router>
-          <ScrollToTop />
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/weight" element={<WeightTracker />} />
-              <Route path="/measurements" element={<MeasurementsTracker />} />
-              <Route path="/workouts" element={<WorkoutsPage />} />
-              <Route path="/workouts/routines/new" element={<RoutineBuilder />} />
-              <Route path="/workouts/routines/:id/edit" element={<RoutineBuilder />} />
-              <Route path="/workouts/start" element={<WorkoutSession />} />
-              <Route path="/workouts/log-exercise" element={<LogExercise />} />
-              <Route path="/workouts/session/:id" element={<WorkoutSessionDetails />} />
-              <Route path="/goals" element={<GoalsPage />} />
-              <Route path="/progress" element={<ProgressPage />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Layout>
-          <ResetSessionButton />
-        </Router>
+        <ScrollToTop />
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/weight" element={<WeightTracker />} />
+            <Route path="/measurements" element={<MeasurementsTracker />} />
+            <Route path="/workouts" element={<WorkoutsPage />} />
+            <Route path="/workouts/routines/new" element={<RoutineBuilder />} />
+            <Route path="/workouts/routines/:id/edit" element={<RoutineBuilder />} />
+            <Route path="/workouts/start" element={<WorkoutSession />} />
+            <Route path="/workouts/log-exercise" element={<LogExercise />} />
+            <Route path="/workouts/session/:id" element={<WorkoutSessionDetails />} />
+            <Route path="/goals" element={<GoalsPage />} />
+            <Route path="/progress" element={<ProgressPage />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Layout>
+        <ResetSessionButton />
       </AuthProvider>
     </ThemeProvider>
   );
