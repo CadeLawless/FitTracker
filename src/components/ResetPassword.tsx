@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dumbbell, Eye, EyeOff, Moon, Sun } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { supabase, auth } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import FormInput from './ui/FormInput';
 
 type Theme = 'light' | 'dark';
@@ -26,6 +26,7 @@ export default function ResetPassword() {
   const token = searchParams.get('token');
 
   const [passwordReset, setPasswordReset] = useState<passwordReset|null>(null);
+  const [success, setSuccess] = useState<boolean>(false);
 
   const [message, setMessage] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -101,6 +102,7 @@ export default function ResetPassword() {
       const data = await res.json();
       if (data.success) {
         setMessage(data.message);
+        setSuccess(true);
       } else {
         setError(data.message);
       }
@@ -166,7 +168,18 @@ export default function ResetPassword() {
           </div>
         }
 
-        {passwordReset && !resetExpired && !passwordReset.used &&
+        {success &&
+          <div className='text-center'>
+            <Link
+              to={'/'}
+              className="inline-block mt-4 py-2.5 lg:py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            >
+              Go to Login
+            </Link>
+          </div>
+        }
+
+        {!success && passwordReset && !resetExpired && !passwordReset.used &&
           <>
             {/* Form */}
             <form className="mt-6 lg:mt-8 space-y-4 lg:space-y-6" onSubmit={handleSubmit}>
