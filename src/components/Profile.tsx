@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Save, Calendar, Ruler, Activity, Mail, Edit2, X, Check } from 'lucide-react';
+import { User, Save, Calendar, Ruler, Activity, Mail, Edit2, X, Check, Lock, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/date';
 import { scrollToRef } from '../lib/htmlElement';
@@ -13,6 +13,9 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [changePassword, setChangePassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState<boolean>(false);
+  const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -26,7 +29,13 @@ export default function Profile() {
     activity_level: '',
   });
 
+  const [changePasswordFormData, setChangePasswordFormData] = useState({
+    current_password: '',
+    new_password: '',
+  });
+
   const formRef = useRef<HTMLFormElement>(null);
+  const changePasswordFormRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     if(authLoading) return;
@@ -53,6 +62,23 @@ export default function Profile() {
     scrollToRef(formRef, editing && isRefPresent);
   }, [editing]);
   
+  useEffect(() => {
+    const isRefPresent = !!changePasswordFormRef.current;
+    scrollToRef(changePasswordFormRef, changePassword && isRefPresent);
+  }, [changePassword]);
+  
+  useEffect(() => {
+    if(success !== ''){
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+  }, [success]);
+
+  useEffect(() => {
+    if(editing && error !== ''){
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+  }, [error]);
+
   const loadProfile = async () => {
     try {
       if (!user) return;
@@ -157,6 +183,47 @@ export default function Profile() {
     });
   };
 
+  const handleChangePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      if (!user) throw new Error('No authenticated user');
+
+      const { error: currentPasswordError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: changePasswordFormData.current_password
+      });
+
+      if (currentPasswordError) {
+        throw new Error('Incorrect current password');
+      }
+
+      if(changePasswordFormData.new_password.length < 6){
+        throw new Error('New Password must be at least 6 characters long');
+      }
+
+      const { error: newPasswordError } = await supabase.auth.updateUser({
+        password: changePasswordFormData.new_password
+      })
+      if (newPasswordError) {
+        console.error('Error updating password:', newPasswordError.message);
+        setError('Something went wrong while trying to change your password');
+      } else {
+        setSuccess('Password changed successfully!');
+        setChangePassword(false);
+      }
+    } catch (error: any) {
+      console.error('Error changing password:', error);
+      setError(error.message || 'Failed to change password');
+    } finally {
+      setSaving(false);
+    }
+
+  }
+
   const calculateAge = (birthDate: string): number => {
     if (!birthDate) return 0;
     const today = new Date();
@@ -204,7 +271,10 @@ export default function Profile() {
         </div>
         {!editing && (
           <button
-            onClick={() => setEditing(true)}
+            onClick={() => {
+              setEditing(true);
+              setChangePassword(false);
+            }}
             className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm lg:text-base"
           >
             <Edit2 className="h-4 w-4 mr-2" />
@@ -221,7 +291,7 @@ export default function Profile() {
         </div>
       )}
 
-      {error && (
+      {editing && error && (
         <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-400/40 text-red-600 px-4 py-3 rounded-lg text-sm lg:text-base">
           {error}
         </div>
@@ -513,6 +583,123 @@ export default function Profile() {
                     {profile?.updated_at ? new Date(profile.updated_at).toLocaleDateString() : 'Never'}
                   </p>
                 </div>
+                <h3 className="text-sm lg:text-base font-medium col-span-full text-gray-900 dark:text-gray-100 mt-4">Password &amp; Security</h3>
+                {!changePassword ? (
+                  <div>
+                    <button
+                      onClick={() => {
+                        setChangePassword(true);
+                        setEditing(false);
+                      }}
+                      className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                    >
+                      <Lock className="h-4 w-4 mr-2" />
+                      Change Password
+                    </button>
+                  </div>
+                ) : (
+                  <form
+                    ref={changePasswordFormRef}
+                    onSubmit={handleChangePasswordSubmit}
+                    className="col-span-full grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm"
+                  >
+                    <div className="col-span-full text-base font-medium col-span-full text-gray-900 dark:text-gray-300 mt-3">
+                      Change Password
+                    </div>
+                    {error && (
+                      <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-400/40 text-red-600 px-4 py-3 rounded-lg text-sm lg:text-base">
+                        {error}
+                      </div>
+                    )}
+                    <div>
+                      <label htmlFor="current_password" className="block text-sm font-medium text-gray-700 dark:text-gray-200 dark:text-gray-300">
+                        Current Password
+                      </label>
+                      <div className="mt-1 relative">
+                        <FormInput
+                            id="current_password"
+                            name="current_password"
+                            type={showCurrentPassword ? 'text' : 'password'}
+                            required
+                            value={changePasswordFormData.current_password}
+                            onChange={(e) => setChangePasswordFormData({
+                              ...changePasswordFormData,
+                              current_password: e.target.value,
+                            })}
+                            className="pr-10"
+                            placeholder="Enter your current password"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                            className="absolute top-[50%] translate-y-[-50%] right-0 pr-3 flex items-center"
+                        >
+                          {showCurrentPassword ? (
+                          <EyeOff className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                          ) : (
+                          <Eye className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <label htmlFor="new_password" className="block text-sm font-medium text-gray-700 dark:text-gray-200 dark:text-gray-300">
+                        New Password
+                      </label>
+                      <div className="mt-1 relative">
+                        <FormInput
+                            id="new_password"
+                            name="new_password"
+                            type={showNewPassword ? 'text' : 'password'}
+                            required
+                            value={changePasswordFormData.new_password}
+                            onChange={(e) => setChangePasswordFormData({
+                              ...changePasswordFormData,
+                              new_password: e.target.value,
+                            })}
+                            className="pr-10"
+                            placeholder="Enter your new password"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                            className="absolute top-[50%] translate-y-[-50%] right-0 pr-3 flex items-center"
+                        >
+                          {showNewPassword ? (
+                          <EyeOff className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                          ) : (
+                          <Eye className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex flex-col col-span-full sm:flex-row justify-end gap-3 pt-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setChangePassword(false);
+                          setError('');
+                          setSuccess('');
+                          setChangePasswordFormData({
+                            current_password: '',
+                            new_password: '',
+                          });
+                        }}
+                        className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors text-sm lg:text-base"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={saving}
+                        className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm lg:text-base"
+                      >
+                        <Lock className="h-4 w-4 mr-2" />
+                        {saving ? 'Changing...' : 'Confirm Change'}
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
             </div>
           </div>

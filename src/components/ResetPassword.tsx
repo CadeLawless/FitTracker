@@ -89,8 +89,12 @@ export default function ResetPassword() {
     setMessage('');
 
     try {
-      if(formData.new_password !== formData.confirm_password){
+      if (formData.new_password !== formData.confirm_password) {
         throw {message: 'New Password and Confirm New Password must match'};
+      }
+      
+      if(formData.new_password.length < 6) {
+        throw {message: 'New Password must be at least 6 characters long'};
       }
 
       const res = await fetch('/.netlify/functions/reset-password', {
@@ -208,7 +212,7 @@ export default function ResetPassword() {
                         value={formData.new_password}
                         onChange={handleInputChange}
                         className="pr-10"
-                        placeholder="Enter your password"
+                        placeholder="Enter new password"
                     />
                     <button
                         type="button"
@@ -236,7 +240,7 @@ export default function ResetPassword() {
                             value={formData.confirm_password}
                             onChange={handleInputChange}
                             className="pr-10"
-                            placeholder="Enter your password"
+                            placeholder="Enter same password"
                         />
                     </div>
                 </div>
