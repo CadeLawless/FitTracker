@@ -920,7 +920,7 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
   
             {/* Exercise Actions */}
             <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-8">
                 {!showCustomTimer ? (
                   <button
                     onClick={() => setShowCustomTimer(true)}
@@ -930,12 +930,12 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
                     Custom Rest Timer
                   </button>
                 ) : (
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center justify-center gap-x-3 gap-y-4 flex-wrap">
                     <div className="flex items-center gap-1">
                       <FormInput
                         inputMode="numeric"
                         type="number"
-                        value={customRestMinutes}
+                        value={customRestMinutes === 0 ? '' : customRestMinutes}
                         onChange={(e) => setCustomRestMinutes(parseInt(e.target.value) || 0)}
                         className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
                         min="0"
@@ -947,7 +947,8 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
                       <FormInput
                         inputMode="numeric"
                         type="number"
-                        value={customRestSeconds}
+                        value={customRestSeconds === 0 ? '' : customRestSeconds}
+                        placeholder='0'
                         onChange={(e) => setCustomRestSeconds(parseInt(e.target.value) || 0)}
                         className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
                         min="0"
@@ -955,40 +956,46 @@ console.log('Cancel workout clicked for session:', workoutState.session?.id);
                       />
                       <span className="text-sm text-gray-600 dark:text-gray-400">sec</span>
                     </div>
-                    <button
-                      onClick={startCustomRestTimer}
-                      className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
-                    >
-                      Start
-                    </button>
-                    <button
-                      onClick={() => setShowCustomTimer(false)}
-                      className="px-3 py-1 border border-gray-300 text-gray-700 dark:text-gray-200 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-900/50"
-                    >
-                      Cancel
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={startCustomRestTimer}
+                        className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                      >
+                        Start
+                      </button>
+                      <button
+                        onClick={() => setShowCustomTimer(false)}
+                        className="px-3 py-1 border border-gray-300 text-gray-700 dark:text-gray-200 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-900/50"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
                 )}
   
-                {workoutState.currentExerciseIndex > 0 && (
-                  <button
-                    onClick={previousExercise}
-                    className="flex items-center justify-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Previous
-                  </button>
-                )}
-                
-                {workoutState.currentExerciseIndex < routineExercises.length - 1 && (
-                  <button
-                    onClick={nextExercise}
-                    className="flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                  >
-                    Next
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </button>
-                )}
+                {routineExercises.length > 1 &&
+                  <div className='flex gap-3'>
+                    {workoutState.currentExerciseIndex > 0 && (
+                      <button
+                        onClick={previousExercise}
+                        className="flex items-center justify-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                      >
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        Previous
+                      </button>
+                    )}
+                    
+                    {workoutState.currentExerciseIndex < routineExercises.length - 1 && (
+                      <button
+                        onClick={nextExercise}
+                        className="flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                      >
+                        Next
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </button>
+                    )}
+                  </div>
+                }
               </div>
             </div>
           </div>

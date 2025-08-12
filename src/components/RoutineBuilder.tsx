@@ -582,8 +582,8 @@ export default function RoutineBuilder() {
 
                         {/* Rest Timer - Minutes and Seconds */}
                         <div className="mt-3">
-                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-2">
-                            <Timer className="h-3 w-3 inline mr-1" />
+                          <label className="flex items-center gap-1 text-xs font-medium text-gray-700 dark:text-gray-200 mb-2">
+                            <Timer className="h-3 w-3" />
                             Rest Time
                           </label>
                           <div className="flex items-center gap-2">
@@ -593,7 +593,7 @@ export default function RoutineBuilder() {
                                 type="number"
                                 min="0"
                                 max="59"
-                                value={getRestMinutes(routineExercise.rest_seconds)}
+                                value={getRestMinutes(routineExercise.rest_seconds) === 0 ? '' : getRestMinutes(routineExercise.rest_seconds)}
                                 onChange={(e) => updateRestTime(
                                   index, 
                                   parseInt(e.target.value) || 0, 
@@ -610,7 +610,7 @@ export default function RoutineBuilder() {
                                 type="number"
                                 min="0"
                                 max="59"
-                                value={getRestSecondsRemainder(routineExercise.rest_seconds)}
+                                value={getRestSecondsRemainder(routineExercise.rest_seconds) === 0 ? '' : getRestSecondsRemainder(routineExercise.rest_seconds)}
                                 onChange={(e) => updateRestTime(
                                   index, 
                                   getRestMinutes(routineExercise.rest_seconds), 
@@ -621,11 +621,6 @@ export default function RoutineBuilder() {
                               />
                               <span className="text-xs text-gray-500">sec</span>
                             </div>
-                            {routineExercise.rest_seconds && routineExercise.rest_seconds > 0 && (
-                              <span className="text-xs text-gray-400 ml-2">
-                                ({routineExercise.rest_seconds}s total)
-                              </span>
-                            )}
                           </div>
                         </div>
                         
