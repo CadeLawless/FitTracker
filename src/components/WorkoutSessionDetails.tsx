@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Clock, Scale, Calendar, Dumbbell, Target, TrendingUp, Edit2, Save, X, RotateCcw, Timer } from 'lucide-react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -9,6 +9,7 @@ import FormInput from './ui/FormInput';
 import { formatMinutes } from '../lib/formatMinutes';
 import { getSessionStatusBadge } from '../lib/getSessionStatusBadge';
 import { insertHTMLLineBreaks } from '../lib/insertHTMLLineBreaks';
+import { scrollToRef } from '../lib/htmlElement';
 
 interface WorkoutSessionWithSets extends WorkoutSession {
   sets: (ExerciseSet & { exercise: Exercise })[];
@@ -35,6 +36,13 @@ export default function WorkoutSessionDetails() {
     reps: '', 
     durationMinutes: '' 
   });
+
+  const notesSectionRef = useRef<HTMLDivElement|null>(null);
+
+  useEffect(() => {
+    const isRefCurrent = !!notesSectionRef.current;
+    scrollToRef(notesSectionRef, showNotesForm && isRefCurrent);
+  }, [showNotesForm]);
 
   useEffect(() => {
     if(authLoading) return;
@@ -568,7 +576,7 @@ export default function WorkoutSessionDetails() {
       </div>
 
       {/* Notes Section */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
+      <div ref={notesSectionRef} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
         <div className="flex flex-wrap justify-between items-center gap-2 mb-3">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Workout Notes</h3>
           {!showNotesForm && (
