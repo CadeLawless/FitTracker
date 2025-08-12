@@ -607,7 +607,7 @@ export default function Profile() {
                       Change Password
                     </div>
                     {error && (
-                      <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-400/40 text-red-600 px-4 py-3 rounded-lg text-sm lg:text-base">
+                      <div className="col-span-full bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-400/40 text-red-600 px-4 py-3 rounded-lg text-sm lg:text-base">
                         {error}
                       </div>
                     )}
