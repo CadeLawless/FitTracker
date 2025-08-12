@@ -217,7 +217,10 @@ export default function WorkoutSessionDetails() {
 
       if (error) throw error;
       setShowNotesForm(false);
-      loadWorkoutSession();
+      setSession({
+        ...session,
+        notes: workoutNotes,
+      });
     } catch (error) {
       console.error('Error updating notes:', error);
     }
@@ -575,6 +578,20 @@ export default function WorkoutSessionDetails() {
         ))}
       </div>
 
+      {/* Empty State */}
+      {exerciseGroups.length === 0 && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-8 lg:p-12 text-center">
+          <Dumbbell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-500 mb-2">No exercises logged for this workout</p>
+          <p className="text-sm text-gray-400">
+            {session.status === 'active' 
+              ? 'Resume this session to start logging exercises.'
+              : 'This workout session doesn\'t have any recorded sets.'
+            }
+          </p>
+        </div>
+      )}
+
       {/* Notes Section */}
       <div ref={notesSectionRef} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 lg:p-6">
         <div className="flex flex-wrap justify-between items-center gap-2 mb-3">
@@ -620,23 +637,9 @@ export default function WorkoutSessionDetails() {
             </div>
           </form>
         ) : (
-          <p className="text-gray-700 dark:text-gray-200">{insertHTMLLineBreaks(session?.notes ?? "No notes")}</p>
+          <p className="text-gray-700 dark:text-gray-200">{insertHTMLLineBreaks(session?.notes && session.notes.trim() !== '' ? session.notes : "No notes")}</p>
         )}
       </div>
-
-      {/* Empty State */}
-      {exerciseGroups.length === 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-8 lg:p-12 text-center">
-          <Dumbbell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500 mb-2">No exercises logged for this workout</p>
-          <p className="text-sm text-gray-400">
-            {session.status === 'active' 
-              ? 'Resume this session to start logging exercises.'
-              : 'This workout session doesn\'t have any recorded sets.'
-            }
-          </p>
-        </div>
-      )}
     </div>
   );
 }
