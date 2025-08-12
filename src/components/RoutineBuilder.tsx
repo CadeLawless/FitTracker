@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, GripVertical, Save, X, Search, Dumbbell, Edit2, Timer } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, Trash2, Save, X, Search, Dumbbell, Edit2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Exercise, RoutineExercise } from '../types';
@@ -7,6 +7,7 @@ import { useCustomExercises } from '../hooks/useCustomExercises';
 import { CustomExerciseForm } from '../components/CustomExerciseForm';
 import { useAuth } from '../contexts/AuthContext';
 import FormInput from './ui/FormInput';
+import { RoutineExerciseList } from './RoutineExerciseList';
 
 export default function RoutineBuilder() {
   const { user, authLoading } = useAuth();
@@ -19,7 +20,6 @@ export default function RoutineBuilder() {
   const [saving, setSaving] = useState(false);
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -190,77 +190,10 @@ export default function RoutineBuilder() {
     }
   };
 
-  const removeExercise = (index: number) => {
-    setRoutineExercises(routineExercises.filter((_, i) => i !== index));
-  };
-
   const updateExercise = (index: number, field: keyof RoutineExercise, value: any) => {
     const updated = [...routineExercises];
     updated[index] = { ...updated[index], [field]: value };
     setRoutineExercises(updated);
-  };
-
-  // Helper functions for rest timer
-  const getRestMinutes = (restSeconds: number | null | undefined): number => {
-    if (!restSeconds) return 0;
-    return Math.floor(restSeconds / 60);
-  };
-
-  const getRestSecondsRemainder = (restSeconds: number | null | undefined): number => {
-    if (!restSeconds) return 0;
-    return restSeconds % 60;
-  };
-
-  const updateRestTime = (index: number, minutes: number, seconds: number) => {
-    const totalSeconds = minutes * 60 + seconds;
-    updateExercise(index, 'rest_seconds', totalSeconds);
-  };
-
-  // Drag and drop handlers
-  const handleDragStart = (e: React.DragEvent, index: number) => {
-    setDraggedIndex(index);
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/html', '');
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  };
-
-  const handleDragEnter = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
-    e.preventDefault();
-    
-    if (draggedIndex === null || draggedIndex === dropIndex) {
-      setDraggedIndex(null);
-      return;
-    }
-
-    const newExercises = [...routineExercises];
-    const draggedExercise = newExercises[draggedIndex];
-    
-    // Remove the dragged exercise
-    newExercises.splice(draggedIndex, 1);
-    
-    // Insert at new position
-    newExercises.splice(dropIndex, 0, draggedExercise);
-    
-    // Update order_index for all exercises
-    const updatedExercises = newExercises.map((exercise, index) => ({
-      ...exercise,
-      order_index: index,
-    }));
-    
-    setRoutineExercises(updatedExercises);
-    setDraggedIndex(null);
-  };
-
-  const handleDragEnd = () => {
-    setDraggedIndex(null);
   };
 
   const filteredExercises = availableExercises.filter(exercise =>
@@ -471,173 +404,13 @@ export default function RoutineBuilder() {
             </div>
           </div>
           
-          <div className="p-4 lg:p-6">
+          <div className="relative m-4 lg:m-6">
             {routineExercises.length > 0 ? (
-              <div className="space-y-4">
-                {routineExercises.map((routineExercise, index) => (
-                  <div 
-                    key={routineExercise.id} 
-                    className={`border border-gray-200 dark:border-gray-600 rounded-lg p-4 transition-all duration-200 ${
-                      draggedIndex === index ? 'opacity-50 scale-95' : 'hover:shadow-md'
-                    }`}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, index)}
-                    onDragOver={handleDragOver}
-                    onDragEnter={handleDragEnter}
-                    onDrop={(e) => handleDrop(e, index)}
-                    onDragEnd={handleDragEnd}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="flex items-center cursor-move">
-                        <GripVertical className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:text-gray-400 transition-colors" />
-                        <span className="ml-2 text-sm font-medium text-gray-500">#{index + 1}</span>
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-3">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-medium text-gray-900 dark:text-gray-100">{routineExercise.exercise?.name}</h3>
-                              {routineExercise.exercise?.is_custom && (
-                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-400/20 text-green-800 dark:text-green-200">
-                                  Custom
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">{routineExercise.exercise?.muscle_group}</p>
-                            {routineExercise.exercise?.equipment && (
-                              <p className="text-xs text-gray-500">{routineExercise.exercise.equipment}</p>
-                            )}
-                          </div>
-                          <button
-                            onClick={() => removeExercise(index)}
-                            className="text-gray-400 hover:text-red-600 transition-colors"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-
-                        {/* Skip Weight/Reps Checkboxes */}
-                        <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
-                          <div className="flex flex-wrap gap-4">
-                            <label className="flex items-center">
-                              <input
-                                type="checkbox"
-                                checked={!routineExercise.requires_weight}
-                                onChange={(e) => updateExercise(index, 'requires_weight', !e.target.checked)}
-                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                              />
-                              <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">Skip Weight</span>
-                            </label>
-                            <label className="flex items-center">
-                              <input
-                                type="checkbox"
-                                checked={!routineExercise.requires_reps}
-                                onChange={(e) => updateExercise(index, 'requires_reps', !e.target.checked)}
-                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                              />
-                              <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">Skip Reps</span>
-                            </label>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Sets</label>
-                            <FormInput
-                              inputMode="numeric"
-                              type="number"
-                              min="1"
-                              value={routineExercise.target_sets}
-                              onChange={(e) => updateExercise(index, 'target_sets', parseInt(e.target.value))}
-                            />
-                          </div>
-                          {routineExercise.requires_reps && (
-                            <div>
-                              <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Reps</label>
-                              <FormInput
-                                inputMode="numeric"
-                                type="number"
-                                min="1"
-                                value={routineExercise.target_reps || ''}
-                                onChange={(e) => updateExercise(index, 'target_reps', e.target.value ? parseInt(e.target.value) : null)}
-                                placeholder="10"
-                              />
-                            </div>
-                          )}
-                          {routineExercise.requires_weight && (
-                            <div>
-                              <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Weight (lbs)</label>
-                              <FormInput
-                                type="number"
-                                step="0.5"
-                                min="0"
-                                value={routineExercise.target_weight || ''}
-                                onChange={(e) => updateExercise(index, 'target_weight', e.target.value ? parseFloat(e.target.value) : null)}
-                                placeholder="135"
-                              />
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Rest Timer - Minutes and Seconds */}
-                        <div className="mt-3">
-                          <label className="flex items-center gap-1 text-xs font-medium text-gray-700 dark:text-gray-200 mb-2">
-                            <Timer className="h-3 w-3" />
-                            Rest Time
-                          </label>
-                          <div className="flex items-center gap-2">
-                            <div className="flex items-center gap-1">
-                              <FormInput
-                                inputMode="numeric"
-                                type="number"
-                                min="0"
-                                max="59"
-                                value={getRestMinutes(routineExercise.rest_seconds) === 0 ? '' : getRestMinutes(routineExercise.rest_seconds)}
-                                onChange={(e) => updateRestTime(
-                                  index, 
-                                  parseInt(e.target.value) || 0, 
-                                  getRestSecondsRemainder(routineExercise.rest_seconds)
-                                )}
-                                className="w-16 px-2 py-1"
-                                placeholder="2"
-                              />
-                              <span className="text-xs text-gray-500">min</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <FormInput
-                                inputMode="numeric"
-                                type="number"
-                                min="0"
-                                max="59"
-                                value={getRestSecondsRemainder(routineExercise.rest_seconds) === 0 ? '' : getRestSecondsRemainder(routineExercise.rest_seconds)}
-                                onChange={(e) => updateRestTime(
-                                  index, 
-                                  getRestMinutes(routineExercise.rest_seconds), 
-                                  parseInt(e.target.value) || 0
-                                )}
-                                className="w-16 px-2 py-1"
-                                placeholder="0"
-                              />
-                              <span className="text-xs text-gray-500">sec</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="mt-3">
-                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Notes (optional)</label>
-                          <FormInput
-                            type="text"
-                            value={routineExercise.notes || ''}
-                            onChange={(e) => updateExercise(index, 'notes', e.target.value)}
-                            placeholder="Form cues, variations, etc."
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <RoutineExerciseList
+                routineExercises={routineExercises}
+                setRoutineExercises={setRoutineExercises}
+                updateExercise={updateExercise}
+              />
             ) : (
               <div className="text-center py-8">
                 <Plus className="h-12 w-12 text-gray-300 mx-auto mb-4" />

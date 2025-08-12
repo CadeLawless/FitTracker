@@ -7,6 +7,12 @@
   transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
+/* dragging cursor */
+body.dragging * {
+  cursor: grabbing !important;
+  user-select: none !important;
+}
+
 /* Fix for auto-filled inputs */
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
